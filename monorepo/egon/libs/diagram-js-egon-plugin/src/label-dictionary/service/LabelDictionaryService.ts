@@ -1,17 +1,19 @@
 import { LabelEntry } from "../domain/labelEntry";
 import { WorkObjectLabelEntry } from "../domain/workObjectLabelEntry";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
-import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
 import { ElementTypes } from "../../domain/entities/elementTypes";
+import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
 
 export class LabelDictionaryService {
+    static $inject: string[] = [];
+
     activityLabels: LabelEntry[] = [];
     workObjektLabels: WorkObjectLabelEntry[] = [];
 
     constructor(
         // private massNamingService: MassNamingService,
-        private elementRegistryService: ElementRegistryService,
-        private iconDictionaryService: IconDictionaryService,
+        private readonly elementRegistryService: ElementRegistryService,
+        private readonly iconDictionaryService: IconDictionaryService,
         // private dialogService: DialogService,
         // private snackbar: MatSnackBar,
     ) {}
@@ -147,3 +149,8 @@ export class LabelDictionaryService {
     //     }
     // }
 }
+
+LabelDictionaryService.$inject = [
+    "domainStoryIconDictionaryService",
+    "domainStoryElementRegistryService",
+];
