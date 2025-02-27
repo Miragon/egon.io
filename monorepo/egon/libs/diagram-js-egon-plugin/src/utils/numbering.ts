@@ -8,8 +8,6 @@ import { ActivityCanvasObject } from "../domain/entities/activityCanvasObject";
 const numberRegistry: SVGElement[] = [];
 const multipleNumberRegistry = [false];
 
-const canvasElementRegistry = new ElementRegistryService();
-
 export interface Box {
     x: number;
     y: number;
@@ -98,6 +96,7 @@ export function numberBoxDefinitions(element: Connection): Box {
 export function generateAutomaticNumber(
     elementActivity: Element,
     commandStack: CommandStack,
+    canvasElementRegistry: ElementRegistryService,
 ) {
     const semantic = elementActivity.businessObject;
     const usedNumbers = [0];
@@ -179,7 +178,7 @@ export function updateExistingNumbersAtEditing(
 }
 
 // get the IDs of activities with their associated number, only returns activities that are originating from an actor
-export function getNumbersAndIDs() {
+export function getNumbersAndIDs(canvasElementRegistry: ElementRegistryService) {
     const iDWithNumber = [];
     const activities = canvasElementRegistry.getActivitiesFromActors();
 

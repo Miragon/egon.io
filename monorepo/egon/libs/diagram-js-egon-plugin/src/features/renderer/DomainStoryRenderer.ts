@@ -28,6 +28,9 @@ import { countLines, labelPosition } from "../labeling/position";
 import { calculateTextWidth } from "../labeling/utils";
 import { angleBetween } from "../../utils/mathExtensions";
 import { getScaledPath, isCustomIcon, isCustomSvgIcon } from "../../utils/util";
+import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
+import { DirtyFlagService } from "../../domain/service/DirtyFlagService";
+import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 
 const RENDERER_IDS = new Ids();
 const numbers = [];
@@ -44,8 +47,11 @@ export class DomainStoryRenderer extends BaseRenderer {
         eventBus: EventBus,
         private readonly styles: Styles,
         private readonly canvas: Canvas,
-        private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
         private readonly commandStack: CommandStack,
+        private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
+        private readonly elementRegistryService: ElementRegistryService,
+        private readonly dirtyFlagService: DirtyFlagService,
+        private readonly iconDictionaryService: IconDictionaryService,
     ) {
         super(eventBus, 2000);
 
@@ -82,8 +88,8 @@ export class DomainStoryRenderer extends BaseRenderer {
         const type = shape["type"];
         shape.businessObject.type = type;
 
-        elementRegistryService.correctInitialize();
-        dirtyFlagService.makeDirty();
+        this.elementRegistryService.correctInitialize();
+        this.dirtyFlagService.makeDirty();
 
         if (type.includes(ElementTypes.ACTOR)) {
             return this.drawActor(visuals, shape);
@@ -115,7 +121,7 @@ export class DomainStoryRenderer extends BaseRenderer {
     override drawConnection(visuals: SVGElement, connection: Connection): SVGElement {
         const type = connection["type"];
 
-        dirtyFlagService.makeDirty();
+        this.dirtyFlagService.makeDirty();
 
         // fixes activities that were copy-pasted
         if (!connection.businessObject.type) {
@@ -135,11 +141,10 @@ export class DomainStoryRenderer extends BaseRenderer {
             width: element.width,
             height: element.height,
         };
-        let iconSRC =
-            iconDictionaryService.getTypeIconSRC(
-                ElementTypes.ACTOR,
-                getIconId(element["type"]),
-            ) ?? "";
+        let iconSRC = this.iconDictionaryService.getTypeIconSRC(
+            ElementTypes.ACTOR,
+            getIconId(element["type"]),
+        );
         iconSRC = this.getIconSvg(iconSRC, element);
         const actor = svgCreate(iconSRC);
 
@@ -158,7 +163,7 @@ export class DomainStoryRenderer extends BaseRenderer {
             y: element.height / 2 - 25,
         };
         let iconSRC =
-            iconDictionaryService.getTypeIconSRC(
+            this.iconDictionaryService.getTypeIconSRC(
                 ElementTypes.WORKOBJECT,
                 getIconId(element["type"]),
             ) ?? "";
@@ -431,7 +436,7 @@ export class DomainStoryRenderer extends BaseRenderer {
         const match = iconSvg.match(/fill=\s*"(?!none).*?"|fill:\s*[#r]\w*[;\s]{1}/);
         if (match && match.some((it) => it)) {
             return iconSvg
-                .replaceAll(/fill=\s*"(?!none).*?"/g, `fill="${pickedColor} "`)
+                .replaceAll(/fill=\s*"(?!none).*?"/g, `fill="${pickedColor}"`)
                 .replaceAll(/fill:\s*[#r]\w*[;\s]{1}/g, `fill:${pickedColor};`);
         } else {
             const index = iconSvg.indexOf("<svg ") + 5;
@@ -735,7 +740,11 @@ export class DomainStoryRenderer extends BaseRenderer {
                 element.source["type"] &&
                 element.source["type"].includes(ElementTypes.ACTOR)
             ) {
-                generateAutomaticNumber(element, this.commandStack);
+                generateAutomaticNumber(
+                    element,
+                    this.commandStack,
+                    this.elementRegistryService,
+                );
             }
 
             // render the background for the number
@@ -875,6 +884,9 @@ DomainStoryRenderer.$inject = [
     "eventBus",
     "styles",
     "canvas",
-    "domainStoryTextRenderer",
     "commandStack",
+    "domainStoryTextRenderer",
+    "domainStoryElementRegistryService",
+    "domainStoryDirtyFlagService",
+    "domainStoryIconDictionaryService",
 ];
