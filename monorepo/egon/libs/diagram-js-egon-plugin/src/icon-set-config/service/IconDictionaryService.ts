@@ -176,7 +176,6 @@ export class IconDictionaryService {
     }
 
     getTypeIconSRC(type: ElementTypes, name: string): string {
-        console.debug("getTypeIconSRC", this.selectedActorsDictionary);
         if (type === ElementTypes.ACTOR) {
             return this.selectedActorsDictionary.get(name);
         } else if (type === ElementTypes.WORKOBJECT) {

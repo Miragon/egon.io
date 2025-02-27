@@ -33,8 +33,6 @@ export class DomainStoryElementFactory extends ElementFactory<
             return super.create(type, attrs);
         }
 
-        console.log(attrs);
-
         if (!attrs?.businessObject) {
             attrs.businessObject = {
                 type: attrs["type"],
