@@ -12,8 +12,6 @@ import Palette from "diagram-js/lib/features/palette/Palette";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 import { ElementTypes } from "../../domain/entities/elementTypes";
 
-const iconDictionaryService = new IconDictionaryService();
-
 export class DomainStoryPaletteProvider implements PaletteProvider {
     static $inject: string[] = [];
 
@@ -23,6 +21,7 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
         private readonly elementFactory: ElementFactory,
         private readonly spaceTool: SpaceTool,
         private readonly lassoTool: LassoTool,
+        private readonly iconDictionaryService: IconDictionaryService,
     ) {
         palette.registerProvider(this);
     }
@@ -34,9 +33,11 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
     private initPalette(): PaletteEntries {
         const actions: Map<string, PaletteEntry> = new Map();
 
-        iconDictionaryService.initTypeDictionaries();
+        // this.iconDictionaryService.initTypeDictionaries();
 
-        const actorTypes = iconDictionaryService.getIconsAssignedAs(ElementTypes.ACTOR);
+        const actorTypes = this.iconDictionaryService.getIconsAssignedAs(
+            ElementTypes.ACTOR,
+        );
 
         actorTypes?.keysArray().forEach((name: any) => {
             const entries = this.addCanvasObjectTypes(name, "actor", ElementTypes.ACTOR);
@@ -51,7 +52,7 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
             action: () => {},
         });
 
-        const workObjectTypes = iconDictionaryService.getIconsAssignedAs(
+        const workObjectTypes = this.iconDictionaryService.getIconsAssignedAs(
             ElementTypes.WORKOBJECT,
         );
 
@@ -115,7 +116,7 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
         className: string,
         elementType: ElementTypes,
     ): PaletteEntries {
-        const icon = iconDictionaryService.getCSSClassOfIcon(name);
+        const icon = this.iconDictionaryService.getCSSClassOfIcon(name);
 
         const key = `domainStory-${className}${name}`;
         const value = this.createAction(
@@ -170,4 +171,5 @@ DomainStoryPaletteProvider.$inject = [
     "elementFactory",
     "spaceTool",
     "lassoTool",
+    "domainStoryIconDictionaryService",
 ];
