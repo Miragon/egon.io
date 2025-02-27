@@ -7,19 +7,15 @@ import { Rect } from "diagram-js/lib/util/Types";
 import { assign } from "min-dash";
 import { DomainStoryModeling } from "../modeling/DomainStoryModeling";
 import { DomainStoryTextRenderer } from "../text-renderer/DomainStoryTextRenderer";
-import { DomainStoryUpdateLabelHandler } from "../update-handler/DomainStoryUpdateLabelHandler";
-import { isBackground } from "../rules/DomainStoryRules";
+import { LabelDictionaryService } from "../../label-dictionary/service/LabelDictionaryService";
 import { ElementTypes } from "../../domain/entities/elementTypes";
+import { isBackground } from "../rules/DomainStoryRules";
 import { autocomplete, getLabel } from "./utils";
 import { is } from "../../utils/util";
 import { sanitizeTextForSVGExport } from "../../utils/sanitizer";
-import { LabelDictionaryService } from "../../label-dictionary/service/LabelDictionaryService";
 
 let numberStash = 0;
 let stashUse = false;
-
-// TODO: Fix this
-declare const labelDictionaryService: LabelDictionaryService;
 
 export function getNumberStash() {
     const number = { use: stashUse, number: numberStash };
@@ -31,11 +27,11 @@ export function toggleStashUse(use: boolean) {
     stashUse = use;
 }
 
-export function focusElement(element: Element | null) {
+export function focusElement(element: HTMLDivElement) {
     // Opening an Angular Dialog seems to mess with the focus logic somehow.
     // My guess is that it makes the mousedown event passive, which prevents "preventDefault" from intercepting.
     // I am not sure how to fix it, but this seems to be a workaround.
-    setTimeout(() => (element as HTMLElement)?.focus(), 0);
+    setTimeout(() => element.focus(), 0);
 }
 
 export class DomainStoryLabelEditingProvider {
@@ -48,7 +44,7 @@ export class DomainStoryLabelEditingProvider {
         private readonly modeling: DomainStoryModeling,
         resizeHandles: ResizeHandles,
         private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
-        private readonly domainStoryUpdateLabelHandler: DomainStoryUpdateLabelHandler,
+        private readonly labelDictionaryService: LabelDictionaryService,
     ) {
         directEditing.registerProvider(this);
 
@@ -253,10 +249,10 @@ export class DomainStoryLabelEditingProvider {
 
     private createAutocomplete(element: DjsElement) {
         const editingBox = document.getElementsByClassName("djs-direct-editing-content");
-        focusElement(editingBox.item(0));
+        focusElement(editingBox.item(0) as HTMLDivElement);
         autocomplete(
             editingBox[0] as HTMLInputElement,
-            labelDictionaryService.getUniqueWorkObjectNames(),
+            this.labelDictionaryService.getUniqueWorkObjectNames(),
             element,
             this.eventBus,
         );
@@ -270,5 +266,5 @@ DomainStoryLabelEditingProvider.$inject = [
     "modeling",
     "resizeHandles",
     "domainStoryTextRenderer",
-    "domainStoryUpdateLabelHandler",
+    "domainStoryLabelDictionaryService",
 ];
