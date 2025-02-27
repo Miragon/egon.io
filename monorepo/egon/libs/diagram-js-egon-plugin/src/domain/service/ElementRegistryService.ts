@@ -1,11 +1,11 @@
 import ElementRegistry from "diagram-js/lib/core/ElementRegistry";
-import { CanvasObject } from "../../domain/entities/canvasObject";
-import { ActivityCanvasObject } from "../../domain/entities/activityCanvasObject";
-import { ElementTypes } from "../../domain/entities/elementTypes";
-import { GroupCanvasObject } from "../../domain/entities/groupCanvasObject";
-import { UsedIconList } from "../../domain/entities/UsedIconList";
+import { CanvasObject } from "../entities/canvasObject";
+import { ActivityCanvasObject } from "../entities/activityCanvasObject";
+import { ElementTypes } from "../entities/elementTypes";
+import { GroupCanvasObject } from "../entities/groupCanvasObject";
+import { UsedIconList } from "../entities/UsedIconList";
 
-export class DomainStoryElementRegistry {
+export class ElementRegistryService {
     static $inject: string[] = [];
 
     private fullyInitialized = false;
@@ -212,4 +212,4 @@ export class DomainStoryElementRegistry {
     }
 }
 
-DomainStoryElementRegistry.$inject = ["elementRegistry"];
+ElementRegistryService.$inject = ["elementRegistry"];
