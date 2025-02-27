@@ -18,11 +18,11 @@ export class ElementRegistryService {
      */
     correctInitialize(): void {
         if (!this.fullyInitialized) {
-            console.log(this.registry.getAll());
-            // if (this.registry.__implicitroot) {
-            //     this.registry = this.registry.__implicitroot.element.children;
-            //     this.fullyInitialized = true;
-            // }
+            const root = this.registry.find((element) => element.id.startsWith("root"));
+            if (root) {
+                // this.registry = this.registry.__implicitroot.element.children;
+                this.fullyInitialized = true;
+            }
         }
     }
 
