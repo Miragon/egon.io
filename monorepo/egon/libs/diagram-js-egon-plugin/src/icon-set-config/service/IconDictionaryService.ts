@@ -11,8 +11,11 @@ import { sanitizeIconName } from "../../utils/sanitizer";
 
 export const ICON_CSS_CLASS_PREFIX = "icon-domain-story-";
 
+/**
+ * The dictionaries hold icons (as SVG) and icon names as key-value pairs:
+ */
 export class IconDictionaryService {
-    // The dictionaries hold icons (as SVG) and icon names as key-value pairs:
+    static $inject: string[] = [];
 
     // these dictionaries make up the current icon set:
     private selectedActorsDictionary = new Dictionary();
@@ -20,7 +23,7 @@ export class IconDictionaryService {
 
     private customIconSet?: IconSet;
 
-    initTypeDictionaries(): void {
+    constructor() {
         let namesOfIcons: NamesOfSelectedIcons;
 
         if (typeof this.customIconSet == "undefined") {
@@ -172,26 +175,27 @@ export class IconDictionaryService {
         return new Dictionary();
     }
 
-    getTypeIconSRC(type: ElementTypes, name: string): string | null {
+    getTypeIconSRC(type: ElementTypes, name: string): string {
+        console.debug("getTypeIconSRC", this.selectedActorsDictionary);
         if (type === ElementTypes.ACTOR) {
             return this.selectedActorsDictionary.get(name);
         } else if (type === ElementTypes.WORKOBJECT) {
             return this.selectedWorkObjectsDictionary.get(name);
         }
-        return null;
+        throw new Error(`[IconDictionaryService] Unsupported value type: ${type}`);
     }
 
-    getCSSClassOfIcon(name: string): string | null {
+    getCSSClassOfIcon(name: string): string {
         return ICON_CSS_CLASS_PREFIX + sanitizeIconName(name.toLowerCase());
     }
 
-    getIconSource(name: string): string | null {
+    getIconSource(name: string): string {
         if (builtInIcons.has(name)) {
             return builtInIcons.get(name);
         } else if (customIcons.has(name)) {
             return customIcons.get(name);
         }
-        return null;
+        throw new Error(`[IconDictionaryService] Unsupported value name: ${name}`);
     }
 
     getActorsDictionary(): Dictionary {
