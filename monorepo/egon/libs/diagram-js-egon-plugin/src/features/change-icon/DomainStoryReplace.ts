@@ -14,7 +14,7 @@ export class DomainStoryReplace {
      * @param oldElement - element to be replaced
      * @param newElementData - containing information about the new Element, for example height, width, type.
      */
-    replaceElement(oldElement: Shape, newElementData: Shape) {
+    replaceElement(oldElement: Shape, newElementData: Partial<Shape>) {
         const newElement = this.setCenterOfElement(newElementData, oldElement);
         const outgoingActivities = newElement.outgoing;
         const incomingActivities = newElement.incoming;
@@ -30,7 +30,7 @@ export class DomainStoryReplace {
         return newElement;
     }
 
-    private setCenterOfElement(newElementData: Shape, oldElement: Shape) {
+    private setCenterOfElement(newElementData: Partial<Shape>, oldElement: Shape) {
         newElementData.x = Math.ceil(
             oldElement.x + (newElementData.width || oldElement.width) / 2,
         );
@@ -40,7 +40,7 @@ export class DomainStoryReplace {
 
         assign(newElementData, { name: oldElement.businessObject.name });
 
-        return this.modeling.replaceShape(oldElement, newElementData, {});
+        return this.modeling.replaceShape(oldElement, newElementData as Shape, {});
     }
 }
 

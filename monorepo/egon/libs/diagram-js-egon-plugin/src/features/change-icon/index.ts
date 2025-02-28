@@ -1,9 +1,9 @@
 import DomainStoryModeling from "../modeling";
+import IconDictionaryService from "../../icon-set-config/service";
 
 import { DomainStoryReplaceMenuProvider } from "./DomainStoryReplaceMenuProvider";
 import { DomainStoryReplace } from "./DomainStoryReplace";
-import IconDictionaryService from "../../icon-set-config/service";
-import { DomainStoryReplaceOption } from "./replaceOptions";
+import { DomainStoryReplaceOption } from "./DomainStoryReplaceOption";
 
 export default {
     __depends__: [DomainStoryModeling, IconDictionaryService],

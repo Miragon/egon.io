@@ -2,9 +2,15 @@ import { Shape } from "diagram-js/lib/model/Types";
 import { forEach } from "min-dash";
 import { ElementTypes } from "../../domain/entities/elementTypes";
 import { DomainStoryReplace } from "./DomainStoryReplace";
-import { DomainStoryReplaceOption } from "./DomainStoryReplaceOption";
+import { DomainStoryReplaceOption, ReplaceOption } from "./DomainStoryReplaceOption";
+import PopupMenuProvider, {
+    PopupMenuEntries,
+    PopupMenuEntriesProvider,
+    PopupMenuEntry,
+} from "diagram-js/lib/features/popup-menu/PopupMenuProvider";
+import { PopupMenuTarget } from "diagram-js/lib/features/popup-menu/PopupMenu";
 
-export class DomainStoryReplaceMenuProvider {
+export class DomainStoryReplaceMenuProvider implements PopupMenuProvider {
     static $inject: string[] = [];
 
     constructor(
@@ -12,22 +18,28 @@ export class DomainStoryReplaceMenuProvider {
         private readonly domainStoryReplaceOption: DomainStoryReplaceOption,
     ) {}
 
+    getPopupMenuEntries(
+        target: PopupMenuTarget,
+    ): PopupMenuEntriesProvider | PopupMenuEntries {
+        return Object.fromEntries(this.getEntries(target));
+    }
+
     /**
      * Get all entries from replaceOptions for the given element and apply filters
      * on them. Get, for example, only elements, which are different from the current one.
      * @return a list of menu entry items
      */
-    getEntries(element: Shape) {
-        let entries;
-        if (element["type"].includes(ElementTypes.ACTOR)) {
-            entries = this.domainStoryReplaceOption.actorReplaceOptions(element["type"]);
-        } else if (element["type"].includes(ElementTypes.WORKOBJECT)) {
-            entries = this.domainStoryReplaceOption.workObjectReplaceOptions(
-                element["type"],
-            );
+    private getEntries(element: PopupMenuTarget) {
+        const el = element as Shape;
+
+        let entries: ReplaceOption[] = [];
+        if (el["type"].includes(ElementTypes.ACTOR)) {
+            entries = this.domainStoryReplaceOption.actorReplaceOptions(el["type"]);
+        } else if (el["type"].includes(ElementTypes.WORKOBJECT)) {
+            entries = this.domainStoryReplaceOption.workObjectReplaceOptions(el["type"]);
         }
 
-        return this.createEntries(element, entries);
+        return this.createEntries(el, entries);
     }
 
     /**
@@ -35,12 +47,12 @@ export class DomainStoryReplaceMenuProvider {
      * according to a filter function.
      * @return a list of menu items
      */
-    private createEntries(element: Shape, replaceOptions: any) {
-        const menuEntries: any[] = [];
+    private createEntries(element: Shape, replaceOptions: ReplaceOption[]) {
+        const menuEntries: Map<string, PopupMenuEntry> = new Map();
 
         forEach(replaceOptions, (definition) => {
             const entry = this.createMenuEntry(definition, element);
-            menuEntries.push(entry);
+            menuEntries.set(definition.actionName, entry);
         });
 
         return menuEntries;
@@ -56,7 +68,11 @@ export class DomainStoryReplaceMenuProvider {
      *
      * @return menu entry item
      */
-    private createMenuEntry(definition: any, element: Shape, action?: () => void) {
+    private createMenuEntry(
+        definition: ReplaceOption,
+        element: Shape,
+        action?: () => void,
+    ): PopupMenuEntry {
         const replaceElement = this.domainStoryReplace.replaceElement;
         const replaceAction = () => {
             return replaceElement(element, definition.target);
@@ -67,7 +83,7 @@ export class DomainStoryReplaceMenuProvider {
         return {
             label: definition.label,
             className: definition.className,
-            id: definition.actionName,
+            // id: definition.actionName,
             action: action,
         };
     }

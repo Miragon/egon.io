@@ -1,5 +1,13 @@
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 import { ElementTypes } from "../../domain/entities/elementTypes";
+import { Shape } from "diagram-js/lib/model/Types";
+
+export type ReplaceOption = {
+    label: string;
+    actionName: string;
+    className: string;
+    target: Partial<Shape>;
+};
 
 export class DomainStoryReplaceOption {
     static $inject: string[] = [];
@@ -9,7 +17,7 @@ export class DomainStoryReplaceOption {
     actorReplaceOptions(name: string) {
         const actors = this.iconDictionaryService.getIconsAssignedAs(ElementTypes.ACTOR);
 
-        const replaceOption: any[] = [];
+        const replaceOption: ReplaceOption[] = [];
 
         actors.keysArray().forEach((actorType, index) => {
             if (!name.includes(actorType)) {
@@ -32,7 +40,7 @@ export class DomainStoryReplaceOption {
             ElementTypes.WORKOBJECT,
         );
 
-        const replaceOption: any[] = [];
+        const replaceOption: ReplaceOption[] = [];
 
         workObjects.keysArray().forEach((workObjectType, index) => {
             if (!name.includes(workObjectType)) {
