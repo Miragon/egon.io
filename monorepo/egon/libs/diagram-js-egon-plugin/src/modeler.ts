@@ -12,6 +12,7 @@ import DomainStoryRenderer from "./features/renderer";
 import DomainStoryModeling from "./features/modeling";
 import DomainStoryPaletteProvider from "./features/palette";
 import DomainStoryContextPadProvider from "./features/context-pad";
+import DomainStoryLabelEditingProvider from "./features/labeling";
 
 const buildInModules = [
     MoveCanvasModule,
@@ -30,6 +31,7 @@ const domainStoryModules = [
     DomainStoryModeling,
     DomainStoryPaletteProvider,
     DomainStoryContextPadProvider,
+    DomainStoryLabelEditingProvider,
 ];
 
 export default {

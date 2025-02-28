@@ -5,5 +5,5 @@ import { LabelDictionaryService } from "./LabelDictionaryService";
 export default {
     __depends__: [IconDictionaryService, ElementRegistryService],
     __init__: ["domainStoryLabelDictionaryService"],
-    domainStoryLabelDictionaryService: LabelDictionaryService,
+    domainStoryLabelDictionaryService: ["type", LabelDictionaryService],
 };

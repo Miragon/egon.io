@@ -16,5 +16,5 @@ export default {
         ResizeModule,
     ],
     __init__: ["domainStoryLabelEditingProvider"],
-    domainStoryLabelEditingProvider: DomainStoryLabelEditingProvider,
+    domainStoryLabelEditingProvider: ["type", DomainStoryLabelEditingProvider],
 };
