@@ -2,7 +2,12 @@ import Diagram from "diagram-js";
 import Canvas from "diagram-js/lib/core/Canvas";
 import ElementFactory from "diagram-js/lib/core/ElementFactory";
 
-import EgonIo from "@egon/diagram-js-egon-plugin";
+import EgonIo, {
+    DirtyFlagService,
+    ElementRegistryService,
+    IconDictionaryService,
+    LabelDictionaryService,
+} from "@egon/diagram-js-egon-plugin";
 
 const additionalModules = [EgonIo];
 
@@ -17,3 +22,19 @@ const elementFactory: ElementFactory = editor.get("elementFactory");
 const root = elementFactory.createRoot();
 
 canvas.setRootElement(root);
+
+const elementRegistryService: ElementRegistryService = editor.get(
+    "domainStoryElementRegistryService",
+);
+const dirtyFlagService: DirtyFlagService = editor.get("domainStoryDirtyFlagService");
+const iconDictionaryService: IconDictionaryService = editor.get(
+    "domainStoryIconDictionaryService",
+);
+const labelDictionaryService: LabelDictionaryService = editor.get(
+    "domainStoryLabelDictionaryService",
+);
+
+console.log("elementRegistryService", elementRegistryService);
+console.log("dirtyFlagService", dirtyFlagService);
+console.log("iconDictionaryService", iconDictionaryService);
+console.log("labelDictionaryService", labelDictionaryService);
