@@ -1,5 +1,6 @@
 import ResizeModule from "diagram-js/lib/features/resize";
 import DirectEditingModule from "diagram-js-direct-editing/lib";
+import CommandStack from "diagram-js/lib/command";
 
 import DomainStoryModeling from "../modeling";
 import DomainStoryTextRenderer from "../text-renderer";
@@ -14,6 +15,7 @@ export default {
         LabelDictionaryService,
         DirectEditingModule,
         ResizeModule,
+        CommandStack,
     ],
     __init__: ["domainStoryLabelEditingProvider"],
     domainStoryLabelEditingProvider: ["type", DomainStoryLabelEditingProvider],

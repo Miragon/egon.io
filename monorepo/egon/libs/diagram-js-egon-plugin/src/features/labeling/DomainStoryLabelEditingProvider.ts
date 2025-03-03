@@ -13,6 +13,8 @@ import { isBackground } from "../rules/DomainStoryRules";
 import { autocomplete, getLabel } from "./utils";
 import { is } from "../../utils/util";
 import { sanitizeTextForSVGExport } from "../../utils/sanitizer";
+import CommandStack from "diagram-js/lib/command/CommandStack";
+import { DomainStoryUpdateLabelHandler } from "./handler/DomainStoryUpdateLabelHandler";
 
 let numberStash = 0;
 let stashUse = false;
@@ -38,14 +40,20 @@ export class DomainStoryLabelEditingProvider {
     static $inject: string[] = [];
 
     constructor(
+        private readonly modeling: DomainStoryModeling,
+        private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
+        private readonly labelDictionaryService: LabelDictionaryService,
         private readonly eventBus: EventBus,
         private readonly canvas: Canvas,
         private readonly directEditing: DirectEditing,
-        private readonly modeling: DomainStoryModeling,
         resizeHandles: ResizeHandles,
-        private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
-        private readonly labelDictionaryService: LabelDictionaryService,
+        commandStack: CommandStack,
     ) {
+        commandStack.registerHandler(
+            "element.updateLabel",
+            DomainStoryUpdateLabelHandler,
+        );
+
         directEditing.registerProvider(this);
 
         // listen to dblclick on non-root elements
@@ -260,11 +268,12 @@ export class DomainStoryLabelEditingProvider {
 }
 
 DomainStoryLabelEditingProvider.$inject = [
+    "modeling",
+    "domainStoryTextRenderer",
+    "domainStoryLabelDictionaryService",
     "eventBus",
     "canvas",
     "directEditing",
-    "modeling",
     "resizeHandles",
-    "domainStoryTextRenderer",
-    "domainStoryLabelDictionaryService",
+    "commandStack",
 ];

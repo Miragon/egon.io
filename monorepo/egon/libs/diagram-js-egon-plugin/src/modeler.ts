@@ -1,3 +1,5 @@
+import EditorActionsModule from "diagram-js/lib/features/editor-actions";
+import KeyboardBindingsModule from "diagram-js/lib/features/keyboard";
 import MoveCanvasModule from "diagram-js/lib/navigation/movecanvas";
 import KeyboardMoveModule from "diagram-js/lib/navigation/keyboard-move";
 import ZoomScrollModule from "diagram-js/lib/navigation/zoomscroll";
@@ -13,8 +15,13 @@ import DomainStoryModeling from "./features/modeling";
 import DomainStoryPaletteProvider from "./features/palette";
 import DomainStoryContextPadProvider from "./features/context-pad";
 import DomainStoryLabelEditingProvider from "./features/labeling";
+import DomainStoryUpdateHandler from "./features/update-handler";
+import DomainStoryCopyPaste from "./features/copy-paste";
+import DomainStoryKeyBinding from "./features/keyboard";
 
 const buildInModules = [
+    EditorActionsModule,
+    KeyboardBindingsModule,
     MoveCanvasModule,
     KeyboardMoveModule,
     ZoomScrollModule,
@@ -29,9 +36,12 @@ const domainStoryModules = [
     DomainStoryElementFactory,
     DomainStoryRenderer,
     DomainStoryModeling,
+    DomainStoryUpdateHandler,
     DomainStoryPaletteProvider,
     DomainStoryContextPadProvider,
     DomainStoryLabelEditingProvider,
+    DomainStoryCopyPaste,
+    DomainStoryKeyBinding,
 ];
 
 export default {

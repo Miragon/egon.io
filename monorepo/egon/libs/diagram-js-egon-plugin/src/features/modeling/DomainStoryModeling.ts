@@ -30,7 +30,7 @@ export class DomainStoryModeling extends Modeling {
         return context.newShape;
     }
 
-    updateLabel(element: Element, newLabel: string, newBounds: Rect) {
+    updateLabel(element: Element, newLabel: string, newBounds?: Rect) {
         // if (
         //     element.businessObject
         //         ? newLabel !== element.businessObject.name
@@ -44,7 +44,7 @@ export class DomainStoryModeling extends Modeling {
         // }
     }
 
-    updateNumber(element: Element, newNumber: number, newBounds: Rect) {
+    updateNumber(element: Element, newNumber: number, newBounds?: Rect) {
         // if (
         //     element.businessObject
         //         ? newNumber !== element.businessObject.number
