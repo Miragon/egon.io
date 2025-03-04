@@ -15,7 +15,7 @@ import { Connection, Element } from "diagram-js/lib/model/Types";
 import { hasPrimaryModifier } from "diagram-js/lib/util/Mouse";
 import { DomainStoryElementFactory } from "../element-factory/DomainStoryElementFactory";
 import { DomainStoryModeling } from "../modeling/DomainStoryModeling";
-import { DomainStoryReplaceMenuProvider } from "../change-icon/DomainStoryReplaceMenuProvider";
+import { DomainStoryReplaceMenuProvider } from "../replace/DomainStoryReplaceMenuProvider";
 import { DirtyFlagService } from "../../domain/service/DirtyFlagService";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 import { hexToRGBA, isHexWithAlpha, rgbaToHex } from "../../utils/colorConverter";

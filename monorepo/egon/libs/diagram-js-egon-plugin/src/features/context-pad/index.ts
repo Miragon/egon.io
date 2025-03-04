@@ -8,7 +8,7 @@ import RulesModule from "diagram-js/lib/features/rules";
 
 import DomainStoryElementFactory from "../element-factory";
 import DomainStoryModeling from "../modeling";
-import DomainStoryReplaceMenuProvider from "../change-icon";
+import DomainStoryReplaceMenuProvider from "../replace";
 import DomainStoryDirtyFlagService from "../../domain/service";
 import DomainStoryIconDictionaryService from "../../icon-set-config/service";
 

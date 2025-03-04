@@ -11,11 +11,11 @@ export class DomainStoryReplace {
     constructor(private readonly modeling: DomainStoryModeling) {}
 
     /**
-     * @param oldElement - element to be replaced
-     * @param newElementData - containing information about the new Element, for example height, width, type.
+     * @param oldShape - element to be replaced
+     * @param newShapeData - containing information about the new Element, for example height, width, type.
      */
-    replaceElement(oldElement: Shape, newElementData: Partial<Shape>) {
-        const newElement = this.setCenterOfElement(newElementData, oldElement);
+    replaceElement(oldShape: Shape, newShapeData: Partial<Shape>) {
+        const newElement = this.setCenterOfElement(newShapeData, oldShape);
         const outgoingActivities = newElement.outgoing;
         const incomingActivities = newElement.incoming;
 
@@ -30,17 +30,17 @@ export class DomainStoryReplace {
         return newElement;
     }
 
-    private setCenterOfElement(newElementData: Partial<Shape>, oldElement: Shape) {
-        newElementData.x = Math.ceil(
-            oldElement.x + (newElementData.width || oldElement.width) / 2,
+    private setCenterOfElement(newShapeData: Partial<Shape>, oldShape: Shape) {
+        newShapeData.x = Math.ceil(
+            oldShape.x + (newShapeData.width || oldShape.width) / 2,
         );
-        newElementData.y = Math.ceil(
-            oldElement.y + (newElementData.height || oldElement.height) / 2,
+        newShapeData.y = Math.ceil(
+            oldShape.y + (newShapeData.height || oldShape.height) / 2,
         );
 
-        assign(newElementData, { name: oldElement.businessObject.name });
+        assign(newShapeData, { name: oldShape.businessObject.name });
 
-        return this.modeling.replaceShape(oldElement, newElementData as Shape, {});
+        return this.modeling.replaceShape(oldShape, newShapeData, {});
     }
 }
 

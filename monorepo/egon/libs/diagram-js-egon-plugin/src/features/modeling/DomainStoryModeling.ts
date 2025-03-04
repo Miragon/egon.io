@@ -17,16 +17,18 @@ export class DomainStoryModeling extends Modeling {
 
     override replaceShape(
         oldShape: Shape,
-        newShape: Shape,
+        newData: Partial<Shape>,
         hints: ModelingHints,
     ): Shape {
         const context = {
-            oldShape: oldShape,
-            newShape: newShape,
+            oldShape,
+            newData,
             hints: hints || {},
         };
 
         this.commandStack.execute("shape.replace", context);
+
+        // @ts-expect-error context will be altered
         return context.newShape;
     }
 

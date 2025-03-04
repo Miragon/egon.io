@@ -73,9 +73,8 @@ export class DomainStoryReplaceMenuProvider implements PopupMenuProvider {
         element: Shape,
         action?: () => void,
     ): PopupMenuEntry {
-        const replaceElement = this.domainStoryReplace.replaceElement;
         const replaceAction = () => {
-            return replaceElement(element, definition.target);
+            return this.domainStoryReplace.replaceElement(element, definition.target);
         };
 
         action = action || replaceAction;
