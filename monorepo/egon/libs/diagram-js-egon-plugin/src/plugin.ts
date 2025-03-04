@@ -12,6 +12,7 @@ import minimapModule from "diagram-js-minimap";
 import DomainStoryElementFactory from "./features/element-factory";
 import DomainStoryRenderer from "./features/renderer";
 import DomainStoryModeling from "./features/modeling";
+import DomainStoryUpdater from "./features/updater";
 import DomainStoryPaletteProvider from "./features/palette";
 import DomainStoryContextPadProvider from "./features/context-pad";
 import DomainStoryLabelEditingProvider from "./features/labeling";
@@ -36,6 +37,7 @@ const domainStoryModules = [
     DomainStoryElementFactory,
     DomainStoryRenderer,
     DomainStoryModeling,
+    DomainStoryUpdater,
     DomainStoryUpdateHandler,
     DomainStoryPaletteProvider,
     DomainStoryContextPadProvider,

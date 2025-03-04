@@ -1,4 +1,4 @@
-export { default } from "./modeler";
+export { default } from "./plugin";
 
 export { ElementRegistryService } from "./domain/service/ElementRegistryService";
 export { DirtyFlagService } from "./domain/service/DirtyFlagService";
