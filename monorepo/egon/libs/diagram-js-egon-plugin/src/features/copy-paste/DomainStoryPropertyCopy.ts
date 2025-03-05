@@ -1,7 +1,7 @@
 import EventBus from "diagram-js/lib/core/EventBus";
 import { forEach, has, isArray, isDefined, isObject, reduce, sortBy } from "min-dash";
 
-type CopiedProperty = boolean | Map<string, any>;
+type CopiedProperty = boolean | Record<string, any>;
 
 const DISALLOWED_PROPERTIES = ["incoming", "outgoing"];
 
@@ -32,8 +32,8 @@ export class DomainStoryPropertyCopy {
     }
 
     copyElement(
-        sourceElement: Map<string, any>,
-        targetElement: Map<string, any>,
+        sourceElement: Record<string, any>,
+        targetElement: Record<string, any>,
         propertyNames?: string[],
     ) {
         if (propertyNames && !isArray(propertyNames)) {
@@ -59,7 +59,7 @@ export class DomainStoryPropertyCopy {
             let sourceProperty;
 
             if (has(sourceElement, propertyName)) {
-                sourceProperty = sourceElement.get(propertyName);
+                sourceProperty = sourceElement[propertyName];
             }
 
             const copiedProperty = this.copyProperty(
@@ -82,7 +82,7 @@ export class DomainStoryPropertyCopy {
             }
 
             if (isDefined(copiedProperty)) {
-                targetElement.set(propertyName, copiedProperty);
+                targetElement[propertyName] = copiedProperty;
             }
         });
 
@@ -90,8 +90,8 @@ export class DomainStoryPropertyCopy {
     }
 
     copyProperty(
-        property: Map<string, any>,
-        parent: Map<string, any>,
+        property: Record<string, any>,
+        parent: Record<string, any>,
         propertyName: string,
     ): CopiedProperty | undefined {
         // allow others to copy property
@@ -104,16 +104,14 @@ export class DomainStoryPropertyCopy {
             },
         );
 
-        console.debug("[DomainStoryPropertyCopy] copied property: " + copiedProperty);
-
         // return if copying is NOT allowed
         if (typeof copiedProperty === "boolean" && !copiedProperty) {
             return;
         }
 
         if (copiedProperty) {
-            if (isObject(copiedProperty) && !copiedProperty.has("$parent")) {
-                copiedProperty.set("$parent", parent);
+            if (isObject(copiedProperty) && !copiedProperty["$parent"]) {
+                copiedProperty["$parent"] = parent;
             }
 
             // if copiedProperty is a boolean and true, returns true
@@ -152,9 +150,9 @@ export class DomainStoryPropertyCopy {
 
         // copy model elements
         if (isObject(property)) {
-            copiedProperty = new Map();
+            copiedProperty = {};
 
-            copiedProperty.set("$parent", parent);
+            copiedProperty["$parent"] = parent;
 
             // recursion
             copiedProperty = this.copyElement(property, copiedProperty);

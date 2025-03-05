@@ -21,7 +21,7 @@ export class DomainStoryReplaceMenuProvider implements PopupMenuProvider {
     getPopupMenuEntries(
         target: PopupMenuTarget,
     ): PopupMenuEntriesProvider | PopupMenuEntries {
-        return Object.fromEntries(this.getEntries(target));
+        return this.getEntries(target);
     }
 
     /**
@@ -48,11 +48,13 @@ export class DomainStoryReplaceMenuProvider implements PopupMenuProvider {
      * @return a list of menu items
      */
     private createEntries(element: Shape, replaceOptions: ReplaceOption[]) {
-        const menuEntries: Map<string, PopupMenuEntry> = new Map();
+        const menuEntries: Record<string, PopupMenuEntry> = {};
 
         forEach(replaceOptions, (definition) => {
-            const entry = this.createMenuEntry(definition, element);
-            menuEntries.set(definition.actionName, entry);
+            menuEntries[definition.actionName] = this.createMenuEntry(
+                definition,
+                element,
+            );
         });
 
         return menuEntries;

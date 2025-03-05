@@ -31,7 +31,7 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
     }
 
     private initPalette(): PaletteEntries {
-        const actions: Map<string, PaletteEntry> = new Map();
+        const actions: Record<string, PaletteEntry> = {};
 
         // this.iconDictionaryService.initTypeDictionaries();
 
@@ -42,15 +42,15 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
         actorTypes?.keysArray().forEach((name: any) => {
             const entries = this.addCanvasObjectTypes(name, "actor", ElementTypes.ACTOR);
             Object.entries(entries).forEach(([key, value]) => {
-                actions.set(key, value);
+                actions[key] = value;
             });
         });
 
-        actions.set("actor-separator", {
+        actions["actor-separator"] = {
             group: "actor",
             separator: true,
             action: () => {},
-        });
+        };
 
         const workObjectTypes = this.iconDictionaryService.getIconsAssignedAs(
             ElementTypes.WORKOBJECT,
@@ -63,31 +63,28 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
                 ElementTypes.WORKOBJECT,
             );
             Object.entries(entries).forEach(([key, value]) => {
-                actions.set(key, value);
+                actions[key] = value;
             });
         });
 
-        actions.set("workObject-separator", {
+        actions["workObject-separator"] = {
             group: "workObject",
             separator: true,
             action: () => {},
-        });
-        actions.set(
-            "domainStory-group",
-            this.createAction(
-                ElementTypes.GROUP,
-                "group",
-                "icon-domain-story-tool-group",
-                "group",
-                {},
-            ),
+        };
+        actions["domainStory-group"] = this.createAction(
+            ElementTypes.GROUP,
+            "group",
+            "icon-domain-story-tool-group",
+            "group",
+            {},
         );
-        actions.set("group-separator", {
+        actions["group-separator"] = {
             group: "group",
             separator: true,
             action: () => {},
-        });
-        actions.set("lasso-tool", {
+        };
+        actions["lasso-tool"] = {
             group: "tools",
             className: "bpmn-icon-lasso-tool",
             title: "Activate the lasso tool",
@@ -96,8 +93,8 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
                     this.lassoTool.activateSelection(event);
                 },
             },
-        });
-        actions.set("space-tool", {
+        };
+        actions["space-tool"] = {
             group: "tools",
             className: "bpmn-icon-space-tool",
             title: "Activate the create/remove space tool",
@@ -106,9 +103,9 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
                     this.spaceTool.activateSelection(event, false, false);
                 },
             },
-        });
+        };
 
-        return Object.fromEntries(actions);
+        return actions;
     }
 
     private addCanvasObjectTypes(

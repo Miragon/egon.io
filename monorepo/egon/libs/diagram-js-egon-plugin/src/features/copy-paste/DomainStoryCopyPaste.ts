@@ -16,7 +16,7 @@ const LOW_PRIORITY = 750;
 export class DomainStoryCopyPaste {
     static $inject: string[] = [];
 
-    private references: Map<string, any> = new Map();
+    private references: Record<string, any> = {};
 
     constructor(
         private readonly domainStoryPropertyCopy: DomainStoryPropertyCopy,
@@ -39,14 +39,14 @@ export class DomainStoryCopyPaste {
         });
 
         eventBus.on("copyPaste.pasteElements", () => {
-            this.references = new Map();
+            this.references = {};
         });
 
         eventBus.on("copyPaste.pasteElement", (context: any) => {
             const cache = context.cache,
                 descriptor = context.descriptor,
                 oldBusinessObject = descriptor.oldBusinessObject,
-                newBusinessObject: Map<string, any> = new Map();
+                newBusinessObject: Record<string, any> = {};
 
             // do NOT copy a business object if external label
             if (isLabel(descriptor)) {
@@ -82,7 +82,6 @@ export class DomainStoryCopyPaste {
             );
         }
 
-        // @ts-expect-error I don't know what to do with this
         this.references = omit(
             this.references,
             reduce(

@@ -151,6 +151,6 @@ export class LabelDictionaryService {
 }
 
 LabelDictionaryService.$inject = [
-    "domainStoryIconDictionaryService",
     "domainStoryElementRegistryService",
+    "domainStoryIconDictionaryService",
 ];

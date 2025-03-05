@@ -41,7 +41,7 @@ export class DomainStoryRenderer extends BaseRenderer {
 
     private rendererId = RENDERER_IDS.next();
 
-    private markers: Map<string, SVGMarkerElement> = new Map();
+    private markers: Record<string, SVGMarkerElement> = {};
 
     constructor(
         eventBus: EventBus,
@@ -585,7 +585,7 @@ export class DomainStoryRenderer extends BaseRenderer {
     private marker(type: string, fill: string, stroke: string) {
         const id = type + "-" + fill + "-" + stroke + "-" + this.rendererId;
 
-        if (!this.markers.has(id)) {
+        if (!this.markers[id]) {
             this.createMarker(type, fill, stroke);
         }
         return "url(#" + id + ")";
@@ -651,7 +651,7 @@ export class DomainStoryRenderer extends BaseRenderer {
             svgAppend(this.canvas._svg, defs);
         }
         svgAppend(defs, marker);
-        this.markers.set(id, marker);
+        this.markers[id] = marker;
     }
 
     /**
