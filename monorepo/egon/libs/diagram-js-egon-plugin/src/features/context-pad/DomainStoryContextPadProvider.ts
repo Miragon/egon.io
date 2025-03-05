@@ -151,8 +151,13 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
         };
     }
 
-    private startConnect(event: any, element: Element, autoActivate: boolean) {
-        this.connect.start(event, element, undefined, autoActivate);
+    private startConnect(): (
+        event: any,
+        element: Element,
+        autoActivate: boolean,
+    ) => void {
+        return (event: any, element: Element, autoActivate: boolean) =>
+            this.connect.start(event, element, undefined, autoActivate);
     }
 
     private addDelete(elements: Element[]): [string, ContextPadEntry<any>] {
@@ -289,8 +294,8 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
                 className: "bpmn-icon-connection",
                 title: this.translate("Connect with activity"),
                 action: {
-                    click: this.startConnect,
-                    dragstart: this.startConnect,
+                    click: this.startConnect(),
+                    dragstart: this.startConnect(),
                 },
             },
         ];
@@ -426,7 +431,7 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
             className: className,
             title: "Append " + title,
             action: {
-                dragstart: this.startConnect,
+                dragstart: this.startConnect(),
                 click: appendStart,
             },
         };
