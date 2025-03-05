@@ -132,7 +132,8 @@ export function getScaledPath(param: any) {
         my = param.containerHeight * param.position.my;
     }
 
-    const coordinates: Map<string, number> = new Map(); // map for the scaled coordinates
+    const coordinates: Record<string, number> = {}; // map for the scaled coordinates
+
     if (param.position) {
         // path
         const heightRatio =
@@ -145,10 +146,8 @@ export function getScaledPath(param: any) {
             heightIndex < rawPath.heightElements.length;
             heightIndex++
         ) {
-            coordinates.set(
-                "y" + heightIndex,
-                rawPath.heightElements[heightIndex] * heightRatio,
-            );
+            coordinates["y" + heightIndex] =
+                rawPath.heightElements[heightIndex] * heightRatio;
         }
 
         // Apply a width ratio
@@ -157,10 +156,8 @@ export function getScaledPath(param: any) {
             widthIndex < rawPath.widthElements.length;
             widthIndex++
         ) {
-            coordinates.set(
-                "x" + widthIndex,
-                rawPath.widthElements[widthIndex] * widthRatio,
-            );
+            coordinates["x" + widthIndex] =
+                rawPath.widthElements[widthIndex] * widthRatio;
         }
     }
 
@@ -173,7 +170,7 @@ export function getScaledPath(param: any) {
 }
 
 function format(str: string, obj: any) {
-    return String(str).replace(tokenRegex, function (all, key) {
+    return str.replace(tokenRegex, function (all, key) {
         return replacer(all, key, obj);
     });
 }

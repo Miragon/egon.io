@@ -108,11 +108,13 @@ export class DomainStoryRenderer extends BaseRenderer {
         const type = shape["type"];
 
         if (type.includes(ElementTypes.ACTOR)) {
-            return this.getActorPath(shape);
+            return this.getPath(shape);
         } else if (type.includes(ElementTypes.WORKOBJECT)) {
-            return this.getWorkObjectPath(shape);
+            return this.getPath(shape);
         } else if (type.includes(ElementTypes.GROUP)) {
-            return this.getGroupPath(shape);
+            return this.getPath(shape);
+        } else if (type.includes(ElementTypes.TEXTANNOTATION)) {
+            return this.getPath(shape);
         }
 
         throw new Error("[DomainStoryRenderer] The type of the shape is invalid.");
@@ -296,16 +298,6 @@ export class DomainStoryRenderer extends BaseRenderer {
         return textElement;
     }
 
-    getWorkObjectPath(shape: Shape) {
-        const rectangle = this.getRectPath(shape);
-        return componentsToPath(rectangle);
-    }
-
-    getGroupPath(shape: Shape) {
-        const rectangle = this.getRectPath(shape);
-        return componentsToPath(rectangle);
-    }
-
     getActivityPath(connection: Connection) {
         const waypoints = connection.waypoints.map(function (p) {
             // return p.original || p;
@@ -322,7 +314,7 @@ export class DomainStoryRenderer extends BaseRenderer {
         return componentsToPath(activityPath);
     }
 
-    getActorPath(shape: Shape) {
+    private getPath(shape: Shape) {
         const rectangle = this.getRectPath(shape);
         return componentsToPath(rectangle);
     }
