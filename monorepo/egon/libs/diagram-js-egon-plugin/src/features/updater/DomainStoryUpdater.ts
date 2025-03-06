@@ -190,9 +190,9 @@ export class DomainStoryUpdater extends CommandInterceptor {
         };
     }
 
-    private copyWaypoints(connection: Connection) {
+    private copyWaypoints(connection: Connection): Point[] {
         return connection.waypoints.map(function (p) {
-            // @ts-expect-error TODO: Does original exist???
+            // @ts-expect-error Property original does exist on type Point
             const original: Point | undefined = p.original;
 
             if (original) {

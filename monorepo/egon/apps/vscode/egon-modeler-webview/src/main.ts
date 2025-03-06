@@ -13,6 +13,9 @@ const additionalModules = [EgonIo];
 
 const editor = new Diagram({
     container: document.getElementById("domainStoryEditor"),
+    width: "100%",
+    height: "100%",
+    position: "relative",
     modules: [...additionalModules],
 });
 

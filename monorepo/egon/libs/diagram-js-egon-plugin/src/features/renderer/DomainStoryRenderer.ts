@@ -57,7 +57,7 @@ export class DomainStoryRenderer extends BaseRenderer {
 
         eventBus.on("bendpoint.move.start", 200, function (event: any) {
             // the bendpoint which we are dragging will otherwise be displayed with 0.3 opacity
-            // through bendpoint-dragging we match the css class more specificly, hence our style applies
+            // through bendpoint-dragging we match the CSS class more specifically, hence our style applies
             svgClasses(event.context.draggerGfx).add("bendpoint-dragging");
             // the old path of the activity will otherwise be displayed in gray
             canvas.addMarker(event.context.connection, "djs-element-hidden");
@@ -115,9 +115,9 @@ export class DomainStoryRenderer extends BaseRenderer {
             return this.getPath(shape);
         } else if (type.includes(ElementTypes.TEXTANNOTATION)) {
             return this.getPath(shape);
+        } else {
+            return super.getShapePath(shape);
         }
-
-        throw new Error("[DomainStoryRenderer] The type of the shape is invalid.");
     }
 
     override drawConnection(visuals: SVGElement, connection: Connection): SVGElement {
@@ -532,11 +532,7 @@ export class DomainStoryRenderer extends BaseRenderer {
         return undefined;
     }
 
-    private checkIfPointOverlapsText(point: Point, source?: Element) {
-        if (!source) {
-            throw new Error("[DomainStoryRenderer] Source is undefined.");
-        }
-
+    private checkIfPointOverlapsText(point: Point, source: Element) {
         if (point.y > source["y"] + 60) {
             if (point.x > source["x"] + 3 && point.x < source["x"] + 72) {
                 const lineOffset = this.getLineOffset(source);
@@ -560,7 +556,7 @@ export class DomainStoryRenderer extends BaseRenderer {
                 const tspans = text?.getElementsByTagName("tspan");
                 if (tspans) {
                     const tspan = tspans[tspans.length - 1];
-                    offset = parseInt(tspan.getAttribute("y") ?? "0");
+                    offset = parseInt(tspan.getAttribute("y") ?? "0") / 100;
                 }
             }
         }
