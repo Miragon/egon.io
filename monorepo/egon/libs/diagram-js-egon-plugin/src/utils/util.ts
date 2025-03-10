@@ -1,7 +1,11 @@
 import { Element, Shape } from "diagram-js/lib/model/Types";
 
 // TODO: this will not work for actors and work objects as the name of the icon is part of the type
-export function is(element: Element, type: string) {
+export function is(element: Element | undefined, type: string): boolean {
+    if (!element) {
+        return false;
+    }
+
     const bo = getBusinessObject(element);
 
     return bo && bo.type === type;

@@ -1,4 +1,4 @@
-import { Element as DjsElement, Shape } from "diagram-js/lib/model/Types";
+import { Element, Shape } from "diagram-js/lib/model/Types";
 import Canvas from "diagram-js/lib/core/Canvas";
 import EventBus from "diagram-js/lib/core/EventBus";
 import { DirectEditing } from "diagram-js-direct-editing/lib";
@@ -54,7 +54,7 @@ export class DomainStoryLabelEditingProvider {
             DomainStoryUpdateLabelHandler,
         );
 
-        directEditing.registerProvider(this);
+        this.directEditing.registerProvider(this);
 
         // listen to dblclick on non-root elements
         eventBus.on("element.dblclick", (event: any) => {
@@ -63,7 +63,7 @@ export class DomainStoryLabelEditingProvider {
                 // if we edit an activity, we do not want the standard editing box
                 numberStash = event.element.businessObject.number;
                 stashUse = true;
-                directEditing.complete();
+                this.directEditing.complete();
             }
         });
 
@@ -84,9 +84,9 @@ export class DomainStoryLabelEditingProvider {
         );
 
         // cancel on command stack changes
-        eventBus.on(["commandStack.changed"], function () {
-            if (directEditing.isActive()) {
-                directEditing.cancel();
+        eventBus.on(["commandStack.changed"], () => {
+            if (this.directEditing.isActive()) {
+                this.directEditing.cancel();
             }
         });
 
@@ -94,6 +94,26 @@ export class DomainStoryLabelEditingProvider {
             resizeHandles.removeResizers();
             const element = event.active.element;
             this.createAutocomplete(element);
+        });
+
+        eventBus.on("create.end", 500, (event: any) => {
+            const element = event.shape,
+                canExecute = event.context.canExecute;
+
+            if (!canExecute) {
+                return;
+            }
+            if (!is(element, ElementTypes.ACTIVITY)) {
+                this.activateDirectEdit(element);
+            }
+            const editingBox = document.getElementsByClassName(
+                "djs-direct-editing-content",
+            );
+            focusElement(editingBox.item(0) as HTMLDivElement);
+        });
+
+        eventBus.on("autoPlace.end", 500, (event: any) => {
+            this.activateDirectEdit(event.shape);
         });
     }
 
@@ -231,18 +251,17 @@ export class DomainStoryLabelEditingProvider {
     }
 
     update(element: Shape, newLabel: string, activeContextText: string, bounds: Rect) {
-        if (!is(element, ElementTypes.TEXTANNOTATION)) {
-            return;
-        }
-
         const bbox = this.canvas.getAbsoluteBBox(element);
 
-        const newBounds = {
-            x: element.x,
-            y: element.y,
-            width: (element.width / bbox.width) * bounds.width,
-            height: (element.height / bbox.height) * bounds.height,
-        };
+        let newBounds: Rect | undefined;
+        if (!is(element, ElementTypes.TEXTANNOTATION)) {
+            newBounds = {
+                x: element.x,
+                y: element.y,
+                width: (element.width / bbox.width) * bounds.width,
+                height: (element.height / bbox.height) * bounds.height,
+            };
+        }
 
         this.modeling.updateLabel(
             element,
@@ -251,11 +270,11 @@ export class DomainStoryLabelEditingProvider {
         );
     }
 
-    private activateDirectEdit(element: DjsElement) {
+    private activateDirectEdit(element: Element) {
         this.directEditing.activate(element);
     }
 
-    private createAutocomplete(element: DjsElement) {
+    private createAutocomplete(element: Element) {
         const editingBox = document.getElementsByClassName("djs-direct-editing-content");
         focusElement(editingBox.item(0) as HTMLDivElement);
         autocomplete(
