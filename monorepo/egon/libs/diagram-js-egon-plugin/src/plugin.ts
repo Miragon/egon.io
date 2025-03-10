@@ -15,7 +15,7 @@ import DomainStoryModeling from "./features/modeling";
 import DomainStoryUpdater from "./features/updater";
 import DomainStoryPaletteProvider from "./features/palette";
 import DomainStoryContextPadProvider from "./features/context-pad";
-import DomainStoryLabelEditingProvider from "./features/labeling";
+import DomainStoryLabelEditing from "./features/labeling";
 import DomainStoryUpdateHandler from "./features/update-handler";
 import DomainStoryCopyPaste from "./features/copy-paste";
 import DomainStoryKeyBinding from "./features/keyboard";
@@ -41,7 +41,7 @@ const domainStoryModules = [
     DomainStoryUpdateHandler,
     DomainStoryPaletteProvider,
     DomainStoryContextPadProvider,
-    DomainStoryLabelEditingProvider,
+    DomainStoryLabelEditing,
     DomainStoryCopyPaste,
     DomainStoryKeyBinding,
 ];

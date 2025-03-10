@@ -2243,6 +2243,7 @@ __metadata:
     nx: "npm:20.4.4"
     prettier: "npm:^3.4.1"
     rxjs: "npm:^7.8.0"
+    tiny-svg: "npm:^4.1.3"
     ts-archlint: "npm:^0.15.0"
     ts-jest: "npm:^29.1.0"
     ts-node: "npm:^10.9.2"
@@ -16610,6 +16611,13 @@ __metadata:
   version: 3.1.3
   resolution: "tiny-svg@npm:3.1.3"
   checksum: 10c0/325b07286acc42089f35db6d9df552b0f7f502975eb5785a6628eb45db1b07674ab0a1c8419826215407bce61ed7d08796638aa7d460cff09e6bbb213ecd2af4
+  languageName: node
+  linkType: hard
+
+"tiny-svg@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "tiny-svg@npm:4.1.3"
+  checksum: 10c0/fdc6d5f1f942ae6569c7f404f7287b7082bd3425ae4c137f0fdb83878d8b18f55219c8dd4a4e02b25cab25204f9ec5c396a1d6e4766b700a115369eaa18055e8
   languageName: node
   linkType: hard
 

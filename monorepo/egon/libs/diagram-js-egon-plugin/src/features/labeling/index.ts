@@ -7,6 +7,7 @@ import DomainStoryTextRenderer from "../text-renderer";
 import LabelDictionaryService from "../../label-dictionary/service";
 
 import { DomainStoryLabelEditingProvider } from "./DomainStoryLabelEditingProvider";
+import { DomainStoryLabelEditingPreview } from "./DomainStoryLabelEditingPreview";
 
 export default {
     __depends__: [
@@ -17,6 +18,7 @@ export default {
         ResizeModule,
         CommandStack,
     ],
-    __init__: ["domainStoryLabelEditingProvider"],
+    __init__: ["domainStoryLabelEditingProvider", "domainStoryLabelEditingPreview"],
     domainStoryLabelEditingProvider: ["type", DomainStoryLabelEditingProvider],
+    domainStoryLabelEditingPreview: ["type", DomainStoryLabelEditingPreview],
 };
