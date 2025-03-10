@@ -482,12 +482,6 @@ export class DomainStoryRenderer extends BaseRenderer {
         const waypoints = element.waypoints;
         const lines = countLines(semantic.name);
 
-        if (element.waypoints === null) {
-            throw new Error(
-                "[DomainStoryRenderer] NullPointerException: The value of `element.waypoints` is null.",
-            );
-        }
-
         const position = labelPosition(waypoints, lines);
         const startPoint = element.waypoints[position.selected];
         const endPoint = element.waypoints[position.selected + 1];
@@ -556,7 +550,7 @@ export class DomainStoryRenderer extends BaseRenderer {
                 const tspans = text?.getElementsByTagName("tspan");
                 if (tspans) {
                     const tspan = tspans[tspans.length - 1];
-                    offset = parseInt(tspan.getAttribute("y") ?? "0") / 100;
+                    offset = parseInt(tspan.getAttribute("y") ?? "0");
                 }
             }
         }
@@ -684,11 +678,10 @@ export class DomainStoryRenderer extends BaseRenderer {
 
     private renderNumber(parentGfx: any, number: number, options: any, type: string) {
         const text = this.domainStoryTextRenderer.createText(String(number), options);
-        const height = 0;
 
         svgClasses(text).add("djs-labelNumber");
 
-        this.setCoordinates(type, text, options, height, parentGfx);
+        this.setCoordinates(type, text, options, parentGfx);
 
         // !IMPORTANT!
         // When converting svg-files via Inkscape or Photoshop, the svg-circle is converted to a black dot that obscures the number.
@@ -759,8 +752,7 @@ export class DomainStoryRenderer extends BaseRenderer {
         type: string,
         text: SVGElement,
         options: any,
-        height: number,
-        parentGfx: any,
+        parentGfx: SVGElement,
     ) {
         if (/:activity$/.test(type)) {
             text.innerHTML = this.manipulateInnerHTMLXLabel(
@@ -774,11 +766,13 @@ export class DomainStoryRenderer extends BaseRenderer {
                 0,
             );
         } else if (/:actor/.test(type)) {
-            height = parentGfx.firstChild.attributes.height.nodeValue;
-            text.innerHTML = this.manipulateInnerHTMLYLabel(text.children, height, 0);
+            const h: string =
+                (parentGfx.firstChild as SVGElement)?.getAttribute("height") ?? "";
+            text.innerHTML = this.manipulateInnerHTMLYLabel(text.children, h, 0);
         } else if (/:workObject/.test(type)) {
-            height = parentGfx.firstChild.attributes.height.nodeValue;
-            text.innerHTML = this.manipulateInnerHTMLYLabel(text.children, height, 26);
+            const h: string =
+                (parentGfx.firstChild as SVGElement)?.getAttribute("height") ?? "";
+            text.innerHTML = this.manipulateInnerHTMLYLabel(text.children, h, 26);
         }
     }
 
@@ -792,10 +786,9 @@ export class DomainStoryRenderer extends BaseRenderer {
         type?: string,
     ) {
         const text = this.domainStoryTextRenderer.createText(label || "", options);
-        const height = 0;
 
         svgClasses(text).add("djs-label");
-        this.setCoordinates(type ?? "", text, options, height, parentGfx);
+        this.setCoordinates(type ?? "", text, options, parentGfx);
 
         svgAppend(parentGfx, text);
         return text;
@@ -828,7 +821,7 @@ export class DomainStoryRenderer extends BaseRenderer {
      */
     private manipulateInnerHTMLXLabel(
         children: HTMLCollection,
-        x: number,
+        x: string,
         offset: number,
     ) {
         if (!children) {
@@ -839,7 +832,7 @@ export class DomainStoryRenderer extends BaseRenderer {
         for (let i = 0; i < children.length; i++) {
             result += children[i].outerHTML.replace(
                 /x="-?\d*.\d*"/,
-                'x="' + (x + offset + 14) + '"',
+                'x="' + (Number(x) + offset + 14) + '"',
             );
         }
         return result;
@@ -850,18 +843,14 @@ export class DomainStoryRenderer extends BaseRenderer {
      */
     private manipulateInnerHTMLYLabel(
         children: HTMLCollection,
-        y: number,
+        y: string,
         offset: number,
     ) {
-        if (!children) {
-            throw new Error("[DomainStoryRenderer] Parameter children is undefined!");
-        }
-
         let result = "";
         for (let i = 0; i < children.length; i++) {
             result += children[i].outerHTML.replace(
                 /y="-?\d*.\d*"/,
-                'y="' + (y + offset + 14 * i) + '"',
+                'y="' + (Number(y) + offset + 14 * i) + '"',
             );
         }
         return result;
