@@ -2212,6 +2212,7 @@ __metadata:
     "@types/jasmine": "npm:^5.1.4"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^22.8.6"
+    "@types/vscode": "npm:^1.98.0"
     "@typescript-eslint/utils": "npm:^8.19.0"
     "@vitest/ui": "npm:^1.3.1"
     angular-eslint: "npm:^19.0.2"
@@ -2248,6 +2249,7 @@ __metadata:
     ts-jest: "npm:^29.1.0"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.3.0"
+    tsyringe: "npm:^4.8.0"
     typescript: "npm:~5.7.2"
     typescript-eslint: "npm:^8.19.0"
     vite: "npm:^5.0.0"
@@ -5806,6 +5808,13 @@ __metadata:
   version: 4.0.5
   resolution: "@types/tough-cookie@npm:4.0.5"
   checksum: 10c0/68c6921721a3dcb40451543db2174a145ef915bc8bcbe7ad4e59194a0238e776e782b896c7a59f4b93ac6acefca9161fccb31d1ce3b3445cb6faa467297fb473
+  languageName: node
+  linkType: hard
+
+"@types/vscode@npm:^1.98.0":
+  version: 1.98.0
+  resolution: "@types/vscode@npm:1.98.0"
+  checksum: 10c0/8ae0c4bfb8443cf804a6fbe0f489ef95d1b5ffef1007b1b4805b2353b95e8795f83d3bcdff611da9c1cdc1dbab53d2c24b961d9a0c8fc23aa567b353c4b79bf9
   languageName: node
   linkType: hard
 
@@ -16931,6 +16940,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^1.9.3":
+  version: 1.14.1
+  resolution: "tslib@npm:1.14.1"
+  checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^2.0.0, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.8.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
@@ -16942,6 +16958,15 @@ __metadata:
   version: 1.0.6
   resolution: "tsscmp@npm:1.0.6"
   checksum: 10c0/2f79a9455e7e3e8071995f98cdf3487ccfc91b760bec21a9abb4d90519557eafaa37246e87c92fa8bf3fef8fd30cfd0cc3c4212bb929baa9fb62494bfa4d24b2
+  languageName: node
+  linkType: hard
+
+"tsyringe@npm:^4.8.0":
+  version: 4.8.0
+  resolution: "tsyringe@npm:4.8.0"
+  dependencies:
+    tslib: "npm:^1.9.3"
+  checksum: 10c0/e13810e8ff39c4093acd0649bc5db3c164825827631e1522cd9d5ca8694a018447fa1c24f059ea54e93b1020767b1131b9dc9ce598dabfc9aa41c11544bbfe19
   languageName: node
   linkType: hard
 
