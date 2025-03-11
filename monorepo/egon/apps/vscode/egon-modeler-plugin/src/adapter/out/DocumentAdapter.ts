@@ -1,6 +1,6 @@
 import { Range, TextDocument, workspace, WorkspaceEdit } from "vscode";
 
-import { DocumentPort } from "port/out";
+import { DocumentPort } from "../../application/port/out";
 
 export class DocumentAdapter implements DocumentPort {
     private activeDocument: TextDocument | undefined;

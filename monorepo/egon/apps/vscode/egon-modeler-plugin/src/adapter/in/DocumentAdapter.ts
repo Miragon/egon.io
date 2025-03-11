@@ -1,8 +1,11 @@
 import { TextDocument, workspace } from "vscode";
 import { inject, injectable } from "tsyringe";
 
-import { setUpdateFrom, UpdateFrom, updateFrom } from "common/helpers";
-import { SyncWebviewCommand, SyncWebviewUseCase } from "port/in/webview";
+import { setUpdateFrom, UpdateFrom, updateFrom } from "../../common/helpers";
+import {
+    SyncWebviewCommand,
+    SyncWebviewUseCase,
+} from "../../application/port/in/webview";
 
 @injectable()
 export class DocumentAdapter {

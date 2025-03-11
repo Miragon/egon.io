@@ -14,12 +14,12 @@ import {
     DocumentAdapter as InDocumentAdapter,
     TextEditorAdapter,
     WebviewAdapter as InWebviewAdapter,
-} from "adapter/in";
+} from "./adapter/in";
 import {
     DocumentAdapter as OutDocumentAdapter,
     WebviewAdapter as OutWebviewAdapter,
-} from "adapter/out";
-import { EXTENSION_CONTEXT } from "common/helpers";
+} from "./adapter/out";
+import { EXTENSION_CONTEXT } from "./common/helpers";
 
 export function activate(context: ExtensionContext) {
     config();

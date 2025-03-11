@@ -1,4 +1,4 @@
-import { MessageType, WebviewMessage } from "common/webview";
+import { MessageType, WebviewMessage } from "../../../common/webview";
 
 export interface InitWebviewUseCase {
     initWebview(initWebviewCommand: InitWebviewCommand): Promise<boolean>;

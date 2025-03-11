@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 
-import { InitWebviewCommand, InitWebviewUseCase } from "port/in/webview";
-import { LoggerPort, WebviewPort } from "port/out";
+import { InitWebviewCommand, InitWebviewUseCase } from "../../port/in/webview";
+import { LoggerPort, WebviewPort } from "../../port/out";
 
 @injectable()
 export class InitWebviewService implements InitWebviewUseCase {

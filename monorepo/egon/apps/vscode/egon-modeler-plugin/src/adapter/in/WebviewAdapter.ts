@@ -1,15 +1,21 @@
 import { TextDocument, Uri, Webview } from "vscode";
 import { inject, injectable } from "tsyringe";
 
-import { MessageType, WebviewMessage } from "common/webview";
+import { MessageType, WebviewMessage } from "../../common/webview";
 import {
     EXTENSION_CONTEXT,
     setUpdateFrom,
     UpdateFrom,
     updateFrom,
-} from "common/helpers";
-import { SyncDocumentCommand, SyncDocumentUseCase } from "port/in/document";
-import { InitWebviewCommand, InitWebviewUseCase } from "port/in/webview";
+} from "../../common/helpers";
+import {
+    SyncDocumentCommand,
+    SyncDocumentUseCase,
+} from "../../application/port/in/document";
+import {
+    InitWebviewCommand,
+    InitWebviewUseCase,
+} from "../../application/port/in/webview";
 
 @injectable()
 export class WebviewAdapter {

@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 
-import { SyncDocumentCommand, SyncDocumentUseCase } from "port/in/document";
-import { DocumentPort, LoggerPort } from "port/out";
+import { SyncDocumentCommand, SyncDocumentUseCase } from "../../port/in/document";
+import { DocumentPort, LoggerPort } from "../../port/out";
 
 @injectable()
 export class SyncDocumentService implements SyncDocumentUseCase {

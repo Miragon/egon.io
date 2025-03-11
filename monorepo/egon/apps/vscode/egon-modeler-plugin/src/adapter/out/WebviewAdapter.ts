@@ -1,7 +1,7 @@
 import { Webview } from "vscode";
 
-import { WebviewMessage } from "common/webview";
-import { WebviewPort } from "port/out";
+import { WebviewMessage } from "../../common/webview";
+import { WebviewPort } from "../../application/port/out";
 
 export class WebviewAdapter implements WebviewPort {
     private activeWebview: WebviewWithId | undefined;

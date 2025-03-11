@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 
-import { TextEditorCommand, TextEditorUseCase } from "port/in/textEditor";
-import { DocumentPort, TextEditorPort } from "port/out";
+import { TextEditorCommand, TextEditorUseCase } from "../../port/in/textEditor";
+import { DocumentPort, TextEditorPort } from "../../port/out";
 import { StandardTextEditor } from "../model/StandardTextEditor";
 
 @injectable()

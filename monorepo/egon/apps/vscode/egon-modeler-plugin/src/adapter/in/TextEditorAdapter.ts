@@ -1,8 +1,11 @@
 import { commands, TabInputText, window } from "vscode";
 import { inject, singleton } from "tsyringe";
 
-import { EXTENSION_CONTEXT } from "common/helpers";
-import { TextEditorCommand, TextEditorUseCase } from "port/in/textEditor";
+import { EXTENSION_CONTEXT } from "../../common/helpers";
+import {
+    TextEditorCommand,
+    TextEditorUseCase,
+} from "../../application/port/in/textEditor";
 
 @singleton()
 export class TextEditorAdapter {

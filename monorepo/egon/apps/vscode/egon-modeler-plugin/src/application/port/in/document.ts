@@ -1,4 +1,4 @@
-import { WebviewMessage } from "common/webview";
+import { WebviewMessage } from "../../../common/webview";
 
 export interface SyncDocumentUseCase {
     sync(syncDocumentQuery: SyncDocumentCommand): Promise<boolean>;

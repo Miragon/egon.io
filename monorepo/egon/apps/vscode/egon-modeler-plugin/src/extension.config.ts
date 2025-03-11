@@ -4,7 +4,7 @@ import {
     LoggerAdapter,
     TextEditorAdapter,
     WebviewAdapter,
-} from "adapter/out";
+} from "./adapter/out";
 import { InitWebviewService } from "./application/domain/service/InitWebviewService";
 import { SyncWebviewService } from "./application/domain/service/SyncWebviewService";
 import { SyncDocumentService } from "./application/domain/service/SyncDocumentService";

@@ -1,8 +1,8 @@
 import { Tab, TabInputText, TextDocumentShowOptions, ViewColumn, window } from "vscode";
 import { container } from "tsyringe";
 
-import { TextEditorPort } from "port/out";
-import { DocumentAdapter } from "adapter/out";
+import { TextEditorPort } from "../../application/port/out";
+import { DocumentAdapter } from ".";
 import { StandardTextEditor } from "../../application/domain/model/StandardTextEditor";
 
 export class TextEditorAdapter implements TextEditorPort {

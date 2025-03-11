@@ -1,4 +1,4 @@
-import { LoggerPort } from "port/out";
+import { LoggerPort } from "../../application/port/out";
 
 export class LoggerAdapter implements LoggerPort {
     info(message: string): void {
