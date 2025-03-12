@@ -10,7 +10,7 @@ export class ElementRegistryService {
 
     private fullyInitialized = false;
 
-    constructor(private registry: ElementRegistry) {}
+    constructor(private readonly registry: ElementRegistry) {}
 
     /**
      * Initially, the registry has only the root-Element.
