@@ -1,24 +1,13 @@
-const { NxAppWebpackPlugin } = require("@nx/webpack/app-plugin");
-const { join } = require("path");
+// Helper for combining webpack config objects
+const { merge } = require("webpack-merge");
+const { composePlugins, withNx } = require("@nx/webpack");
 
-module.exports = {
-    output: {
-        path: join(__dirname, "../../../dist/apps/vscode/egon-modeler-plugin"),
-    },
-    devServer: {
-        port: 4200,
-    },
-    plugins: [
-        new NxAppWebpackPlugin({
-            tsConfig: "./tsconfig.app.json",
-            compiler: "swc",
-            main: "./src/main.ts",
-            index: "./src/index.html",
-            baseHref: "/",
-            assets: ["./src/favicon.ico", "./src/assets"],
-            styles: ["./src/styles.css"],
-            outputHashing: process.env["NODE_ENV"] === "production" ? "all" : "none",
-            optimization: process.env["NODE_ENV"] === "production",
-        }),
-    ],
-};
+module.exports = composePlugins(withNx(), (config) => {
+    return merge(config, {
+        // overwrite values here
+        externals: {
+            vscode: "commonjs vscode", // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+            // modules added here also need to be added in the .vscodeignore file
+        },
+    });
+});

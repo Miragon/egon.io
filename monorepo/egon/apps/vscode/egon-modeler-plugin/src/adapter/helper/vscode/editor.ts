@@ -1,0 +1,43 @@
+import { Uri, Webview } from "vscode";
+
+/**
+ * The name of the directory where the necessary files for the webview are located after build.
+ */
+const WEBVIEW_PATH = "egon-modeler-webview";
+
+export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string {
+    const baseUri = Uri.joinPath(extensionUri, WEBVIEW_PATH);
+
+    const scriptUri = webview.asWebviewUri(Uri.joinPath(baseUri, "index.js"));
+    const styleUri = webview.asWebviewUri(Uri.joinPath(baseUri, "index.css"));
+
+    const nonce = getNonce();
+
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <link href="${styleUri}" rel="stylesheet"/>
+                <title>Egon: Domain Story Modeler</title>
+            </head>
+            <body>
+                <div class="content with-diagram" id="js-drop-zone">
+                    <div class="canvas" id="js-canvas"></div>
+                    <div class="properties-panel-parent" id="js-properties-panel"></div>
+                </div>
+                <script nonce="${nonce}" src="${scriptUri}"></script>
+            </body>
+        </html>
+    `;
+}
+
+function getNonce(): string {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
