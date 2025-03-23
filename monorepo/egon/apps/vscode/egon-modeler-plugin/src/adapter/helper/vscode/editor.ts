@@ -3,7 +3,7 @@ import { Uri, Webview } from "vscode";
 /**
  * The name of the directory where the necessary files for the webview are located after build.
  */
-const WEBVIEW_PATH = "egon-modeler-webview";
+const WEBVIEW_PATH = "webview";
 
 export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string {
     const baseUri = Uri.joinPath(extensionUri, WEBVIEW_PATH);

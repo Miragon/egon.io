@@ -14,7 +14,7 @@ export class DomainStoryPropertyCopy {
             const propertyNames: string[] = context.propertyNames;
 
             if (!propertyNames || !propertyNames.length) {
-                return;
+                return undefined;
             }
 
             return sortBy(propertyNames, function (propertyName): any {
@@ -106,7 +106,7 @@ export class DomainStoryPropertyCopy {
 
         // return if copying is NOT allowed
         if (typeof copiedProperty === "boolean" && !copiedProperty) {
-            return;
+            return undefined;
         }
 
         if (copiedProperty) {
@@ -135,8 +135,7 @@ export class DomainStoryPropertyCopy {
                     );
 
                     // copying might NOT be allowed
-                    if (copiedProperty) {
-                        // @ts-expect-error TypeScript does not like it :(
+                    if (copiedProperty && typeof copiedProperty !== "boolean") {
                         copiedProperty["$parent"] = parent;
 
                         return childProperties.concat(copiedProperty);

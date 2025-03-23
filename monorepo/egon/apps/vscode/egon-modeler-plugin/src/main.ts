@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { ExtensionContext } from "vscode";
 import { setContext } from "./adapter/helper/vscode";
 import { container } from "tsyringe";

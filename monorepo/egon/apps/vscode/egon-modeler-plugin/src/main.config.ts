@@ -3,7 +3,7 @@ import { DomainStoryEditorService } from "./application/service/DomainStoryEdito
 
 export function config() {
     container.register("DomainStoryModelerViewType", {
-        useValue: "egon-io.domainStoryModeler",
+        useValue: "egon.io",
     });
 
     container.register("DomainStoryEditorUseCase", DomainStoryEditorService, {

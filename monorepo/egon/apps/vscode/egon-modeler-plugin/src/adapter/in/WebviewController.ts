@@ -30,7 +30,7 @@ export class WebviewController implements CustomTextEditorProvider {
 
     constructor(
         @inject("DomainStoryModelerViewType")
-        private readonly viewType: string,
+        viewType: string,
         @inject("DomainStoryEditorUseCase")
         protected readonly editorService: DomainStoryEditorUseCase,
     ) {
@@ -93,8 +93,10 @@ export class WebviewController implements CustomTextEditorProvider {
                 }
 
                 if (message instanceof DisplayDomainStoryCommand) {
-                    const content = editor.content;
-                    const command = new DisplayDomainStoryCommand(editor.id, content);
+                    const command = new DisplayDomainStoryCommand(
+                        editor.id,
+                        editor.content,
+                    );
                     if (await webviewPanel.webview.postMessage(command)) {
                         console.log("DomainStoryModeler is ready!");
                     }

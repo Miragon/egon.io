@@ -242,7 +242,7 @@ export class DomainStoryRules extends RuleProvider {
             const result = canConnectToAnnotation(source, target, connection);
 
             if (!result) {
-                return;
+                return undefined;
             }
 
             return canConnect(source, target);
