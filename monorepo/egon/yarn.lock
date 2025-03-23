@@ -2222,6 +2222,7 @@ __metadata:
     "@swc/helpers": "npm:~0.5.11"
     "@types/jasmine": "npm:^5.1.4"
     "@types/jest": "npm:^29.5.12"
+    "@types/lodash": "npm:^4.17.16"
     "@types/node": "npm:^22.8.6"
     "@types/vscode": "npm:^1.98.0"
     "@types/vscode-webview": "npm:^1.57.5"
@@ -2249,6 +2250,7 @@ __metadata:
     karma-coverage: "npm:^2.1.0"
     karma-jasmine: "npm:^5.1.0"
     karma-jasmine-html-reporter: "npm:^2.0.0"
+    lodash: "npm:^4.17.21"
     material-icons: "npm:^1.13.2"
     min-dash: "npm:^4.2.2"
     ng-mocks: "npm:^14.13.1"
@@ -6060,6 +6062,13 @@ __metadata:
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 10c0/a996a745e6c5d60292f36731dd41341339d4eeed8180bb09226e5c8d23759067692b1d88e5d91d72ee83dfc00d3aca8e7bd43ea120516c17922cbcb7c3e252db
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:^4.17.16":
+  version: 4.17.16
+  resolution: "@types/lodash@npm:4.17.16"
+  checksum: 10c0/cf017901b8ab1d7aabc86d5189d9288f4f99f19a75caf020c0e2c77b8d4cead4db0d0b842d009b029339f92399f49f34377dd7c2721053388f251778b4c23534
   languageName: node
   linkType: hard
 
