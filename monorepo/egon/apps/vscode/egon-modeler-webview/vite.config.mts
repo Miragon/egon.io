@@ -16,8 +16,6 @@ export default defineConfig({
     },
     plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"])],
     build: {
-        outDir: "../../../dist/apps/vscode/egon-modeler-webview",
-        emptyOutDir: true,
         reportCompressedSize: true,
         commonjsOptions: {
             transformMixedEsModules: true,
