@@ -1,58 +1,42 @@
 export interface Command {
+    /**
+     * After parsing the command, TypeScript can't identify the type of the object
+     * with **instanceof**.
+     * Therefore, we use this as a workaround.
+     */
     TYPE: string;
     editorId: string;
 }
 
+export class InitializeWebviewCommand implements Command {
+    readonly TYPE = InitializeWebviewCommand.name;
+
+    constructor(readonly editorId: string) {}
+}
+
 export class DisplayDomainStoryCommand implements Command {
-    TYPE = "displayDomainStoryCommand";
+    readonly TYPE = DisplayDomainStoryCommand.name;
 
     constructor(
-        private readonly _editorId: string,
-        private readonly _text: string,
+        readonly editorId: string,
+        readonly text: string,
     ) {}
-
-    get editorId(): string {
-        return this._editorId;
-    }
-
-    get text(): string {
-        return this._text;
-    }
 }
 
 export class SyncDocumentCommand implements Command {
-    TYPE = "syncDocumentCommand";
+    readonly TYPE = SyncDocumentCommand.name;
 
     constructor(
-        private readonly _editorId: string,
-        private readonly _text: string,
+        readonly editorId: string,
+        readonly text: string,
     ) {}
-
-    get editorId(): string {
-        return this._editorId;
-    }
-
-    get text(): string {
-        return this._text;
-    }
 }
 
 export class GetDomainStoryAsSvgCommand implements Command {
-    TYPE = "getDomainStoryAsSvgCommand";
+    readonly TYPE = GetDomainStoryAsSvgCommand.name;
 
     constructor(
-        private readonly _editorId: string,
-        private readonly _svg?: string,
+        readonly editorId: string,
+        readonly svg?: string,
     ) {}
-
-    get editorId(): string {
-        return this._editorId;
-    }
-
-    get svg(): string {
-        if (!this._svg) {
-            throw new Error("Property svg is undefined");
-        }
-        return this._svg;
-    }
 }
