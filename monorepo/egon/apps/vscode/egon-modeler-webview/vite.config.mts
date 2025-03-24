@@ -14,7 +14,14 @@ export default defineConfig({
         port: 4300,
         host: "localhost",
     },
+
     plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"])],
+
+    esbuild: {
+        minifyIdentifiers: false,
+        keepNames: true,
+    },
+
     build: {
         reportCompressedSize: true,
         commonjsOptions: {

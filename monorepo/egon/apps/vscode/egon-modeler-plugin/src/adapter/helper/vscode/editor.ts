@@ -23,10 +23,7 @@ export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string
                 <title>Egon: Domain Story Modeler</title>
             </head>
             <body>
-                <div class="content with-diagram" id="js-drop-zone">
-                    <div class="canvas" id="js-canvas"></div>
-                    <div class="properties-panel-parent" id="js-properties-panel"></div>
-                </div>
+                <div id="egon-io-container"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>
         </html>

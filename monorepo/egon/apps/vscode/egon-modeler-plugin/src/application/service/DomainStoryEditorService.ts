@@ -5,15 +5,17 @@ import { injectable } from "tsyringe";
 @injectable()
 export class DomainStoryEditorService implements DomainStoryEditorUseCase {
     create(id: string, uri: string, content: string): string {
+        let editor: DomainStoryEditor;
         try {
-            const editor = DomainStoryEditor.getInstance();
+            editor = DomainStoryEditor.createInstance(id, uri, content);
+            editor.setActiveEditor(id);
+        } catch (error: unknown) {
+            editor = DomainStoryEditor.getInstance();
             editor.addEditor({ id, uri, content });
             editor.setActiveEditor(id);
-        } catch (error) {
-            DomainStoryEditor.getInstance(id, uri, content);
         }
 
-        return DomainStoryEditor.getInstance().id;
+        return editor.id;
     }
 
     getActiveEditor(): Editor {

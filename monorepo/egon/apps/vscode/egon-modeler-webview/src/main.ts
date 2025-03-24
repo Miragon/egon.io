@@ -11,6 +11,7 @@ import {
 import {
     Command,
     DisplayDomainStoryCommand,
+    InitializeWebviewCommand,
     SyncDocumentCommand,
 } from "@egon/data-transfer-objects";
 
@@ -30,10 +31,17 @@ const updateStory = debounce(importStory, 100);
  * 1. A new .egn file was opened
  * 2. User switched to another tab and now switched back
  */
-window.onload = async function () {
+window.onload = function () {
     window.addEventListener("message", onReceiveMessage);
 
-    vscode.postMessage(new DisplayDomainStoryCommand("", ""));
+    let editorId: string;
+    try {
+        editorId = vscode.getState().editorId;
+    } catch (error: unknown) {
+        editorId = "";
+    }
+
+    vscode.postMessage(new InitializeWebviewCommand(editorId));
 
     console.debug("[DEBUG] Modeler is initialized...");
 };
@@ -43,23 +51,28 @@ window.onload = async function () {
  */
 function sendStoryChanges() {
     const egn = exportStory();
-    vscode.postMessage(new SyncDocumentCommand("", egn));
+    vscode.postMessage(new SyncDocumentCommand(vscode.getState().editorId, egn));
 }
 
 /**
  * Listen to messages from the backend.
  */
-async function onReceiveMessage(message: MessageEvent<Command>) {
+function onReceiveMessage(message: MessageEvent<Command>) {
     const command = message.data;
 
     switch (true) {
-        case command instanceof DisplayDomainStoryCommand: {
+        case command.TYPE === DisplayDomainStoryCommand.name: {
+            const c = command as DisplayDomainStoryCommand;
+            console.log("[DEBUG]", c.editorId, c.text);
             try {
                 getDomainStoryModeler();
-                updateStory(command.text);
+                updateStory(c.text);
             } catch (error: unknown) {
                 if (error instanceof NoModelerError) {
-                    initializeDomainStoryModeler(command.text);
+                    initializeDomainStoryModeler(c.text);
+                    vscode.setState({
+                        editorId: c.editorId,
+                    });
                 }
             }
             break;
@@ -69,6 +82,8 @@ async function onReceiveMessage(message: MessageEvent<Command>) {
 
 function initializeDomainStoryModeler(story: string) {
     createDomainStoryModeler();
-    importStory(story);
+    if (story) {
+        importStory(story);
+    }
     onCommandStackChanged(debounce(sendStoryChanges, 100));
 }

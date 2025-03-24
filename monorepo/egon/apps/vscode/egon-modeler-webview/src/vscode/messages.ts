@@ -2,6 +2,7 @@ import { VsCodeApi, VsCodeImpl, VsCodeMock } from "./api";
 import {
     Command,
     DisplayDomainStoryCommand,
+    InitializeWebviewCommand,
     SyncDocumentCommand,
 } from "@egon/data-transfer-objects";
 
@@ -25,22 +26,23 @@ class MockedVsCodeApi extends VsCodeMock<StateType, Command> {
         throw new Error("Method not implemented.");
     }
 
-    override postMessage(message: Command): void {
+    override postMessage(command: Command): void {
         switch (true) {
-            case message instanceof DisplayDomainStoryCommand: {
+            case command.TYPE === InitializeWebviewCommand.name: {
                 // The initial message that gets sent if the webview is fully
                 // loaded.
-                console.debug("[DEBUG] DisplayDomainStoryCommand", message);
-                dispatchEvent(new DisplayDomainStoryCommand("", ""));
+                console.debug("[DEBUG] DisplayDomainStoryCommand", command);
+                dispatchEvent(new DisplayDomainStoryCommand("123456", mockStory));
                 break;
             }
-            case message instanceof SyncDocumentCommand: {
-                console.debug("[DEBUG] SyncDocumentCommand", message);
-                dispatchEvent(new SyncDocumentCommand("", ""));
+            case command.TYPE === SyncDocumentCommand.name: {
+                console.debug("[DEBUG] SyncDocumentCommand", command);
+                const c = command as SyncDocumentCommand;
+                dispatchEvent(new SyncDocumentCommand("123456", c.text));
                 break;
             }
             default: {
-                throw new Error(`Unknown message type: ${message.TYPE}`);
+                throw new Error(`Unknown message type: ${command.TYPE}`);
             }
         }
 
@@ -53,3 +55,6 @@ class MockedVsCodeApi extends VsCodeMock<StateType, Command> {
         }
     }
 }
+
+const mockStory =
+    '{"domain":{},"dst":[{"type":"domainStory:actorPerson","name":"dfww","id":"shape_3388","x":285,"y":155}]}';

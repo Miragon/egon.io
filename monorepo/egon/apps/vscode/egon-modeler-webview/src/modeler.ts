@@ -12,6 +12,7 @@ export function createDomainStoryModeler(): Diagram {
     const additionalModules = [EgonIo];
 
     domainStoryModeler = new Diagram({
+        container: document.getElementById("egon-io-container"),
         width: "100%",
         height: "100%",
         position: "relative",

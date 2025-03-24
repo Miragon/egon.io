@@ -17,6 +17,7 @@ import { domainStoryEditorUi, getContext } from "../helper/vscode";
 import {
     Command,
     DisplayDomainStoryCommand,
+    InitializeWebviewCommand,
     SyncDocumentCommand,
 } from "@egon/data-transfer-objects";
 
@@ -79,50 +80,52 @@ export class WebviewController implements CustomTextEditorProvider {
         disposables?: Disposable[],
     ) {
         webviewPanel.webview.onDidReceiveMessage(
-            async (message: Command) => {
+            async (command: Command) => {
                 console.debug(
-                    `[${new Date(Date.now()).toJSON()}] Message received -> ${message.TYPE}`,
+                    `[${new Date(Date.now()).toJSON()}] Message received -> ${command.TYPE}`,
                 );
 
                 const editor = this.editorService.getActiveEditor();
 
-                if (message.editorId !== editor.id) {
-                    throw new Error(
-                        `Editor ID's do not match (${message.editorId} != ${editor.id})`,
-                    );
-                }
-
-                if (message instanceof DisplayDomainStoryCommand) {
-                    const command = new DisplayDomainStoryCommand(
-                        editor.id,
-                        editor.content,
-                    );
-                    if (await webviewPanel.webview.postMessage(command)) {
-                        console.log("DomainStoryModeler is ready!");
+                switch (true) {
+                    case command.TYPE === InitializeWebviewCommand.name: {
+                        const command = new DisplayDomainStoryCommand(
+                            editor.id,
+                            editor.content,
+                        );
+                        if (await webviewPanel.webview.postMessage(command)) {
+                            console.log("DomainStoryModeler is ready!");
+                        }
+                        break;
                     }
-                }
+                    case command.TYPE === SyncDocumentCommand.name: {
+                        const c = command as SyncDocumentCommand;
+                        if (c.editorId !== editor.id) {
+                            throw new Error(
+                                `Editor ID's do not match (${command.editorId} != ${editor.id})`,
+                            );
+                        }
+                        this.isChangeDocumentEventBlocked = true;
+                        console.debug("SyncDocumentCommand -> blocked");
 
-                if (message instanceof SyncDocumentCommand) {
-                    this.isChangeDocumentEventBlocked = true;
-                    console.debug("SyncDocumentCommand -> blocked");
+                        // Update the content of the active editor
+                        editor.content = c.text;
+                        const edit = new WorkspaceEdit();
+                        edit.replace(
+                            Uri.parse(editor.uri),
+                            new Range(0, 0, 9999, 0),
+                            editor.content,
+                        );
+                        workspace.applyEdit(edit);
 
-                    // Update the content of the active editor
-                    editor.content = message.text;
-                    const edit = new WorkspaceEdit();
-                    edit.replace(
-                        Uri.parse(editor.uri),
-                        new Range(0, 0, 9999, 0),
-                        editor.content,
-                    );
-                    workspace.applyEdit(edit);
-
-                    this.isChangeDocumentEventBlocked = false;
-                    console.debug("SyncDocumentCommand -> released");
+                        this.isChangeDocumentEventBlocked = false;
+                        console.debug("SyncDocumentCommand -> released");
+                    }
                 }
 
                 console.debug(
                     `[${new Date(Date.now()).toJSON()}] Message processed -> ${
-                        message.TYPE
+                        command.TYPE
                     }`,
                 );
             },

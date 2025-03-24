@@ -37,14 +37,17 @@ export class DomainStoryEditor {
         this._content = content;
     }
 
-    static getInstance(id?: string, uri?: string, content?: string): DomainStoryEditor {
+    static createInstance(id: string, uri: string, content: string) {
+        if (this.instance) {
+            throw new Error(`A instance of DomainStoryEditor already exists.`);
+        }
+        DomainStoryEditor.instance = new DomainStoryEditor(id, uri, content);
+        return DomainStoryEditor.instance;
+    }
+
+    static getInstance(): DomainStoryEditor {
         if (!DomainStoryEditor.instance) {
-            if (!id || !uri || !content) {
-                throw Error(
-                    `DomainStoryEditor instance doesn't exist, therefore you have to path a id, documentPath and content.`,
-                );
-            }
-            DomainStoryEditor.instance = new DomainStoryEditor(id, uri, content);
+            throw Error(`DomainStoryEditor instance does not exist, please create one.`);
         }
         return DomainStoryEditor.instance;
     }

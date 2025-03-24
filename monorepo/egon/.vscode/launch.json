@@ -18,7 +18,7 @@
       ],
       "sourceMapPathOverrides": {
         "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
-        "webpack://?:*/*": "${workspaceFolder}/apps/vscode/egon-io/*"
+        "webpack://?:*/*": "${workspaceFolder}/apps/vscode/egon-modeler-plugin/*"
       }
     }
   ]
