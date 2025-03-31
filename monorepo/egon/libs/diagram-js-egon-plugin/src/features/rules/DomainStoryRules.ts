@@ -198,8 +198,7 @@ export class DomainStoryRules extends RuleProvider {
                     if (result === false) {
                         return false;
                     }
-                    const res = this.canCreate(s, target);
-                    return res;
+                    return this.canCreate(s, target);
                 },
                 undefined,
             );
