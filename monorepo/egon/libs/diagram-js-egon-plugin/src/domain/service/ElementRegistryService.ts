@@ -18,7 +18,9 @@ export class ElementRegistryService {
      */
     correctInitialize(): void {
         if (!this.fullyInitialized) {
-            const root = this.registry.find((element) => element.id.startsWith("root"));
+            const root = this.registry.find((element) =>
+                element.id.startsWith("__implicitroot"),
+            );
             if (root) {
                 // this.registry = this.registry.__implicitroot.element.children;
                 this.fullyInitialized = true;
