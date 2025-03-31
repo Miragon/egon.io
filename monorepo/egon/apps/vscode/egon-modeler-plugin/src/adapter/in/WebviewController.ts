@@ -116,10 +116,10 @@ export class WebviewController implements CustomTextEditorProvider {
                             new Range(0, 0, 9999, 0),
                             editor.content,
                         );
-                        workspace.applyEdit(edit);
-
-                        this.isChangeDocumentEventBlocked = false;
-                        console.debug("SyncDocumentCommand -> released");
+                        if (await workspace.applyEdit(edit)) {
+                            this.isChangeDocumentEventBlocked = false;
+                            console.debug("SyncDocumentCommand -> released");
+                        }
                     }
                 }
 
