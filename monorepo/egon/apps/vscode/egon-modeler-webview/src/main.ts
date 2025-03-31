@@ -81,7 +81,11 @@ function onReceiveMessage(message: MessageEvent<Command>) {
 
 function initializeDomainStoryModeler(story: string) {
     createDomainStoryModeler();
-    importStory(story ?? emptyStory);
+    if (story !== "") {
+        importStory(story);
+    } else {
+        importStory(emptyStory);
+    }
     onCommandStackChanged(debounce(sendStoryChanges, 100));
 }
 
