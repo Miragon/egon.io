@@ -42,7 +42,14 @@
         "tsConfig": "apps/vscode/egon-modeler-plugin/tsconfig.app.json",
         "generatePackageJson": true,
         "webpackConfig": "apps/vscode/egon-modeler-plugin/webpack.config.js",
-        "babelUpwardRootMode": true
+        "babelUpwardRootMode": true,
+        "assets": [
+          {
+            "glob": "style.css",
+            "input": "apps/vscode/egon-modeler-plugin/src",
+            "output": "/assets"
+          }
+        ]
       },
       "configurations": {
         "development": {
@@ -68,7 +75,13 @@
         "generatePackageJson": true,
         "webpackConfig": "apps/vscode/egon-modeler-plugin/webpack.config.js",
         "babelUpwardRootMode": true,
-        "assets": []
+        "assets": [
+          {
+            "glob": "style.css",
+            "input": "apps/vscode/egon-modeler-plugin/src",
+            "output": "/assets"
+          }
+        ]
       }
     },
     "test": {

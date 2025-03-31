@@ -7,9 +7,12 @@ const WEBVIEW_PATH = "webview";
 
 export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string {
     const baseUri = Uri.joinPath(extensionUri, WEBVIEW_PATH);
+    const pluginStyleUri = webview.asWebviewUri(
+        Uri.joinPath(extensionUri, "assets", "style.css"),
+    );
 
     const scriptUri = webview.asWebviewUri(Uri.joinPath(baseUri, "index.js"));
-    const styleUri = webview.asWebviewUri(Uri.joinPath(baseUri, "index.css"));
+    const webviewStyleUri = webview.asWebviewUri(Uri.joinPath(baseUri, "index.css"));
 
     const nonce = getNonce();
 
@@ -19,12 +22,13 @@ export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string
             <head>
                 <meta charset="UTF-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-                <link href="${styleUri}" rel="stylesheet"/>
+                <link href="${pluginStyleUri}" rel="stylesheet"/>
+                <link href="${webviewStyleUri}" rel="stylesheet"/>
                 <title>Egon: Domain Story Modeler</title>
             </head>
             <body>
                 <div id="egon-io-container"></div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
+                <script nonce="${nonce}" src="${scriptUri}" type="module"></script>
             </body>
         </html>
     `;

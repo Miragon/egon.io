@@ -18,9 +18,7 @@ export class DomainStoryPropertyCopy {
             }
 
             return sortBy(propertyNames, function (propertyName): any {
-                const val = propertyName === "extensionElements";
-                console.debug("[DomainStoryPropertyCopy]" + val);
-                return val;
+                return propertyName === "extensionElements";
             });
         });
 

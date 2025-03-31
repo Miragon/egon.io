@@ -1,4 +1,4 @@
-import { getVsCodeApi } from "./vscode/messages";
+import { getVsCodeApi } from "./vscode/api";
 import { debounce } from "lodash";
 import {
     createDomainStoryModeler,
@@ -63,7 +63,6 @@ function onReceiveMessage(message: MessageEvent<Command>) {
     switch (true) {
         case command.TYPE === DisplayDomainStoryCommand.name: {
             const c = command as DisplayDomainStoryCommand;
-            console.log("[DEBUG]", c.editorId, c.text);
             try {
                 getDomainStoryModeler();
                 updateStory(c.text);
