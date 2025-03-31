@@ -12,5 +12,5 @@ export default {
         ],
     },
     moduleFileExtensions: ["ts", "js", "html"],
-    coverageDirectory: "../../coverage/apps/vscode/egon-modeler-webview",
+    coverageDirectory: "../../../coverage/apps/vscode/egon-modeler-webview",
 };
