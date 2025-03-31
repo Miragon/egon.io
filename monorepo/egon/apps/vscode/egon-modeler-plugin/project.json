@@ -92,7 +92,7 @@
             "output": "/assets"
           },
           {
-            "glob": ".vscodeignore",
+            "glob": "vscodeignore",
             "input": "{workspaceRoot}/apps/vscode/egon-modeler-plugin",
             "output": "/"
           },
