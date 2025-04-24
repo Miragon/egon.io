@@ -11,6 +11,7 @@ import { assign, pick } from "min-dash";
 import { Connection, Shape } from "diagram-js/lib/model/Types";
 import { ElementTypes } from "../../domain/entities/elementTypes";
 import { reworkGroupElements } from "../../utils/util";
+import { isBackground, isGroup } from "../rules/DomainStoryRules";
 
 export class DomainStoryUpdater extends CommandInterceptor {
     constructor(
@@ -99,14 +100,20 @@ export class DomainStoryUpdater extends CommandInterceptor {
             // save element position
             assign(businessObject, pick(shape, ["x", "y"]));
 
-            // save element size if resizable
             if (shape["type"] === ElementTypes.GROUP) {
+                // save element size if resizable
                 assign(businessObject, pick(shape, ["height", "width"]));
 
                 // rework the child-parent relations if a group was moved, such that all Objects that are visually in the group are also associated with it
                 // since we do not have access to the standard-canvas object here, we cannot use the function correctGroupChildren() from DSLabelUtil
-                if (parent != null) {
-                    reworkGroupElements(parent, shape);
+                if (parent) {
+                    if (isBackground(parent) || isGroup(parent)) {
+                        reworkGroupElements(parent, shape);
+                    } else {
+                        // the group is created on top of a shape or connection which makes it their child; we need to invert the child-parent relationship
+                        shape.parent = parent.parent;
+                        reworkGroupElements(parent.parent, shape);
+                    }
                 }
             }
             if (
