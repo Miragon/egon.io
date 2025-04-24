@@ -20,6 +20,9 @@ export function reworkGroupElements(parent: any, shape: Shape) {
         if (innerShape.id !== shape.id) {
             if (innerShape.x >= shape.x && innerShape.x <= shape.x + shape.width) {
                 if (innerShape.y >= shape.y && innerShape.y <= shape.y + shape.height) {
+                    if (innerShape.children.includes(shape)) {
+                        innerShape.children.remove(shape);
+                    }
                     innerShape.parent = shape;
                     if (!shape.children.includes(innerShape)) {
                         shape.children.push(innerShape);
