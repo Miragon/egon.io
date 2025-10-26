@@ -1,7 +1,7 @@
 import EventBus from "diagram-js/lib/core/EventBus";
 import { ElementTypes } from "../../domain/entities/elementTypes";
 import { html, render } from "diagram-js/lib/ui";
-import NumberingPopupMenu from "./ui/NumberingPopupMenu";
+import PopupMenu from "../../ui/PopupMenu";
 import { DomainStoryNumberingRegistry } from "./DomainStoryNumberingRegistry";
 import { ActivityCanvasObject } from "../../domain/entities/activityCanvasObject";
 import CommandStack from "diagram-js/lib/command/CommandStack";
@@ -49,13 +49,19 @@ export class DomainStoryNumberingUi {
 
             const tempContainer = document.createElement("div");
 
+            const isActivityFromActor =
+                !!this.elementRegistryService.getActivityFromActorById(
+                    element.businessObject.id,
+                );
+
             render(
-                html`<${NumberingPopupMenu}
+                html`<${PopupMenu}
                     x=${position.x}
                     y=${position.y}
                     label=${element.businessObject.name}
                     index=${element.businessObject.number}
                     isMultiple=${element.businessObject.multipleNumberAllowed}
+                    displayNumber=${isActivityFromActor}
                     onUpdate=${onUpdate}
                     onCancel=${onCancel}
                 />`,

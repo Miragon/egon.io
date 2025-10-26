@@ -1,4 +1,5 @@
 import { html, useState } from "diagram-js/lib/ui";
+import Button from "./Button";
 
 interface PopupProps {
     x: number;
@@ -6,11 +7,12 @@ interface PopupProps {
     label?: string;
     index?: number;
     isMultiple?: boolean;
+    displayNumber?: boolean;
     onUpdate: (label: string, index: number | undefined, isMultiple: boolean) => void;
     onCancel: () => void;
 }
 
-export default function NumberingPopupMenu(props: PopupProps) {
+export default function PopupMenu(props: PopupProps) {
     const x = props.x;
     const y = props.y;
     const onUpdate: (
@@ -67,37 +69,43 @@ export default function NumberingPopupMenu(props: PopupProps) {
         >
             <h3 style="margin: 0 0 8px 0;">Edit Activity</h3>
             <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="multiple" style="min-width: 80px;">Multiple:</label>
-                    <input
-                        name="multiple"
-                        type="checkbox"
-                        onInput=${handleMultipleChange}
-                    />
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="index" style="min-width: 80px;">Number:</label>
-                    <input
-                        name="index"
-                        type="number"
-                        value=${index}
-                        onInput=${handleNumberChange}
-                        style="flex: 1; 
+                ${props.displayNumber
+                    ? html`
+                          <div style="display: flex; align-items: center; gap: 8px;">
+                              <label for="multiple" style="min-width: 80px;"
+                                  >Multiple:</label
+                              >
+                              <input
+                                  name="multiple"
+                                  type="checkbox"
+                                  onInput=${handleMultipleChange}
+                              />
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 8px;">
+                              <label for="index" style="min-width: 80px;">Number:</label>
+                              <input
+                                  name="index"
+                                  type="number"
+                                  value=${index}
+                                  onInput=${handleNumberChange}
+                                  style="flex: 1; 
                         border: 1px solid #ccc; 
                         border-radius: 4px; 
                         padding: 6px;
                         transition: border-color 0.2s ease;"
-                        onFocus=${(e: FocusEvent) => {
-                            const target = e.target as HTMLInputElement;
-                            target.style.borderColor = "#00e379";
-                            target.style.outline = "none";
-                        }}
-                        onBlur=${(e: FocusEvent) => {
-                            const target = e.target as HTMLInputElement;
-                            target.style.borderColor = "#ccc";
-                        }}
-                    />
-                </div>
+                                  onFocus=${(e: FocusEvent) => {
+                                      const target = e.target as HTMLInputElement;
+                                      target.style.borderColor = "#00e379";
+                                      target.style.outline = "none";
+                                  }}
+                                  onBlur=${(e: FocusEvent) => {
+                                      const target = e.target as HTMLInputElement;
+                                      target.style.borderColor = "#ccc";
+                                  }}
+                              />
+                          </div>
+                      `
+                    : ""}
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <label for="label" style="min-width: 80px;">Label:</label>
                     <input
@@ -128,37 +136,5 @@ export default function NumberingPopupMenu(props: PopupProps) {
                 <${Button} text="Cancel" onClick=${onCancel} />
             </div>
         </div>
-    `;
-}
-
-function Button(props: any) {
-    const text = props.text;
-    const onClick = props.onClick;
-
-    return html`
-        <button
-            style="cursor: pointer; 
-            padding: 8px 16px; 
-            font-size: 14px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            background-color: #f0f0f0; 
-            flex: 1;
-            min-height: 36px;
-            transition: all 0.2s ease;"
-            onClick=${onClick}
-            onMouseEnter=${(e: MouseEvent) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.borderColor = "#00e379";
-                target.style.color = "#00e379";
-            }}
-            onMouseLeave=${(e: MouseEvent) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.borderColor = "#ccc";
-                target.style.color = "inherit";
-            }}
-        >
-            ${text}
-        </button>
     `;
 }
