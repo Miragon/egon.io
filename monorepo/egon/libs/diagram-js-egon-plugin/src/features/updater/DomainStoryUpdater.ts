@@ -90,7 +90,7 @@ export class DomainStoryUpdater extends CommandInterceptor {
                 (element) => !element.id.startsWith("root"),
             );
 
-            // make a sure element is added / removed from egon._elements
+            // make sure an element is added / removed from egon._elements
             if (!parent) {
                 collectionRemove(elements, businessObject);
             } else {
@@ -104,7 +104,7 @@ export class DomainStoryUpdater extends CommandInterceptor {
                 // save element size if resizable
                 assign(businessObject, pick(shape, ["height", "width"]));
 
-                // rework the child-parent relations if a group was moved, such that all Objects that are visually in the group are also associated with it
+                // to rework the child-parent relations if a group was moved, such that all Objects that are visually in the group are also associated with it
                 // since we do not have access to the standard-canvas object here, we cannot use the function correctGroupChildren() from DSLabelUtil
                 if (parent) {
                     if (isBackground(parent) || isGroup(parent)) {
@@ -150,7 +150,7 @@ export class DomainStoryUpdater extends CommandInterceptor {
                 (element) => !element.id.startsWith("root"),
             );
 
-            // make a sure element is added / removed from egon._elements
+            // make sure an element is added / removed from egon._elements
             if (!parent) {
                 collectionRemove(elements, businessObject);
             } else {

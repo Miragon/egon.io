@@ -142,6 +142,10 @@ export class ElementRegistryService {
         return activitiesFromActors;
     }
 
+    getActivityById(id: string): ActivityCanvasObject | undefined {
+        return this.getActivitiesFromActors().find((activity) => activity.id === id);
+    }
+
     getUsedIcons(): UsedIconList {
         const actors = this.getAllActors();
         const workobjects = this.getAllWorkobjects();

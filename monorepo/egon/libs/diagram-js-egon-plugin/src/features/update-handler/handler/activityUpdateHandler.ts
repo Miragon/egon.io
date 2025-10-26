@@ -5,7 +5,7 @@ import { Connection, Element, ElementLike } from "diagram-js/lib/model/Types";
 import { ElementRegistryService } from "../../../domain/service/ElementRegistryService";
 import { ActivityCanvasObject } from "../../../domain/entities/activityCanvasObject";
 import { DomainStoryModeling } from "../../modeling/DomainStoryModeling";
-import { getNumbersAndIDs } from "../../../utils/numbering";
+import { DomainStoryNumberingRegistry } from "../../numbering/DomainStoryNumberingRegistry";
 
 export class ActivityChangedHandler implements CommandHandler {
     static $inject: string[] = [];
@@ -14,12 +14,13 @@ export class ActivityChangedHandler implements CommandHandler {
         private readonly modeling: DomainStoryModeling,
         private readonly elementRegistryService: ElementRegistryService,
         private readonly eventBus: EventBus,
+        private readonly numberingRegistry: DomainStoryNumberingRegistry,
     ) {}
 
     preExecute(context: CommandContext) {
         context.oldLabel = context.businessObject.name || " ";
 
-        const oldNumbersWithIDs = getNumbersAndIDs(this.elementRegistryService);
+        const oldNumbersWithIDs = this.numberingRegistry.getNumbersAndIDs();
         this.modeling.updateLabel(context.businessObject, context.newLabel);
         this.modeling.updateNumber(context.businessObject, context.newNumber);
 
@@ -40,12 +41,7 @@ export class ActivityChangedHandler implements CommandHandler {
 
         this.eventBus.fire("element.changed", { element });
 
-        return [
-            {
-                id: element.id,
-                businessObject: businessObject,
-            },
-        ];
+        return [element];
     }
 
     revert(context: CommandContext): ElementLike[] {
@@ -62,12 +58,7 @@ export class ActivityChangedHandler implements CommandHandler {
 
         this.eventBus.fire("element.changed", { element });
 
-        return [
-            {
-                id: element.id,
-                businessObject: semantic,
-            },
-        ];
+        return [element];
     }
 }
 
@@ -112,12 +103,7 @@ export class ActivityDirectionChangedHandler implements CommandHandler {
 
         this.eventBus.fire("element.changed", { element });
 
-        return [
-            {
-                id: element.id,
-                businessObject: businessObject,
-            },
-        ];
+        return [element];
     }
 
     revert(context: CommandContext): ElementLike[] {
@@ -137,12 +123,7 @@ export class ActivityDirectionChangedHandler implements CommandHandler {
 
         this.eventBus.fire("element.changed", { element });
 
-        return [
-            {
-                id: element.id,
-                businessObject: semantic,
-            },
-        ];
+        return [element];
     }
 }
 
@@ -169,6 +150,7 @@ ActivityChangedHandler.$inject = [
     "modeling",
     "domainStoryElementRegistryService",
     "eventBus",
+    "domainStoryNumberingRegistry",
 ];
 
 ActivityDirectionChangedHandler.$inject = ["modeling", "eventBus"];

@@ -22,8 +22,8 @@ import { hexToRGBA, isHexWithAlpha, rgbaToHex } from "../../utils/colorConverter
 import { ElementTypes } from "../../domain/entities/elementTypes";
 import Rules from "diagram-js/lib/features/rules/Rules";
 import { assign, isArray } from "min-dash";
-import { generateAutomaticNumber } from "../../utils/numbering";
 import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
+import { DomainStoryNumberingRegistry } from "../numbering/DomainStoryNumberingRegistry";
 
 export class DomainStoryContextPadProvider implements ContextPadProvider<Element> {
     static $inject: string[] = [];
@@ -34,6 +34,7 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
         private readonly elementFactory: DomainStoryElementFactory,
         private readonly modeling: DomainStoryModeling,
         replaceMenuProvider: DomainStoryReplaceMenuProvider,
+        private readonly numberingRegistry: DomainStoryNumberingRegistry,
         private readonly dirtyFlagService: DirtyFlagService,
         private readonly iconDictionaryService: IconDictionaryService,
         private readonly elementRegistryService: ElementRegistryService,
@@ -368,11 +369,7 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
         if (source && source["type"].includes(ElementTypes.ACTOR)) {
             newNumber = 0;
         } else {
-            newNumber = generateAutomaticNumber(
-                element,
-                this.commandStack,
-                this.elementRegistryService,
-            );
+            newNumber = this.numberingRegistry.generateAutomaticNumber(element);
         }
         const context = {
             businessObject: businessObject,
@@ -442,6 +439,7 @@ DomainStoryContextPadProvider.$inject = [
     "elementFactory",
     "modeling",
     "domainStoryReplaceMenuProvider",
+    "domainStoryNumberingRegistry",
     "domainStoryDirtyFlagService",
     "domainStoryIconDictionaryService",
     "domainStoryElementRegistryService",

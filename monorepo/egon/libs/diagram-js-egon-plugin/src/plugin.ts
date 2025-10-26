@@ -19,6 +19,7 @@ import DomainStoryLabelEditing from "./features/labeling";
 import DomainStoryUpdateHandler from "./features/update-handler";
 import DomainStoryCopyPaste from "./features/copy-paste";
 import DomainStoryKeyBinding from "./features/keyboard";
+import DomainStoryNumberingUi from "./features/numbering";
 import DomainStoryExportService from "./export/service";
 import DomainStoryImportService from "./import/service";
 
@@ -46,6 +47,7 @@ const domainStoryModules = [
     DomainStoryLabelEditing,
     DomainStoryCopyPaste,
     DomainStoryKeyBinding,
+    DomainStoryNumberingUi,
     DomainStoryExportService,
     DomainStoryImportService,
 ];
