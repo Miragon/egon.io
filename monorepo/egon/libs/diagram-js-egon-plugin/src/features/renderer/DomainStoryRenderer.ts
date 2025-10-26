@@ -2,7 +2,6 @@ import EventBus from "diagram-js/lib/core/EventBus";
 import Styles from "diagram-js/lib/draw/Styles";
 import Canvas from "diagram-js/lib/core/Canvas";
 import BaseRenderer from "diagram-js/lib/draw/BaseRenderer";
-import CommandStack from "diagram-js/lib/command/CommandStack";
 import { Connection, Element, Shape } from "diagram-js/lib/model/Types";
 import { componentsToPath, createLine } from "diagram-js/lib/util/RenderUtil";
 import Ids from "ids";
@@ -23,7 +22,7 @@ import { calculateTextWidth } from "../labeling/utils";
 import { angleBetween } from "../../utils/mathExtensions";
 import { getScaledPath, isCustomIcon, isCustomSvgIcon } from "../../utils/util";
 import { DomainStoryTextRenderer } from "../text-renderer/DomainStoryTextRenderer";
-import { DomainStoryNumberingRegistry } from "../numbering/DomainStoryNumberingRegistry";
+import { DomainStoryNumberingRegistry } from "../popup/DomainStoryNumberingRegistry";
 import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
 import { DirtyFlagService } from "../../domain/service/DirtyFlagService";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
@@ -43,7 +42,6 @@ export class DomainStoryRenderer extends BaseRenderer {
         eventBus: EventBus,
         private readonly styles: Styles,
         private readonly canvas: Canvas,
-        private readonly commandStack: CommandStack,
         private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
         private readonly domainStoryNumberingRegistry: DomainStoryNumberingRegistry,
         private readonly elementRegistryService: ElementRegistryService,
@@ -854,7 +852,6 @@ DomainStoryRenderer.$inject = [
     "eventBus",
     "styles",
     "canvas",
-    "commandStack",
     "domainStoryTextRenderer",
     "domainStoryNumberingRegistry",
     "domainStoryElementRegistryService",

@@ -7,7 +7,7 @@ import { ActivityCanvasObject } from "../../domain/entities/activityCanvasObject
 import CommandStack from "diagram-js/lib/command/CommandStack";
 import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
 
-export class DomainStoryNumberingUi {
+export class DomainStoryPopupService {
     static $inject: string[] = [];
 
     private popupElement: HTMLElement | null = null;
@@ -170,7 +170,7 @@ export class DomainStoryNumberingUi {
     }
 }
 
-DomainStoryNumberingUi.$inject = [
+DomainStoryPopupService.$inject = [
     "eventBus",
     "commandStack",
     "domainStoryElementRegistryService",

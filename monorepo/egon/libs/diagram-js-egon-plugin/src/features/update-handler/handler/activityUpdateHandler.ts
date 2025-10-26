@@ -5,7 +5,7 @@ import { Connection, Element, ElementLike } from "diagram-js/lib/model/Types";
 import { ElementRegistryService } from "../../../domain/service/ElementRegistryService";
 import { ActivityCanvasObject } from "../../../domain/entities/activityCanvasObject";
 import { DomainStoryModeling } from "../../modeling/DomainStoryModeling";
-import { DomainStoryNumberingRegistry } from "../../numbering/DomainStoryNumberingRegistry";
+import { DomainStoryNumberingRegistry } from "../../popup/DomainStoryNumberingRegistry";
 
 export class ActivityChangedHandler implements CommandHandler {
     static $inject: string[] = [];

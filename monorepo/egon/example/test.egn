@@ -1,4 +1,82 @@
 {
   "domain": {},
-  "dst": []
+  "dst": [
+    {
+      "type": "domainStory:actorPerson",
+      "name": "",
+      "id": "shape_3575",
+      "x": 825,
+      "y": 400
+    },
+    {
+      "type": "domainStory:workObjectFolder",
+      "name": "",
+      "id": "shape_1543",
+      "x": 559,
+      "y": 183
+    },
+    {
+      "type": "domainStory:actorPerson",
+      "name": "",
+      "id": "shape_6170",
+      "x": 203,
+      "y": 183
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "ONe",
+      "id": "connection_4527",
+      "pickedColor": "black",
+      "number": 2,
+      "waypoints": [
+        {
+          "original": {
+            "x": 241,
+            "y": 221
+          },
+          "x": 284,
+          "y": 221
+        },
+        {
+          "original": {
+            "x": 597,
+            "y": 221
+          },
+          "x": 559,
+          "y": 221
+        }
+      ],
+      "source": "shape_6170",
+      "target": "shape_1543",
+      "multipleNumberAllowed": false
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "Two",
+      "id": "connection_4985",
+      "pickedColor": "black",
+      "number": 1,
+      "waypoints": [
+        {
+          "original": {
+            "x": 597,
+            "y": 221
+          },
+          "x": 625,
+          "y": 244
+        },
+        {
+          "original": {
+            "x": 863,
+            "y": 438
+          },
+          "x": 825,
+          "y": 407
+        }
+      ],
+      "source": "shape_3575",
+      "target": "shape_1543",
+      "multipleNumberAllowed": false
+    }
+  ]
 }

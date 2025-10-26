@@ -22,8 +22,7 @@ import { hexToRGBA, isHexWithAlpha, rgbaToHex } from "../../utils/colorConverter
 import { ElementTypes } from "../../domain/entities/elementTypes";
 import Rules from "diagram-js/lib/features/rules/Rules";
 import { assign, isArray } from "min-dash";
-import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
-import { DomainStoryNumberingRegistry } from "../numbering/DomainStoryNumberingRegistry";
+import { DomainStoryNumberingRegistry } from "../popup/DomainStoryNumberingRegistry";
 
 export class DomainStoryContextPadProvider implements ContextPadProvider<Element> {
     static $inject: string[] = [];
@@ -37,7 +36,6 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
         private readonly numberingRegistry: DomainStoryNumberingRegistry,
         private readonly dirtyFlagService: DirtyFlagService,
         private readonly iconDictionaryService: IconDictionaryService,
-        private readonly elementRegistryService: ElementRegistryService,
         private readonly rules: Rules,
         private readonly connect: Connect,
         private readonly translate: any,
@@ -442,7 +440,6 @@ DomainStoryContextPadProvider.$inject = [
     "domainStoryNumberingRegistry",
     "domainStoryDirtyFlagService",
     "domainStoryIconDictionaryService",
-    "domainStoryElementRegistryService",
     "rules",
     "connect",
     "translate",

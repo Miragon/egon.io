@@ -162,29 +162,29 @@ export class DomainStoryNumberingRegistry {
      * @example [1, 4, 5, 7] -> [2, 3, 6]
      * @example [3, 5, 5, 8] -> [1, 2, 4, 6, 7]
      */
-    private findGaps(): number[] {
-        const values = Object.keys(this.numberRegistry).map(Number);
+    // private findGaps(): number[] {
+    //     const values = Object.keys(this.numberRegistry).map(Number);
 
-        if (values.length === 0) {
-            return [];
-        }
+    //     if (values.length === 0) {
+    //         return [];
+    //     }
 
-        // Get unique values to handle duplicates
-        const uniqueValues = new Set(values);
+    //     // Get unique values to handle duplicates
+    //     const uniqueValues = new Set(values);
 
-        const max = Math.max(...values);
+    //     const max = Math.max(...values);
 
-        const gaps: number[] = [];
+    //     const gaps: number[] = [];
 
-        // Check each number from 1 to max
-        for (let i = 1; i <= max; i++) {
-            if (!uniqueValues.has(i)) {
-                gaps.push(i);
-            }
-        }
+    //     // Check each number from 1 to max
+    //     for (let i = 1; i <= max; i++) {
+    //         if (!uniqueValues.has(i)) {
+    //             gaps.push(i);
+    //         }
+    //     }
 
-        return gaps;
-    }
+    //     return gaps;
+    // }
 
     private setNumberOfActivity(
         elementArray: ActivityCanvasObject[],
@@ -202,32 +202,6 @@ export class DomainStoryNumberingRegistry {
             });
         }
     }
-
-    /**
-     * If a number was deleted, the numbering needs to be recalculated to avoid gaps.
-     * @private
-     */
-    // private rerender(): void {
-    //     const gaps = this.findGaps();
-    //     for (const gap of gaps) {
-    //         for (const [activityId, index] of this.numberRegistry.entries()) {
-    //             // FIXME: if the gap is more than 1, the numbering is not correct
-    //             const newNumber = index - 1;
-    //             if (index - 1 === gap) {
-    //                 this.numberRegistry.set(activityId, newNumber);
-    //                 const activity =
-    //                     this.domainStoryElementRegistryService.getActivityById(
-    //                         activityId,
-    //                     );
-    //                 if (activity) {
-    //                     activity.businessObject.number = newNumber;
-    //                     const element = activity.businessObject as unknown as Element;
-    //                     this.modeling.updateNumber(element, newNumber);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 DomainStoryNumberingRegistry.$inject = [

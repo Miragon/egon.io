@@ -1,28 +1,28 @@
-import { CanvasObject, testCanvasObject } from './canvasObject';
-import { Waypoint } from './waypoint';
+import { CanvasObject, testCanvasObject } from "./canvasObject";
+import { Waypoint } from "./waypoint";
 import {
-  ActivityBusinessObject,
-  testActivityBusinessObject,
-} from './activityBusinessObject';
-import { ElementTypes } from './elementTypes';
+    ActivityBusinessObject,
+    testActivityBusinessObject,
+} from "./activityBusinessObject";
+import { ElementTypes } from "./elementTypes";
 
 export interface ActivityCanvasObject extends CanvasObject {
-  source: CanvasObject;
-  target: CanvasObject;
+    source: CanvasObject;
+    target: CanvasObject;
 
-  waypoints: Waypoint[];
-  businessObject: ActivityBusinessObject;
+    waypoints: Waypoint[];
+    businessObject: ActivityBusinessObject;
 }
 
 export const testActivityCanvasObject: ActivityCanvasObject = {
-  ...testCanvasObject,
+    ...testCanvasObject,
 
-  source: testCanvasObject,
-  target: testCanvasObject,
+    source: testCanvasObject,
+    target: testCanvasObject,
 
-  type: ElementTypes.ACTIVITY,
+    type: ElementTypes.ACTIVITY,
 
-  waypoints: [],
+    waypoints: [],
 
-  businessObject: testActivityBusinessObject,
+    businessObject: testActivityBusinessObject,
 };
