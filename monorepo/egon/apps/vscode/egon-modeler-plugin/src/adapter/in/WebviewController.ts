@@ -56,6 +56,7 @@ export class WebviewController implements CustomTextEditorProvider {
             webviewPanel.webview.html = domainStoryEditorUi(
                 webviewPanel.webview,
                 getContext().extensionUri,
+                webviewPanel.webview.cspSource,
             );
 
             // Subscribe to events

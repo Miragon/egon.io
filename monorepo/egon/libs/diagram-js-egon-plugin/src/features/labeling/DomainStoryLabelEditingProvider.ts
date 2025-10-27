@@ -62,7 +62,7 @@ export class DomainStoryLabelEditingProvider {
             if (is(event.element, ElementTypes.ACTIVITY)) {
                 // if we edit an activity, we do not want the standard editing box
                 numberStash = event.element.businessObject.number;
-                stashUse = true;
+                stashUse = false;
                 this.directEditing.complete();
             }
         });

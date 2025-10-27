@@ -1,0 +1,11 @@
+import DomainStoryModeling from "../modeling";
+import ElementRegistryService from "../../domain/service";
+import { DomainStoryNumberingRegistry } from "./DomainStoryNumberingRegistry";
+import { DomainStoryPopupService } from "./DomainStoryPopupService";
+
+export default {
+    __depends__: [DomainStoryModeling, ElementRegistryService],
+    __init__: ["domainStoryNumberingRegistry", "domainStoryNumberingUi"],
+    domainStoryNumberingRegistry: ["type", DomainStoryNumberingRegistry],
+    domainStoryNumberingUi: ["type", DomainStoryPopupService],
+};

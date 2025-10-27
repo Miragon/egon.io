@@ -48,7 +48,7 @@ export class DomainStoryCopyPaste {
                 oldBusinessObject = descriptor.oldBusinessObject,
                 newBusinessObject: Record<string, any> = {};
 
-            // do NOT copy a business object if external label
+            // do NOT copy a business object if an external label
             if (isLabel(descriptor)) {
                 descriptor.businessObject = getBusinessObject(
                     cache[descriptor.labelTarget],

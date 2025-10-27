@@ -1,12 +1,5 @@
 import { angleBetween } from "./mathExtensions";
-import { ElementRegistryService } from "../domain/service/ElementRegistryService";
-import { Connection, Element } from "diagram-js/lib/model/Types";
-import CommandStack from "diagram-js/lib/command/CommandStack";
-import EventBus from "diagram-js/lib/core/EventBus";
-import { ActivityCanvasObject } from "../domain/entities/activityCanvasObject";
-
-const numberRegistry: SVGElement[] = [];
-const multipleNumberRegistry = [false];
+import { Connection } from "diagram-js/lib/model/Types";
 
 export interface Box {
     x: number;
@@ -15,15 +8,6 @@ export interface Box {
     height: number;
     textAlign: string;
 }
-
-// export function updateMultipleNumberRegistry(
-//     activityBusinessObjects: ActivityBusinessObject[],
-// ) {
-//     activityBusinessObjects.forEach(
-//         (activity) =>
-//             (multipleNumberRegistry[activity.number ?? 0] = activity.multipleNumberAllowed),
-//     );
-// }
 
 // defines the box for activity numbers
 export function numberBoxDefinitions(element: Connection): Box {
@@ -90,139 +74,4 @@ export function numberBoxDefinitions(element: Connection): Box {
         x: x,
         y: y,
     };
-}
-
-// determine the next available number that is not yet used
-export function generateAutomaticNumber(
-    elementActivity: Element,
-    commandStack: CommandStack,
-    canvasElementRegistry: ElementRegistryService,
-) {
-    const semantic = elementActivity.businessObject;
-    const usedNumbers = [0];
-    let wantedNumber = -1;
-
-    const activitiesFromActors = canvasElementRegistry.getActivitiesFromActors();
-
-    activitiesFromActors.forEach((element) => {
-        if (element.businessObject.number) {
-            usedNumbers.push(+element.businessObject.number);
-        }
-    });
-    for (let i = 0; i < usedNumbers.length; i++) {
-        if (!usedNumbers.includes(i)) {
-            if (!usedNumbers.includes(i)) {
-                wantedNumber = i;
-                i = usedNumbers.length;
-            }
-        }
-    }
-    if (wantedNumber === -1) {
-        wantedNumber = usedNumbers.length;
-    }
-
-    updateExistingNumbersAtGeneration(activitiesFromActors, wantedNumber, commandStack);
-    semantic.number = wantedNumber;
-    return wantedNumber;
-}
-
-// update the numbers at the activities when generating a new activity
-export function updateExistingNumbersAtGeneration(
-    activitiesFromActors: ActivityCanvasObject[],
-    wantedNumber: number,
-    commandStack: CommandStack,
-) {
-    activitiesFromActors.forEach((element) => {
-        const number = element.businessObject.number ?? 0;
-
-        if (number >= wantedNumber) {
-            wantedNumber++;
-            setTimeout(function () {
-                commandStack.execute("activity.changed", {
-                    businessObject: element.businessObject,
-                    newLabel: element.businessObject.name,
-                    newNumber: number,
-                    element: element,
-                });
-            }, 10);
-        }
-    });
-}
-
-// update the numbers at the activities when editing an activity
-export function updateExistingNumbersAtEditing(
-    activitiesFromActors: Element[],
-    wantedNumber: number,
-    eventBus: EventBus,
-) {
-    // get a sorted list of all activities that could need changing
-    const sortedActivities: Element[][] = [[]];
-    activitiesFromActors.forEach((activity) => {
-        if (!sortedActivities[activity.businessObject.number]) {
-            sortedActivities[activity.businessObject.number] = [];
-        }
-        sortedActivities[activity.businessObject.number].push(activity);
-    });
-
-    // set the number of each activity to the next highest number, starting from the number, we overrode
-    const oldMultipleNumberRegistry = [...multipleNumberRegistry];
-    let currentNumber = wantedNumber;
-    for (currentNumber; currentNumber < sortedActivities.length; currentNumber++) {
-        if (sortedActivities[currentNumber]) {
-            wantedNumber++;
-            multipleNumberRegistry[wantedNumber] =
-                oldMultipleNumberRegistry[currentNumber];
-            setNumberOfActivity(sortedActivities[currentNumber], wantedNumber, eventBus);
-        }
-    }
-}
-
-// get the IDs of activities with their associated number, only returns activities that are originating from an actor
-export function getNumbersAndIDs(canvasElementRegistry: ElementRegistryService) {
-    const iDWithNumber = [];
-    const activities = canvasElementRegistry.getActivitiesFromActors();
-
-    for (let i = activities.length - 1; i >= 0; i--) {
-        const id = activities[i].businessObject.id;
-        const number = activities[i].businessObject.number;
-        iDWithNumber.push({ id: id, number: number });
-    }
-    return iDWithNumber;
-}
-
-export function addNumberToRegistry(renderedNumber: SVGElement, number: number) {
-    numberRegistry[number] = renderedNumber;
-}
-
-export function setNumberIsMultiple(number: number, multi: boolean) {
-    multipleNumberRegistry[number] = multi;
-}
-
-/**
- * @returns copy of registry
- */
-export function getNumberRegistry() {
-    return numberRegistry.slice(0);
-}
-
-export function getMultipleNumberRegistry() {
-    return multipleNumberRegistry.slice(0);
-}
-
-function setNumberOfActivity(
-    elementArray: Element[],
-    wantedNumber: number,
-    eventBus: EventBus,
-) {
-    if (elementArray) {
-        elementArray.forEach((element) => {
-            if (element) {
-                const businessObject = element.businessObject;
-                if (businessObject) {
-                    businessObject.number = wantedNumber;
-                }
-                eventBus.fire("element.changed", { element });
-            }
-        });
-    }
 }

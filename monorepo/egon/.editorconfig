@@ -26,6 +26,7 @@ ij_any_method_brace_style = next_line
 
 [*.md]
 trim_trailing_whitespace = false
+max_line_length = off
 
 [*{json,yml,yaml}]
 indent_size = 2

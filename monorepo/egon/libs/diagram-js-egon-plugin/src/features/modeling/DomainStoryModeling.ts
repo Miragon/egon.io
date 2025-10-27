@@ -33,31 +33,31 @@ export class DomainStoryModeling extends Modeling {
     }
 
     updateLabel(element: Element, newLabel: string, newBounds?: Rect) {
-        // if (
-        //     element.businessObject
-        //         ? newLabel !== element.businessObject.name
-        //         : newLabel !== element.name
-        // ) {
-        this.commandStack.execute("element.updateLabel", {
-            element: element,
-            newLabel: newLabel,
-            newBounds: newBounds,
-        });
-        // }
+        if (
+            element.businessObject
+                ? newLabel !== element.businessObject.name
+                : newLabel !== element["name"]
+        ) {
+            this.commandStack.execute("element.updateLabel", {
+                element: element,
+                newLabel: newLabel,
+                newBounds: newBounds,
+            });
+        }
     }
 
     updateNumber(element: Element, newNumber: number, newBounds?: Rect) {
-        // if (
-        //     element.businessObject
-        //         ? newNumber !== element.businessObject.number
-        //         : newNumber !== element.number
-        // ) {
-        this.commandStack.execute("element.updateLabel", {
-            element: element,
-            newNumber: newNumber,
-            newBounds: newBounds,
-        });
-        // }
+        if (
+            element.businessObject
+                ? newNumber !== element.businessObject.number
+                : newNumber !== element["number"]
+        ) {
+            this.commandStack.execute("element.updateLabel", {
+                element: element,
+                newNumber: newNumber,
+                newBounds: newBounds,
+            });
+        }
     }
 
     removeGroup(element: Element) {
