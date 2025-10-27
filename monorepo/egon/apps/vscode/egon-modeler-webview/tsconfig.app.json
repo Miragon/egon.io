@@ -13,6 +13,7 @@
   ],
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "../../../libs/diagram-js-egon-plugin/src/typings/**/*.d.ts"
   ]
 }

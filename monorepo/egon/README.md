@@ -14,7 +14,7 @@
     <a href="https://wsp-consulting.de/en/home-en/">
         <img src="https://raw.githubusercontent.com/Miragon/egon.io/refs/heads/build-vsce-package/monorepo/egon/images/wps-icon.ico" alt="WPS Logo" height="180">
     </a>
-    <h3>Egon - The Domain Story Modeler</h3>
+    <h3>Egon.io — The Domain Story Modeler</h3>
     <p>
         <i>A tool to visualize Domain Stories in your browser.</i>
         <br />
@@ -31,20 +31,7 @@
 
 ## Getting started
 
-We use [Nx](https://nx.dev/) as our monorepo management tool.
-To test the application locally, follow these steps:
-
-1. Install dependencies:
-   ```shell
-   yarn
-   ```
-2. Start a development server:
-   ```shell
-   yarn nx run diagram-js-egon-plugin:build # has to be run once because of css
-   yarn nx run egon-modeler-webview:serve
-   ```
-
-## Documentation
+Open or create a new file with the extension `.egn` and start writing your story.
 
 ## Contributing
 

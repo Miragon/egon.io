@@ -4,9 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/vscode/egon-modeler-plugin/src",
   "tags": [],
-  "implicitDependencies": [
-    "egon-modeler-webview"
-  ],
+  "implicitDependencies": ["egon-modeler-webview"],
   "targets": {
     "observe-all": {
       "executor": "nx:run-commands",
@@ -28,9 +26,7 @@
     },
     "observe": {
       "executor": "@nx/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "development",
       "options": {
         "watch": true,
@@ -61,9 +57,7 @@
     },
     "build": {
       "executor": "@nx/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "target": "node",
@@ -87,7 +81,7 @@
             "output": "/"
           },
           {
-            "glob": "wps-icon.png",
+            "glob": "egon-io-logo.png",
             "input": "{workspaceRoot}/images",
             "output": "/assets"
           },
@@ -106,9 +100,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/vscode/egon-modeler-plugin/jest.config.ts"
       }

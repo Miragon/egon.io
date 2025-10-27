@@ -1,13 +1,15 @@
+import { assign, isArray } from "min-dash";
+import Canvas from "diagram-js/lib/core/Canvas";
+import { Connection, ElementLike, Shape } from "diagram-js/lib/model/Types";
+import { html, render } from "diagram-js/lib/ui";
+import EventBus from "diagram-js/lib/core/EventBus";
+import ElementRegistry from "diagram-js/lib/core/ElementRegistry";
 import { ImportRepairService } from "./ImportRepairService";
 import { BusinessObject } from "../../domain/entities/businessObject";
-import Canvas from "diagram-js/lib/core/Canvas";
-import { assign, isArray } from "min-dash";
 import { DomainStoryElementFactory } from "../../features/element-factory/DomainStoryElementFactory";
-import { Connection, ElementLike, Shape } from "diagram-js/lib/model/Types";
-import ElementRegistry from "diagram-js/lib/core/ElementRegistry";
-import EventBus from "diagram-js/lib/core/EventBus";
 import { ConfigAndDST } from "../../export/domain/configAndDst";
 import { ElementTypes } from "../../domain/entities/elementTypes";
+import VersionBox from "../../ui/VersionBox";
 
 export class DomainStoryImportService {
     static $inject: string[] = [];
@@ -33,10 +35,13 @@ export class DomainStoryImportService {
         console.log("[DEBUG] import()", story);
         const configAndDST: ConfigAndDST = JSON.parse(story);
 
-        const domainStoryElements = configAndDST.dst;
+        let domainStoryElements = configAndDST.dst;
 
         this.importRepairService.removeWhitespacesFromIcons(domainStoryElements);
         this.importRepairService.removeUnnecessaryBpmnProperties(domainStoryElements);
+        this.importRepairService.checkForUnreferencedElementsInActivitiesAndRepair(
+            domainStoryElements,
+        );
 
         this.eventBus.fire("diagram.clear", {});
 
@@ -44,11 +49,33 @@ export class DomainStoryImportService {
             throw new Error("argument must be an array");
         }
 
+        // files downloaded from the web version include objects that are not
+        // part of the domain story but are used for the web version.
+        // We need to filter them out.
+        let lastElement = domainStoryElements[domainStoryElements.length - 1];
+        if (!lastElement.id) {
+            lastElement = domainStoryElements.pop();
+            let importVersionNumber = lastElement;
+
+            // if the last element has the tag 'version',
+            // then there exists another tag 'info' for the description
+            if (importVersionNumber.version) {
+                lastElement = domainStoryElements.pop();
+                importVersionNumber = importVersionNumber.version as string;
+            } else {
+                importVersionNumber = "?";
+            }
+            domainStoryElements = this.handleVersionNumber(
+                importVersionNumber,
+                domainStoryElements,
+            );
+        }
+
         const connections: Connection[] = [],
             groups: Shape[] = [],
             otherElementTypes: ElementLike[] = [];
 
-        domainStoryElements.forEach(function (bo) {
+        domainStoryElements.forEach(function (bo: any) {
             if (isOfTypeConnection(bo)) {
                 connections.push(bo as unknown as Connection);
             } else if (isOfTypeGroup(bo)) {
@@ -89,21 +116,52 @@ export class DomainStoryImportService {
         return this.canvas.addShape(shape);
     }
 
-    private addConnection(element: Connection) {
+    // FIXME: use an actual type for element. It should be BusinessObject from the domain.
+    private addConnection(element: any) {
         this.elements.push(element);
 
         const attributes = assign({ businessObject: element }, element);
 
+        if (element.source === undefined || element.target === undefined) {
+            throw new Error("source and target must be defined");
+        }
+
         const connection = this.elementFactory.create(
             "connection",
             assign(attributes, {
-                source: this.elementRegistry.get(element.source!.id),
-                target: this.elementRegistry.get(element.target!.id),
+                source: this.elementRegistry.get(element.source),
+                target: this.elementRegistry.get(element.target),
             }),
             // this.elementRegistry.get(element.source!.id).parent,
         );
 
         return this.canvas.addConnection(connection);
+    }
+
+    private handleVersionNumber(
+        importVersionNumber: string,
+        elements: BusinessObject[],
+    ): BusinessObject[] {
+        const versionPrefix = +importVersionNumber.substring(
+            0,
+            importVersionNumber.lastIndexOf("."),
+        );
+        if (versionPrefix <= 0.5) {
+            elements =
+                this.importRepairService.updateCustomElementsPreviousV050(elements);
+            // TODO: add V050 dialog
+            // this.showPreviousV050Dialog(versionPrefix);
+        }
+
+        const parentElement = document.getElementById("egon-io-container");
+        if (parentElement) {
+            render(
+                html` <${VersionBox} version=${importVersionNumber} />`,
+                parentElement,
+            );
+        }
+
+        return elements;
     }
 }
 

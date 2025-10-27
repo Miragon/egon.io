@@ -1,11 +1,24 @@
 {
-  "name": "egon-modeler-plugin",
+  "name": "egon-vscode-extension",
   "displayName": "Egon.io: Domain Story Modeler",
   "description": "A tool to visualize Domain Stories in VS Code.",
   "license": "SEE LICENSE IN LICENSE",
   "version": "0.1.0",
-  "publisher": "",
-  "homepage": "https://egon.io/",
+  "publisher": "miragon-gmbh",
+  "homepage": "https://www.miragon.io/",
+  "badges": [
+    {
+      "url": "https://img.shields.io/badge/Follow-@miragon__io-1DA1F2?style=social&logo=twitter&logoColor=1DA1F2",
+      "href": "https://twitter.com/miragon_io",
+      "description": "Our Twitter profile."
+    },
+    {
+      "url": "https://img.shields.io/badge/Follow-miragon-blue?style=social&logo=linkedin&logoColor=blue&url=https://www.linkedin.com/company/miragon-io",
+      "href": "https://www.linkedin.com/company/miragon-io",
+      "description": "Our LinkedIn profile."
+    }
+  ],
+  "preview": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/WPS/egon.io.git"
@@ -16,7 +29,7 @@
   "engines": {
     "vscode": "^1.76.0"
   },
-  "icon": "assets/wps-icon.png",
+  "icon": "assets/egon-io-logo.png",
   "categories": [
     "Visualization",
     "Other"
