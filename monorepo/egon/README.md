@@ -55,7 +55,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## License
 
-Distributed under this [license](LICENSE).
+Distributed under this [license](https://github.com/Miragon/egon.io/blob/dbd0fb34b29e9e1f38e29feb2075bfdff2bfef88/monorepo/egon/LICENSE).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
