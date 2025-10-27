@@ -76,6 +76,6 @@ Distributed under this [license](LICENSE).
 
 [issues-url]: https://github.com/wps/egon.io/issues
 
-[license-shield]: https://img.shields.io/github/license/wps/egon.io.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/badge/license-GPLv3-blue.svg?style=for-the-badge
 
-[license-url]: https://github.com/wps/egon.io/blob/main/LICENSE
+[license-url]: https://github.com/Miragon/egon.io/blob/dbd0fb34b29e9e1f38e29feb2075bfdff2bfef88/monorepo/egon/LICENSE
