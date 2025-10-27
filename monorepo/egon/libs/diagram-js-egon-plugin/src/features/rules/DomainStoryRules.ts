@@ -34,9 +34,7 @@ function isAnnotation(element: Element) {
 
 // indirect usage of IMPLICIT_ROOT_ID, constant not used because of Regex
 export function isBackground(element: Element) {
-    const isRoot = element && /^__implicitroot/.test(element.id);
-    console.log("isRoot", isRoot);
-    return isRoot;
+    return element && /^__implicitroot/.test(element.id);
 }
 
 export function isLabel(element: Element): element is Label {

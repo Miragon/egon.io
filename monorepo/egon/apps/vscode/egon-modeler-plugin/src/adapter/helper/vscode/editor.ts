@@ -5,7 +5,11 @@ import { Uri, Webview } from "vscode";
  */
 const WEBVIEW_PATH = "webview";
 
-export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string {
+export function domainStoryEditorUi(
+    webview: Webview,
+    extensionUri: Uri,
+    cspSource: string,
+): string {
     const baseUri = Uri.joinPath(extensionUri, WEBVIEW_PATH);
     const pluginStyleUri = webview.asWebviewUri(
         Uri.joinPath(extensionUri, "assets", "style.css"),
@@ -22,6 +26,13 @@ export function domainStoryEditorUi(webview: Webview, extensionUri: Uri): string
             <head>
                 <meta charset="UTF-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <meta http-equiv="Content-Security-Policy"
+                  content="
+                    default-src 'none';
+                    img-src ${cspSource} data:;
+                    script-src 'unsafe-inline' ${cspSource};
+                    style-src 'unsafe-inline' ${cspSource};
+                  ">
                 <link href="${pluginStyleUri}" rel="stylesheet"/>
                 <link href="${webviewStyleUri}" rel="stylesheet"/>
                 <title>Egon: Domain Story Modeler</title>

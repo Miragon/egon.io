@@ -2,7 +2,6 @@ import EventBus from "diagram-js/lib/core/EventBus";
 import Styles from "diagram-js/lib/draw/Styles";
 import Canvas from "diagram-js/lib/core/Canvas";
 import BaseRenderer from "diagram-js/lib/draw/BaseRenderer";
-import CommandStack from "diagram-js/lib/command/CommandStack";
 import { Connection, Element, Shape } from "diagram-js/lib/model/Types";
 import { componentsToPath, createLine } from "diagram-js/lib/util/RenderUtil";
 import Ids from "ids";
@@ -14,20 +13,16 @@ import {
 } from "tiny-svg";
 import { query as domQuery } from "min-dom";
 import { assign, isObject } from "min-dash";
-import { DomainStoryTextRenderer } from "../text-renderer/DomainStoryTextRenderer";
 import { getNumberStash } from "../labeling/DomainStoryLabelEditingProvider";
-import {
-    addNumberToRegistry,
-    Box,
-    generateAutomaticNumber,
-    numberBoxDefinitions,
-} from "../../utils/numbering";
+import { Box, numberBoxDefinitions } from "../../utils/numbering";
 import { ElementTypes, getIconId } from "../../domain/entities/elementTypes";
 import { Point } from "diagram-js/lib/util/Types";
 import { countLines, labelPosition } from "../labeling/position";
 import { calculateTextWidth } from "../labeling/utils";
 import { angleBetween } from "../../utils/mathExtensions";
 import { getScaledPath, isCustomIcon, isCustomSvgIcon } from "../../utils/util";
+import { DomainStoryTextRenderer } from "../text-renderer/DomainStoryTextRenderer";
+import { DomainStoryNumberingRegistry } from "../popup/DomainStoryNumberingRegistry";
 import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
 import { DirtyFlagService } from "../../domain/service/DirtyFlagService";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
@@ -47,8 +42,8 @@ export class DomainStoryRenderer extends BaseRenderer {
         eventBus: EventBus,
         private readonly styles: Styles,
         private readonly canvas: Canvas,
-        private readonly commandStack: CommandStack,
         private readonly domainStoryTextRenderer: DomainStoryTextRenderer,
+        private readonly domainStoryNumberingRegistry: DomainStoryNumberingRegistry,
         private readonly elementRegistryService: ElementRegistryService,
         private readonly dirtyFlagService: DirtyFlagService,
         private readonly iconDictionaryService: IconDictionaryService,
@@ -673,7 +668,7 @@ export class DomainStoryRenderer extends BaseRenderer {
             this.numberStyle(box),
             element["type"],
         );
-        addNumberToRegistry(newRenderedNumber, semantic.number);
+        this.domainStoryNumberingRegistry.add(newRenderedNumber, semantic.number);
     }
 
     private renderNumber(parentGfx: any, number: number, options: any, type: string) {
@@ -721,11 +716,7 @@ export class DomainStoryRenderer extends BaseRenderer {
                 element.source["type"] &&
                 element.source["type"].includes(ElementTypes.ACTOR)
             ) {
-                generateAutomaticNumber(
-                    element,
-                    this.commandStack,
-                    this.elementRegistryService,
-                );
+                this.domainStoryNumberingRegistry.generateAutomaticNumber(element);
             }
 
             // render the background for the number
@@ -861,8 +852,8 @@ DomainStoryRenderer.$inject = [
     "eventBus",
     "styles",
     "canvas",
-    "commandStack",
     "domainStoryTextRenderer",
+    "domainStoryNumberingRegistry",
     "domainStoryElementRegistryService",
     "domainStoryDirtyFlagService",
     "domainStoryIconDictionaryService",

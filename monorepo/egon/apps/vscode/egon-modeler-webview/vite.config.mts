@@ -23,6 +23,8 @@ export default defineConfig({
     },
 
     build: {
+        // TODO: parse a webview uri to the diagram-js plugin
+        assetsInlineLimit: 20_000,
         reportCompressedSize: true,
         commonjsOptions: {
             transformMixedEsModules: true,

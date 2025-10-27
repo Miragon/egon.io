@@ -6,13 +6,13 @@ import {
     getDomainStoryModeler,
     importStory,
     NoModelerError,
-    onCommandStackChanged,
+    onCommandStackChanged
 } from "./modeler";
 import {
     Command,
     DisplayDomainStoryCommand,
     InitializeWebviewCommand,
-    SyncDocumentCommand,
+    SyncDocumentCommand
 } from "@egon/data-transfer-objects";
 
 const vscode = getVsCodeApi();
@@ -91,5 +91,12 @@ function initializeDomainStoryModeler(story: string) {
 
 const emptyStory = JSON.stringify({
     domain: {},
-    dst: [],
+    dst: [
+        {
+            info: "",
+        },
+        {
+            version: "3.0.0",
+        },
+    ],
 });

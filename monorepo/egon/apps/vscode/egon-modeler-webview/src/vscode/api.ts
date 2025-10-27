@@ -1,10 +1,6 @@
 import { WebviewApi } from "vscode-webview";
-import {
-    Command,
-    DisplayDomainStoryCommand,
-    InitializeWebviewCommand,
-    SyncDocumentCommand,
-} from "@egon/data-transfer-objects";
+import { Command } from "@egon/data-transfer-objects";
+import { VsCodeMock } from "./mock";
 
 declare const process: { env: { NODE_ENV: string } };
 
@@ -70,52 +66,3 @@ export class MissingStateError extends Error {
         super("State is missing.");
     }
 }
-
-export class VsCodeMock<T, M extends Command> implements VsCodeApi<T, M> {
-    protected state: T | undefined;
-
-    getState(): T {
-        if (!this.state) throw new MissingStateError();
-        return this.state;
-    }
-
-    setState(state: T) {
-        this.state = state;
-    }
-
-    updateState(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    postMessage(command: Command): void {
-        switch (true) {
-            case command.TYPE === InitializeWebviewCommand.name: {
-                // The initial message that gets sent if the webview is fully
-                // loaded.
-                dispatchEvent(new DisplayDomainStoryCommand("123456", mockStory));
-                break;
-            }
-            case command.TYPE === SyncDocumentCommand.name: {
-                const c = command as SyncDocumentCommand;
-                dispatchEvent(new SyncDocumentCommand("123456", c.text));
-                break;
-            }
-            default: {
-                throw new Error(`Unknown message type: ${command.TYPE}`);
-            }
-        }
-
-        function dispatchEvent(event: Command) {
-            window.dispatchEvent(
-                new MessageEvent("message", {
-                    data: event,
-                }),
-            );
-        }
-    }
-}
-
-const mockStory = JSON.stringify({
-    domain: {},
-    dst: [],
-});
