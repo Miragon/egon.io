@@ -70,10 +70,18 @@ function onReceiveMessage(message: MessageEvent<Command>) {
                 updateStory(c.text);
             } catch (error: unknown) {
                 if (error instanceof NoModelerError) {
-                    initializeDomainStoryModeler(c.text);
-                    vscode.updateState({
-                        editorId: c.editorId,
-                    });
+                    try {
+                        vscode.updateState({
+                            editorId: c.editorId,
+                        });
+                    } catch {
+                        vscode.setState({
+                            editorId: c.editorId,
+                            zoom: 1,
+                        });
+                    }
+
+                    initializeDomainStoryModeler(c.text, vscode.getState());
                 }
             }
             break;
@@ -81,15 +89,7 @@ function onReceiveMessage(message: MessageEvent<Command>) {
     }
 }
 
-function initializeDomainStoryModeler(story: string) {
-    let state: ModelerConfig;
-    try {
-        state = vscode.getState();
-        console.log(state);
-    } catch {
-        state = undefined;
-    }
-
+function initializeDomainStoryModeler(story: string, state: ModelerConfig) {
     createDomainStoryModeler(state);
     if (story !== "") {
         importStory(story);
