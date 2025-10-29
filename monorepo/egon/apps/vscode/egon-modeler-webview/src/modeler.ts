@@ -11,7 +11,7 @@ import { debounce } from "lodash";
 let domainStoryModeler: Diagram | undefined;
 
 export interface ModelerConfig {
-    zoom: number;
+    viewbox?: any;
 }
 
 export function createDomainStoryModeler(config: ModelerConfig): Diagram {
@@ -32,7 +32,9 @@ export function createDomainStoryModeler(config: ModelerConfig): Diagram {
 
     canvas.setRootElement(root);
 
-    canvas.zoom(config?.zoom ?? 1);
+    if (config.viewbox) {
+        canvas.viewbox(config.viewbox);
+    }
 
     return domainStoryModeler;
 }

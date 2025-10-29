@@ -6,7 +6,7 @@ declare const process: { env: { NODE_ENV: string } };
 
 type StateType = {
     editorId: string;
-    zoom: number;
+    viewbox?: any;
 };
 
 export function getVsCodeApi(): VsCodeApi<StateType, Command> {
