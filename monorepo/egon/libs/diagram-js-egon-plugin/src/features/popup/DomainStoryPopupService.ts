@@ -6,6 +6,7 @@ import { DomainStoryNumberingRegistry } from "./DomainStoryNumberingRegistry";
 import { ActivityCanvasObject } from "../../domain/entities/activityCanvasObject";
 import CommandStack from "diagram-js/lib/command/CommandStack";
 import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
+import Canvas from "diagram-js/lib/core/Canvas";
 
 export class DomainStoryPopupService {
     static $inject: string[] = [];
@@ -13,6 +14,7 @@ export class DomainStoryPopupService {
     private popupElement: HTMLElement | null = null;
 
     constructor(
+        private readonly canvas: Canvas,
         private readonly eventBus: EventBus,
         private readonly commandStack: CommandStack,
         private readonly elementRegistryService: ElementRegistryService,
@@ -20,7 +22,7 @@ export class DomainStoryPopupService {
     ) {
         this.eventBus.on("element.dblclick", (event: any) => {
             const { element } = event;
-            if (element.type.includes(ElementTypes.ACTIVITY)) {
+            if (element.type?.includes(ElementTypes.ACTIVITY)) {
                 this.open(element);
             }
         });
@@ -163,14 +165,19 @@ export class DomainStoryPopupService {
     private calculatePosition(element: ActivityCanvasObject) {
         const point1 = element["waypoints"][0];
         const point2: any = element["waypoints"][element["waypoints"].length - 1];
+        const canvasX = (point1.x + point2.x) / 2;
+        const canvasY = (point1.y + point2.y) / 2;
+
+        const viewbox = this.canvas.viewbox();
         return {
-            x: (point1.x + point2.x) / 2,
-            y: (point1.y + point2.y) / 2,
+            x: (canvasX - viewbox.x) * viewbox.scale,
+            y: (canvasY - viewbox.y) * viewbox.scale,
         };
     }
 }
 
 DomainStoryPopupService.$inject = [
+    "canvas",
     "eventBus",
     "commandStack",
     "domainStoryElementRegistryService",
