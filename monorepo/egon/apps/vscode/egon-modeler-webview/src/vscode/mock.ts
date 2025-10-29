@@ -19,8 +19,15 @@ export class VsCodeMock<T, M extends Command> implements VsCodeApi<T, M> {
     }
 
     updateState(state: Partial<T>): void {
+        let oldState: T;
+        try {
+            state = this.getState();
+        } catch {
+            state = undefined;
+        }
+
         this.setState({
-            ...this.getState(),
+            ...oldState,
             ...state,
         });
     }
