@@ -18,8 +18,11 @@ export class VsCodeMock<T, M extends Command> implements VsCodeApi<T, M> {
         this.state = state;
     }
 
-    updateState(): void {
-        throw new Error("Method not implemented.");
+    updateState(state: Partial<T>): void {
+        this.setState({
+            ...this.getState(),
+            ...state,
+        });
     }
 
     postMessage(command: Command): void {
