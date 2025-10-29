@@ -16,7 +16,7 @@
     </a>
     <h3>Egon.io — The Domain Story Modeler</h3>
     <p>
-        <i>A tool to visualize Domain Stories in your browser.</i>
+        <i>A tool to edit Domain Stories in Visual Studio Code.</i>
         <br />
         <a href="https://github.com/WPS/egon.io/issues">Report Bug</a>
         ·
@@ -26,12 +26,16 @@
 
 ## About The Project
 
+This plugin integrates the open source tool [Egon.io](https://egon.io/) into Visual Studio Code.
+
 - See http://domainstorytelling.org for more information on Domain Storytelling.
-- The [Egon.io Website](https://egon.io/) contains a user manual.
+- For more information on how to use it please refer to the [User Guide](https://egon.io/howto)
+
+> ‼️ This is a work in progress.
 
 ## Getting started
 
-Open or create a new file with the extension `.egn` and start writing your story.
+Open or create a new `.egn` file and start writing your *domain* story.
 
 ## Contributing
 

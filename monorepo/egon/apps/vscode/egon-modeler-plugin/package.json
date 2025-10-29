@@ -1,7 +1,7 @@
 {
   "name": "egon-vscode-extension",
-  "displayName": "Egon.io: Domain Story Modeler",
-  "description": "A tool to visualize Domain Stories in VS Code.",
+  "displayName": "Egon.io — The Domain Story Modeler",
+  "description": "Write your (domain) story in a visual way with Egon.io.",
   "license": "SEE LICENSE IN LICENSE",
   "version": "0.1.0",
   "publisher": "miragon-gmbh",

@@ -1,9 +1,6 @@
 import { html } from "diagram-js/lib/ui";
 import logo from "../assets/logo/egon-io-logo.png";
 
-console.log("LOGO VALUE:", logo);
-console.log("LOGO prefix:", typeof logo === "string" ? logo.slice(0, 40) : typeof logo);
-
 interface VersionProps {
     version: string;
 }

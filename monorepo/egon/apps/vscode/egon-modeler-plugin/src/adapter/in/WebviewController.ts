@@ -5,7 +5,6 @@ import {
     Disposable,
     Range,
     TextDocument,
-    TextDocumentChangeEvent,
     Uri,
     WebviewPanel,
     window,
@@ -44,11 +43,12 @@ export class WebviewController implements CustomTextEditorProvider {
         webviewPanel: WebviewPanel,
         token: CancellationToken,
     ): Promise<void> {
+        console.log("[DEBUG] resolveCustomTextEditor()");
         try {
             const editorId = this.editorService.create(
                 document.uri.path,
                 document.uri.toString(),
-                document.getText(),
+                document,
             );
             this.disposables.set(editorId, []);
 
@@ -60,10 +60,6 @@ export class WebviewController implements CustomTextEditorProvider {
 
             // Subscribe to events
             this.subscribeToMessageEvent(webviewPanel, this.disposables.get(editorId));
-            this.subscribeToDocumentChangeEvent(
-                webviewPanel,
-                this.disposables.get(editorId),
-            );
             this.subscribeToTabChangeEvent(
                 document,
                 webviewPanel,
@@ -89,9 +85,10 @@ export class WebviewController implements CustomTextEditorProvider {
 
                 switch (true) {
                     case command.TYPE === InitializeWebviewCommand.name: {
+                        console.log("[DEBUG]" + InitializeWebviewCommand.name);
                         const command = new DisplayDomainStoryCommand(
                             editor.id,
-                            editor.content,
+                            editor.document.getText(),
                         );
                         if (await webviewPanel.webview.postMessage(command)) {
                             console.log("DomainStoryModeler is ready!");
@@ -99,6 +96,7 @@ export class WebviewController implements CustomTextEditorProvider {
                         break;
                     }
                     case command.TYPE === SyncDocumentCommand.name: {
+                        console.log("[DEBUG] SyncCommand retrieved ...");
                         const c = command as SyncDocumentCommand;
                         if (c.editorId !== editor.id) {
                             throw new Error(
@@ -109,12 +107,11 @@ export class WebviewController implements CustomTextEditorProvider {
                         console.debug("SyncDocumentCommand -> blocked");
 
                         // Update the content of the active editor
-                        editor.content = c.text;
                         const edit = new WorkspaceEdit();
                         edit.replace(
                             Uri.parse(editor.uri),
                             new Range(0, 0, 9999, 0),
-                            editor.content,
+                            c.text,
                         );
                         if (await workspace.applyEdit(edit)) {
                             this.isChangeDocumentEventBlocked = false;
@@ -128,42 +125,6 @@ export class WebviewController implements CustomTextEditorProvider {
                         command.TYPE
                     }`,
                 );
-            },
-            null,
-            disposables,
-        );
-    }
-
-    /**
-     * User edits the document via text editor.
-     * @param webviewPanel
-     * @param disposables
-     * @private
-     */
-    private subscribeToDocumentChangeEvent(
-        webviewPanel: WebviewPanel,
-        disposables?: Disposable[],
-    ) {
-        workspace.onDidChangeTextDocument(
-            (event: TextDocumentChangeEvent) => {
-                const editor = this.editorService.getActiveEditor();
-                const documentPath = editor.id;
-
-                console.debug("OnDidChangeTextDocument -> trigger");
-                if (
-                    event.contentChanges.length !== 0 &&
-                    documentPath.split(".").pop() === this.extension &&
-                    documentPath === event.document.uri.path &&
-                    !this.isChangeDocumentEventBlocked
-                ) {
-                    console.debug("OnDidChangeTextDocument -> send");
-                    editor.content = event.document.getText();
-                    const command = new DisplayDomainStoryCommand(
-                        editor.id,
-                        editor.content,
-                    );
-                    webviewPanel.webview.postMessage(command);
-                }
             },
             null,
             disposables,
