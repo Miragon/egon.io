@@ -1,18 +1,20 @@
+import { TextDocument } from "vscode";
+
 export interface Editor {
     id: string;
     uri: string;
-    content: string;
+    document: TextDocument;
 }
 
 export class DomainStoryEditor {
     private static instance: DomainStoryEditor;
     private readonly editors: Map<string, Editor> = new Map();
 
-    private constructor(id: string, uri: string, content: string) {
+    private constructor(id: string, uri: string, document: TextDocument) {
         this._id = id;
         this._uri = uri;
-        this._content = content;
-        this.editors.set(id, { id, uri, content });
+        this._document = document;
+        this.editors.set(id, { id, uri, document });
     }
 
     private _id: string;
@@ -27,21 +29,21 @@ export class DomainStoryEditor {
         return this._uri;
     }
 
-    private _content: string;
+    private _document: TextDocument;
 
-    get content(): string {
-        return this._content;
+    get document(): TextDocument {
+        return this._document;
     }
 
-    set content(content: string) {
-        this._content = content;
+    set document(document: TextDocument) {
+        this._document = document;
     }
 
-    static createInstance(id: string, uri: string, content: string) {
+    static createInstance(id: string, uri: string, document: TextDocument) {
         if (this.instance) {
             throw new Error(`A instance of DomainStoryEditor already exists.`);
         }
-        DomainStoryEditor.instance = new DomainStoryEditor(id, uri, content);
+        DomainStoryEditor.instance = new DomainStoryEditor(id, uri, document);
         return DomainStoryEditor.instance;
     }
 
@@ -56,10 +58,10 @@ export class DomainStoryEditor {
      * It is possible to have multiple tabs open. Every tab is a different editor.
      * @param id
      * @param documentPath
-     * @param content
+     * @param document
      */
-    addEditor({ id, uri, content }: Editor) {
-        this.editors.set(id, { id, uri: uri, content });
+    addEditor({ id, uri, document }: Editor) {
+        this.editors.set(id, { id, uri: uri, document });
     }
 
     getEditor(id: string): Editor {
@@ -87,6 +89,6 @@ export class DomainStoryEditor {
         }
         this._id = id;
         this._uri = editor.uri;
-        this._content = editor.content;
+        this._document = editor.document;
     }
 }

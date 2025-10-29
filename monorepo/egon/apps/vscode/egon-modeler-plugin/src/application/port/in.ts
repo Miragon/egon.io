@@ -1,14 +1,15 @@
 import { Editor } from "../domain/DomainStoryEditor";
+import { TextDocument } from "vscode";
 
 export interface DomainStoryEditorUseCase {
     /**
      * Creates and set the active editor.
      * @param id
      * @param uri
-     * @param content
+     * @param document
      * @return editorId
      */
-    create(id: string, uri: string, content: string): string;
+    create(id: string, uri: string, document: TextDocument): string;
 
     /**
      * Get the active editor.
@@ -22,14 +23,6 @@ export interface DomainStoryEditorUseCase {
      * @return editor
      */
     getEditor(id: string): Editor;
-
-    /**
-     * Synchronize the file content with the webview.
-     * @param id
-     * @param content
-     * @return the new file content
-     */
-    sync(id: string, content: string): string;
 
     /**
      * If the user changes the tab to a different DomainStoryEditor the active
