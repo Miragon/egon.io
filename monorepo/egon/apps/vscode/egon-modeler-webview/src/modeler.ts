@@ -5,10 +5,16 @@ import EgonIo, {
 } from "@egon/diagram-js-egon-plugin";
 import Canvas from "diagram-js/lib/core/Canvas";
 import ElementFactory from "diagram-js/lib/core/ElementFactory";
+import EventBus from "diagram-js/lib/core/EventBus";
+import { debounce } from "lodash";
 
 let domainStoryModeler: Diagram | undefined;
 
-export function createDomainStoryModeler(): Diagram {
+export interface ModelerConfig {
+    zoom: number;
+}
+
+export function createDomainStoryModeler(config: ModelerConfig): Diagram {
     const additionalModules = [EgonIo];
 
     domainStoryModeler = new Diagram({
@@ -25,6 +31,8 @@ export function createDomainStoryModeler(): Diagram {
     const root = elementFactory.createRoot();
 
     canvas.setRootElement(root);
+
+    canvas.zoom(config?.zoom ?? 1);
 
     return domainStoryModeler;
 }
@@ -61,7 +69,20 @@ export function exportStory(): string {
  * @throws NoModelerError if the modeler is not initialized
  */
 export function onCommandStackChanged(cb: () => void) {
-    getDomainStoryModeler().get<any>("eventBus").on("commandStack.changed", cb);
+    getDomainStoryModeler()
+        .get<EventBus>("eventBus")
+        .on("commandStack.changed", debounce(cb, 100));
+}
+
+/**
+ * Subscribe to the `canvas.viewbox.changed` event from the `eventBus`.
+ * @param cb
+ * @throws NoModelerError if the modeler is not initialized
+ */
+export function onZoomChanged(cb: (event: any) => void) {
+    getDomainStoryModeler()
+        .get<EventBus>("eventBus")
+        .on("canvas.viewbox.changed", debounce(cb, 100));
 }
 
 export class NoModelerError extends Error {

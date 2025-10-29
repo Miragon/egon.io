@@ -5,8 +5,10 @@ import {
     exportStory,
     getDomainStoryModeler,
     importStory,
+    ModelerConfig,
     NoModelerError,
-    onCommandStackChanged
+    onCommandStackChanged,
+    onZoomChanged
 } from "./modeler";
 import {
     Command,
@@ -69,7 +71,7 @@ function onReceiveMessage(message: MessageEvent<Command>) {
             } catch (error: unknown) {
                 if (error instanceof NoModelerError) {
                     initializeDomainStoryModeler(c.text);
-                    vscode.setState({
+                    vscode.updateState({
                         editorId: c.editorId,
                     });
                 }
@@ -80,13 +82,22 @@ function onReceiveMessage(message: MessageEvent<Command>) {
 }
 
 function initializeDomainStoryModeler(story: string) {
-    createDomainStoryModeler();
+    let state: ModelerConfig;
+    try {
+        state = vscode.getState();
+        console.log(state);
+    } catch {
+        state = undefined;
+    }
+
+    createDomainStoryModeler(state);
     if (story !== "") {
         importStory(story);
     } else {
         importStory(emptyStory);
     }
-    onCommandStackChanged(debounce(sendStoryChanges, 100));
+    onCommandStackChanged(sendStoryChanges);
+    onZoomChanged((event: any) => vscode.updateState({ zoom: event.viewbox.scale }));
 }
 
 const emptyStory = JSON.stringify({
