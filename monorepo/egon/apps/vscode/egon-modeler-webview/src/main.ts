@@ -77,7 +77,7 @@ function onReceiveMessage(message: MessageEvent<Command>) {
                     } catch {
                         vscode.setState({
                             editorId: c.editorId,
-                            zoom: 1,
+                            viewbox: undefined,
                         });
                     }
 
@@ -89,15 +89,19 @@ function onReceiveMessage(message: MessageEvent<Command>) {
     }
 }
 
-function initializeDomainStoryModeler(story: string, state: ModelerConfig) {
-    createDomainStoryModeler(state);
+function initializeDomainStoryModeler(story: string, config: ModelerConfig) {
+    createDomainStoryModeler(config);
     if (story !== "") {
         importStory(story);
     } else {
         importStory(emptyStory);
     }
     onCommandStackChanged(sendStoryChanges);
-    onZoomChanged((event: any) => vscode.updateState({ zoom: event.viewbox.scale }));
+    onZoomChanged((event: any) =>
+        vscode.updateState({
+            viewbox: event.viewbox,
+        }),
+    );
 }
 
 const emptyStory = JSON.stringify({
