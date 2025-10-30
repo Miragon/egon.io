@@ -5,6 +5,7 @@ import {
     Disposable,
     Range,
     TextDocument,
+    TextDocumentChangeEvent,
     Uri,
     WebviewPanel,
     window,
@@ -60,6 +61,10 @@ export class WebviewController implements CustomTextEditorProvider {
 
             // Subscribe to events
             this.subscribeToMessageEvent(webviewPanel, this.disposables.get(editorId));
+            this.subscribeToDocumentChangeEvent(
+                webviewPanel,
+                this.disposables.get(editorId),
+            );
             this.subscribeToTabChangeEvent(
                 document,
                 webviewPanel,
@@ -125,6 +130,41 @@ export class WebviewController implements CustomTextEditorProvider {
                         command.TYPE
                     }`,
                 );
+            },
+            null,
+            disposables,
+        );
+    }
+
+    /**
+     * User edits the document via text editor.
+     * @param webviewPanel
+     * @param disposables
+     * @private
+     */
+    private subscribeToDocumentChangeEvent(
+        webviewPanel: WebviewPanel,
+        disposables?: Disposable[],
+    ) {
+        workspace.onDidChangeTextDocument(
+            (event: TextDocumentChangeEvent) => {
+                const editor = this.editorService.getActiveEditor();
+
+                const documentPath = editor.id;
+                console.debug("OnDidChangeTextDocument -> trigger");
+                if (
+                    event.contentChanges.length !== 0 &&
+                    documentPath.split(".").pop() === this.extension &&
+                    documentPath === event.document.uri.path &&
+                    !this.isChangeDocumentEventBlocked
+                ) {
+                    console.debug("OnDidChangeTextDocument -> send");
+                    const command = new DisplayDomainStoryCommand(
+                        editor.id,
+                        event.document.getText(),
+                    );
+                    webviewPanel.webview.postMessage(command);
+                }
             },
             null,
             disposables,
