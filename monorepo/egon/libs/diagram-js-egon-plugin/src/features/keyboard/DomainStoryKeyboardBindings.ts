@@ -1,8 +1,8 @@
 import Keyboard from "diagram-js/lib/features/keyboard/Keyboard";
 import EditorActions from "diagram-js/lib/features/editor-actions/EditorActions";
 
-export class DomainStoryKeyBinding {
-    static $inject: string[] = [];
+export class DomainStoryKeyboardBindings {
+    static $inject: string[] = ["keyboard", "editorActions"];
 
     constructor(
         private readonly keyboard: Keyboard,
@@ -35,7 +35,7 @@ export class DomainStoryKeyBinding {
                     return true;
                 }
 
-                return false;
+                return undefined;
             },
         ];
     }
@@ -47,7 +47,7 @@ export class DomainStoryKeyBinding {
                 const event = context.keyEvent;
 
                 if (this.keyboard.hasModifier(event)) {
-                    return false;
+                    return undefined;
                 }
 
                 if (this.keyboard.isKey(["s", "S"], event)) {
@@ -55,7 +55,7 @@ export class DomainStoryKeyBinding {
                     return true;
                 }
 
-                return false;
+                return undefined;
             },
         ];
     }
@@ -67,7 +67,7 @@ export class DomainStoryKeyBinding {
                 const event = context.keyEvent;
 
                 if (this.keyboard.hasModifier(event)) {
-                    return false;
+                    return undefined;
                 }
 
                 if (this.keyboard.isKey(["l", "L"], event)) {
@@ -75,7 +75,7 @@ export class DomainStoryKeyBinding {
                     return true;
                 }
 
-                return false;
+                return undefined;
             },
         ];
     }
@@ -95,7 +95,7 @@ export class DomainStoryKeyBinding {
                     return true;
                 }
 
-                return false;
+                return undefined;
             },
         ];
     }
@@ -115,10 +115,8 @@ export class DomainStoryKeyBinding {
                     return true;
                 }
 
-                return false;
+                return undefined;
             },
         ];
     }
 }
-
-DomainStoryKeyBinding.$inject = ["keyboard", "editorActions"];

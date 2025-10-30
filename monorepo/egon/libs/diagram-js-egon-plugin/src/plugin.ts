@@ -18,8 +18,8 @@ import DomainStoryContextPadProvider from "./features/context-pad";
 import DomainStoryLabelEditing from "./features/labeling";
 import DomainStoryUpdateHandler from "./features/update-handler";
 import DomainStoryCopyPaste from "./features/copy-paste";
-import DomainStoryKeyBinding from "./features/keyboard";
-import DomainStoryNumberingUi from "./features/popup";
+import DomainStoryKeyboardBindings from "./features/keyboard";
+import DomainStoryPopupService from "./features/popup";
 import DomainStoryExportService from "./export/service";
 import DomainStoryImportService from "./import/service";
 
@@ -46,8 +46,8 @@ const domainStoryModules = [
     DomainStoryContextPadProvider,
     DomainStoryLabelEditing,
     DomainStoryCopyPaste,
-    DomainStoryKeyBinding,
-    DomainStoryNumberingUi,
+    DomainStoryKeyboardBindings,
+    DomainStoryPopupService,
     DomainStoryExportService,
     DomainStoryImportService,
 ];
