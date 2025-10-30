@@ -32,7 +32,7 @@ export class DomainStoryImportService {
      * @param story
      */
     import(story: string) {
-        console.log("[DEBUG] import()", story);
+        // console.log("[DEBUG] import()", story);
         const configAndDST: ConfigAndDST = JSON.parse(story);
 
         let domainStoryElements = configAndDST.dst;
