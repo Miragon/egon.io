@@ -10,7 +10,7 @@ import {
     WebviewPanel,
     window,
     workspace,
-    WorkspaceEdit,
+    WorkspaceEdit
 } from "vscode";
 import { DomainStoryEditorUseCase } from "../../application/port/in";
 import { domainStoryEditorUi, getContext } from "../helper/vscode";
@@ -18,7 +18,7 @@ import {
     Command,
     DisplayDomainStoryCommand,
     InitializeWebviewCommand,
-    SyncDocumentCommand,
+    SyncDocumentCommand
 } from "@egon/data-transfer-objects";
 
 @singleton()
@@ -44,7 +44,6 @@ export class WebviewController implements CustomTextEditorProvider {
         webviewPanel: WebviewPanel,
         token: CancellationToken,
     ): Promise<void> {
-        console.log("[DEBUG] resolveCustomTextEditor()");
         try {
             const editorId = this.editorService.create(
                 document.uri.path,
@@ -90,7 +89,6 @@ export class WebviewController implements CustomTextEditorProvider {
 
                 switch (true) {
                     case command.TYPE === InitializeWebviewCommand.name: {
-                        console.log("[DEBUG]" + InitializeWebviewCommand.name);
                         const command = new DisplayDomainStoryCommand(
                             editor.id,
                             editor.document.getText(),
@@ -101,7 +99,6 @@ export class WebviewController implements CustomTextEditorProvider {
                         break;
                     }
                     case command.TYPE === SyncDocumentCommand.name: {
-                        console.log("[DEBUG] SyncCommand retrieved ...");
                         const c = command as SyncDocumentCommand;
                         if (c.editorId !== editor.id) {
                             throw new Error(
