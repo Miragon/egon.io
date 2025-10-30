@@ -12,6 +12,7 @@ export class DomainStoryPopupService {
     static $inject: string[] = [];
 
     private popupElement: HTMLElement | null = null;
+    private currentUpdateCallback: ((label: string, index: number | undefined, isMultiple: boolean) => void) | null = null;
 
     constructor(
         private readonly canvas: Canvas,
@@ -37,7 +38,13 @@ export class DomainStoryPopupService {
             isMultiple: boolean,
         ) => {
             this.handleUpdate(element, label, index, isMultiple);
+            this.currentUpdateCallback = null;
             this.close();
+        };
+
+        // Store the update callback for outside click handling
+        this.currentUpdateCallback = (label: string, index: number | undefined, isMultiple: boolean) => {
+            this.handleUpdate(element, label, index, isMultiple);
         };
 
         const onCancel = () => {
@@ -90,6 +97,7 @@ export class DomainStoryPopupService {
             document.removeEventListener("click", this.handleOutsideClick, true);
             this.popupElement.remove();
             this.popupElement = null;
+            this.currentUpdateCallback = null;
         }
     }
 
@@ -157,7 +165,19 @@ export class DomainStoryPopupService {
         const target = event.target as HTMLElement;
         const clickedInsidePopup = target.closest('[data-numbering-popup="true"]');
 
-        if (!clickedInsidePopup) {
+        if (!clickedInsidePopup && this.currentUpdateCallback) {
+            // Get current values from the popup inputs
+            const labelInput = this.popupElement.querySelector('input[name="label"]') as HTMLInputElement;
+            const indexInput = this.popupElement.querySelector('input[name="index"]') as HTMLInputElement;
+            const multipleInput = this.popupElement.querySelector('input[name="multiple"]') as HTMLInputElement;
+
+            const label = labelInput?.value || '';
+            const index = indexInput ? Number(indexInput.value) : undefined;
+            const isMultiple = multipleInput?.checked || false;
+
+            // Trigger the update before closing
+            this.currentUpdateCallback(label, index, isMultiple);
+            this.currentUpdateCallback = null;
             this.close();
         }
     };
