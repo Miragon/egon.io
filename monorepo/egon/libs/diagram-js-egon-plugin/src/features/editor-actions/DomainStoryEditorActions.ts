@@ -1,5 +1,4 @@
 import EditorActions from "diagram-js/lib/features/editor-actions/EditorActions";
-import { Injector } from "didi";
 import Canvas from "diagram-js/lib/core/Canvas";
 import ElementRegistry from "diagram-js/lib/core/ElementRegistry";
 import SpaceTool from "diagram-js/lib/features/space-tool/SpaceTool";
@@ -9,25 +8,27 @@ import HandTool from "diagram-js/lib/features/hand-tool/HandTool";
 import { DirectEditing } from "diagram-js-direct-editing";
 
 export class DomainStoryEditorActions {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "editorActions",
+        "canvas",
+        "elementRegistry",
+        "selection",
+        "spaceTool",
+        "lassoTool",
+        "handTool",
+        "directEditing",
+    ];
 
-    private readonly canvas: Canvas;
-    private readonly elementRegistry: ElementRegistry;
-    private readonly selection: Selection;
-    private readonly spaceTool: SpaceTool;
-    private readonly lassoTool: LassoTool;
-    private readonly handTool: HandTool;
-    private readonly directEditing: DirectEditing;
-
-    constructor(injector: Injector, editorActions: EditorActions) {
-        this.canvas = injector.get("canvas");
-        this.elementRegistry = injector.get("elementRegistry");
-        this.selection = injector.get("selection");
-        this.spaceTool = injector.get("spaceTool");
-        this.lassoTool = injector.get("lassoTool");
-        this.handTool = injector.get("handTool");
-        this.directEditing = injector.get("directEditing");
-
+    constructor(
+        editorActions: EditorActions,
+        private readonly canvas: Canvas,
+        private readonly elementRegistry: ElementRegistry,
+        private readonly selection: Selection,
+        private readonly spaceTool: SpaceTool,
+        private readonly lassoTool: LassoTool,
+        private readonly handTool: HandTool,
+        private readonly directEditing: DirectEditing,
+    ) {
         const actions = {
             selectElements: this.selectAll(),
             spaceTool: this.toggleSpaceTool(),
@@ -85,5 +86,3 @@ export class DomainStoryEditorActions {
         };
     }
 }
-
-DomainStoryEditorActions.$inject = ["injector", "editorActions"];
