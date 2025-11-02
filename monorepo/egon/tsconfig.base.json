@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@egon/data-transfer-objects": ["libs/vscode/data-transfer-objects/src/index.ts"],
-      "@egon/diagram-js-egon-plugin": ["libs/diagram-js-egon-plugin/src/index.ts"]
+      "@egon/diagram-js-egon-plugin": ["libs/diagram-js-egon-plugin/src/index.ts"],
+      "@egon/domain-story": ["libs/vscode/domain-story/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
