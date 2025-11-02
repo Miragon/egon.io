@@ -18,9 +18,9 @@
     <p>
         <i>A tool to edit Domain Stories in Visual Studio Code.</i>
         <br />
-        <a href="https://github.com/WPS/egon.io/issues">Report Bug</a>
+        <a href="https://github.com/Miragon/egon.io/issues">Report Bug</a>
         ·
-        <a href="https://github.com/WPS/egon.io/pulls">Request Feature</a>
+        <a href="https://github.com/Miragon/egon.io/pulls">Request Feature</a>
     </p>
 </div>
 
@@ -29,7 +29,7 @@
 This plugin integrates the open source tool [Egon.io](https://egon.io/) into Visual Studio Code.
 
 - See http://domainstorytelling.org for more information on Domain Storytelling.
-- For more information on how to use it please refer to the [User Guide](https://egon.io/howto)
+- For more information on how to use it, please refer to the [User Guide](https://egon.io/howto)
 
 > ‼️ This is a work in progress.
 
@@ -59,7 +59,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## License
 
-Distributed under this [license](https://github.com/Miragon/egon.io/blob/dbd0fb34b29e9e1f38e29feb2075bfdff2bfef88/monorepo/egon/LICENSE).
+Distributed under this [GPLv3](https://github.com/Miragon/egon.io/blob/dbd0fb34b29e9e1f38e29feb2075bfdff2bfef88/monorepo/egon/LICENSE).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
