@@ -72,11 +72,11 @@ function onReceiveMessage(message: MessageEvent<Command>) {
                 if (error instanceof NoModelerError) {
                     try {
                         vscode.updateState({
-                            editorId: c.editorId,
+                            editorId: c.sessionId,
                         });
                     } catch {
                         vscode.setState({
-                            editorId: c.editorId,
+                            editorId: c.sessionId,
                             viewbox: undefined,
                         });
                     }

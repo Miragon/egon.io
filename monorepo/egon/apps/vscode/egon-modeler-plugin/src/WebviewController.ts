@@ -5,13 +5,13 @@ import {
     TextDocument,
     WebviewPanel,
     window,
-    workspace
+    workspace,
 } from "vscode";
 import { domainStoryEditorUi, getContext } from "./helper";
 import {
     Command,
     InitializeWebviewCommand,
-    SyncDocumentCommand
+    SyncDocumentCommand,
 } from "@egon/data-transfer-objects";
 import { DomainStoryEditorService, VsCodeViewPort } from "@egon/domain-story";
 
@@ -44,7 +44,11 @@ export class WebviewController implements CustomTextEditorProvider {
             const disposables: Disposable[] = [];
 
             const view = new VsCodeViewPort(webviewPanel);
-            this.app.registerSession(editorId, document.getText(), view);
+            const sessionId = this.app.registerSession(
+                editorId,
+                document.getText(),
+                view,
+            );
 
             const msgSub = webviewPanel.webview.onDidReceiveMessage(
                 async (command: Command) => {
@@ -53,15 +57,15 @@ export class WebviewController implements CustomTextEditorProvider {
                     );
 
                     if (command.TYPE === InitializeWebviewCommand.name) {
-                        await this.app.initialize(editorId);
+                        await this.app.initialize(sessionId);
                     } else if (command.TYPE === SyncDocumentCommand.name) {
-                        const c = command as SyncDocumentCommand;
-                        if (c.editorId !== editorId) {
+                        const cmd = command as SyncDocumentCommand;
+                        if (cmd.sessionId !== sessionId) {
                             throw new Error(
-                                `Editor ID mismatch (${c.editorId} != ${editorId})`,
+                                `Editor ID mismatch (${cmd.sessionId} != ${sessionId})`,
                             );
                         }
-                        await this.app.syncFromWebview(editorId, c.text);
+                        await this.app.syncFromWebview(cmd.sessionId, cmd.text);
                     }
 
                     console.debug(
@@ -80,7 +84,7 @@ export class WebviewController implements CustomTextEditorProvider {
                 ) {
                     console.debug("OnDidChangeTextDocument -> send");
                     await this.app.onDocumentChanged(
-                        editorId,
+                        sessionId,
                         event.document.getText(),
                     );
                 }
@@ -90,7 +94,7 @@ export class WebviewController implements CustomTextEditorProvider {
             webviewPanel.onDidDispose(() => {
                 webviewPanel.dispose();
                 disposables.forEach((subscription) => subscription.dispose());
-                this.app.dispose(editorId);
+                this.app.dispose(sessionId);
             });
         } catch (error) {
             console.error(error);

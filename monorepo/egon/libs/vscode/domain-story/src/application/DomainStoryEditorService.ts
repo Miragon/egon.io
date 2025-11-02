@@ -44,30 +44,30 @@ interface SessionState {
  *     constructor(private app: DomainStoryEditorService) {}
  *
  *     async resolveCustomTextEditor(document: TextDocument, panel: WebviewPanel) {
- *         const editorId = document.uri.path;
+ *         const documentId = document.uri.path;
  *         const view = new VsCodeViewPort(panel);
  *
  *         // Register the session
- *         this.app.registerSession(editorId, document.getText(), view);
+ *         const sessionId = this.app.registerSession(documentId, document.getText(), view);
  *
  *         // Handle initialization
  *         panel.webview.onDidReceiveMessage(async (cmd) => {
  *             if (cmd.TYPE === 'InitializeWebview') {
- *                 await this.app.initialize(editorId);
+ *                 await this.app.initialize(sessionId);
  *             } else if (cmd.TYPE === 'SyncDocument') {
- *                 await this.app.syncFromWebview(editorId, cmd.text);
+ *                 await this.app.syncFromWebview(sessionId, cmd.text);
  *             }
  *         });
  *
  *         // Handle document changes
  *         workspace.onDidChangeTextDocument(async (event) => {
- *             if (event.document.uri.path === editorId) {
- *                 await this.app.onDocumentChanged(editorId, event.document.getText());
+ *             if (event.document.uri.path === document.uri.path) {
+ *                 await this.app.onDocumentChanged(sessionId, event.document.getText());
  *             }
  *         });
  *
  *         // Cleanup
- *         panel.onDidDispose(() => this.app.dispose(editorId));
+ *         panel.onDidDispose(() => this.app.dispose(sessionId));
  *     }
  * }
  * ```
@@ -87,27 +87,36 @@ export class DomainStoryEditorService {
      * Registers a new editor session.
      *
      * This should be called when a new editor is opened. If a session with the
-     * same ID already exists, this method does nothing (sessions are not overridden).
+     * same ID already exists, a new session is generated to avoid conflicts
+     * with existing sessions.
      *
-     * @param editorId - Unique identifier for the editor (typically file path)
+     * @param documentId - Unique identifier for the document (typically file path)
      * @param initialText - Initial content of the editor
      * @param view - View port for displaying content to the webview
+     * @returns Unique identifier for the registered editor session
      *
      * @example
      * ```typescript
-     * const editorId = document.uri.path;
+     * const documentId = document.uri.path;
      * const view = new VsCodeViewPort(webviewPanel);
-     * service.registerSession(editorId, document.getText(), view);
+     * const sessionId = service.registerSession(documentId, document.getText(), view);
      * ```
      */
-    registerSession(editorId: string, initialText: string, view: ViewPort): void {
-        if (!this.sessions.has(editorId)) {
-            this.sessions.set(editorId, {
-                guard: 0,
-                session: new EditorSession(editorId, initialText),
-                view,
-            });
+    registerSession(documentId: string, initialText: string, view: ViewPort): string {
+        let index = 1;
+        let sessionId = documentId + `:${index}`;
+        while (this.sessions.has(sessionId)) {
+            index++;
+            sessionId = documentId + `:${index}`;
         }
+
+        this.sessions.set(sessionId, {
+            guard: 0,
+            session: new EditorSession(documentId, initialText),
+            view,
+        });
+
+        return sessionId;
     }
 
     /**
@@ -116,21 +125,21 @@ export class DomainStoryEditorService {
      * This is typically called when the webview sends an initialization message
      * indicating it's ready to receive content.
      *
-     * @param editorId - Unique identifier for the editor
+     * @param sessionId - Unique identifier for the editor session
      *
      * @example
      * ```typescript
      * webview.onDidReceiveMessage(async (cmd) => {
      *     if (cmd.TYPE === 'InitializeWebview') {
-     *         await service.initialize(editorId);
+     *         await service.initialize(sessionId);
      *     }
      * });
      * ```
      */
-    async initialize(editorId: string): Promise<void> {
-        const state = this.get(editorId);
+    async initialize(sessionId: string): Promise<void> {
+        const state = this.get(sessionId);
         if (!state) return;
-        await state.view.display(editorId, state.session.snapshot());
+        await state.view.display(sessionId, state.session.snapshot());
     }
 
     /**
@@ -146,24 +155,24 @@ export class DomainStoryEditorService {
      * 3. onDocumentChanged sees guard > 0 and skips update
      * 4. Guard counter decrements
      *
-     * @param editorId - Unique identifier for the editor
+     * @param sessionId - Unique identifier for the editor session
      * @param text - Updated content from the webview
      *
      * @example
      * ```typescript
      * webview.onDidReceiveMessage(async (cmd) => {
      *     if (cmd.TYPE === 'SyncDocument') {
-     *         await service.syncFromWebview(editorId, cmd.text);
+     *         await service.syncFromWebview(cmd.sessionId, cmd.text);
      *     }
      * });
      * ```
      */
-    async syncFromWebview(editorId: string, text: string): Promise<void> {
-        const state = this.get(editorId);
+    async syncFromWebview(sessionId: string, text: string): Promise<void> {
+        const state = this.get(sessionId);
         if (!state) return;
         state.guard++;
         state.session.applyRemoteSync(text);
-        await this.docs.write(editorId, text);
+        await this.docs.write(this.getDocumentIdFromSessionId(sessionId), text);
         state.guard--;
     }
 
@@ -178,25 +187,25 @@ export class DomainStoryEditorService {
      * - If guard > 0: Change came from syncFromWebview, ignore it
      * - If guard = 0: Change came from user, update the webview
      *
-     * @param editorId - Unique identifier for the editor
+     * @param sessionId - Unique identifier for the editor session
      * @param text - Updated content from the text editor
      *
      * @example
      * ```typescript
      * workspace.onDidChangeTextDocument(async (event) => {
-     *     if (event.document.uri.path === editorId && event.contentChanges.length > 0) {
-     *         await service.onDocumentChanged(editorId, event.document.getText());
+     *     if (event.document.uri.path === document.uri.path && event.contentChanges.length > 0) {
+     *         await service.onDocumentChanged(sessionId, event.document.getText());
      *     }
      * });
      * ```
      */
-    async onDocumentChanged(editorId: string, text: string): Promise<void> {
-        const state = this.get(editorId);
+    async onDocumentChanged(sessionId: string, text: string): Promise<void> {
+        const state = this.get(sessionId);
         if (!state || state.guard > 0) {
             return;
         }
         state.session.applyLocalChange(text);
-        await state.view.display(editorId, text);
+        await state.view.display(sessionId, text);
     }
 
     /**
@@ -204,26 +213,30 @@ export class DomainStoryEditorService {
      *
      * This should be called when the editor/webview is closed to prevent memory leaks.
      *
-     * @param editorId - Unique identifier for the editor to dispose
+     * @param sessionId - Unique identifier for the editor session to dispose
      *
      * @example
      * ```typescript
      * webviewPanel.onDidDispose(() => {
-     *     service.dispose(editorId);
+     *     service.dispose(sessionId);
      * });
      * ```
      */
-    dispose(editorId: string): void {
-        this.sessions.delete(editorId);
+    dispose(sessionId: string): void {
+        this.sessions.delete(sessionId);
     }
 
     /**
-     * Retrieves session state for a given editor.
-     * @param editorId - Editor identifier
+     * Retrieves session state for a given id.
+     * @param sessionId - Editor session identifier
      * @returns Session state if registered, undefined otherwise
      * @internal
      */
-    private get(editorId: string): SessionState | undefined {
-        return this.sessions.get(editorId);
+    private get(sessionId: string): SessionState | undefined {
+        return this.sessions.get(sessionId);
+    }
+
+    private getDocumentIdFromSessionId(sessionId: string): string {
+        return sessionId.split(":")[0];
     }
 }
