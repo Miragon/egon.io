@@ -3,6 +3,7 @@
 ## Overview
 
 The domain-story library has comprehensive test coverage across all three architectural layers:
+
 - **Domain Layer**: Pure business logic tests
 - **Application Layer**: Use case orchestration tests with mocks
 - **Infrastructure Layer**: VS Code adapter tests with mocks
@@ -40,6 +41,7 @@ npx nx run domain-story:test --testFile=EditorSession.spec.ts
 **File**: `src/domain/EditorSession.spec.ts`
 
 **Coverage**:
+
 - ✅ Session creation
 - ✅ Content snapshots
 - ✅ Local changes (user edits document)
@@ -49,11 +51,12 @@ npx nx run domain-story:test --testFile=EditorSession.spec.ts
 - ✅ Immutability guarantees
 
 **Example**:
+
 ```typescript
 it('should apply local changes', () => {
     const session = new EditorSession('test-id', 'initial');
     const event = session.applyLocalChange('updated');
-    
+
     expect(event.origin).toBe('local');
     expect(session.snapshot()).toBe('updated');
 });
@@ -64,6 +67,7 @@ it('should apply local changes', () => {
 **File**: `src/application/DomainStoryEditorService.spec.ts`
 
 **Coverage**:
+
 - ✅ Session registration
 - ✅ Initialization
 - ✅ Webview → Document sync
@@ -74,45 +78,47 @@ it('should apply local changes', () => {
 - ✅ Edge cases (empty, long content, special chars)
 
 **Key Test - Echo Prevention**:
+
 ```typescript
 it('should not create echo loop between webview and document', async () => {
-    service.registerSession('editor-1', 'initial', mockView);
-    mockView.resetCalls('editor-1');
+    const sessionId = service.registerSession('editor-1', 'initial', mockView);
+    mockView.resetCalls(sessionId);
 
-    await service.syncFromWebview('editor-1', 'from webview');
-    
+    await service.syncFromWebview(sessionId, 'from webview');
+
     // During sync, guard is active, so onDocumentChanged should not update view
-    const displayCallsDuringSync = mockView.getDisplayCalls('editor-1').length;
+    const displayCallsDuringSync = mockView.getDisplayCalls(sessionId).length;
     expect(displayCallsDuringSync).toBe(0);
 });
 ```
 
 **Mock Implementations**:
+
 ```typescript
 class MockDocumentPort implements DocumentPort {
     private documents = new Map<string, string>();
 
-    async read(editorId: string): Promise<string> {
-        return this.documents.get(editorId) || '';
+    async read(documentId: string): Promise<string> {
+        return this.documents.get(documentId) || '';
     }
 
-    async write(editorId: string, text: string): Promise<void> {
-        this.documents.set(editorId, text);
+    async write(documentId: string, text: string): Promise<void> {
+        this.documents.set(documentId, text);
     }
 }
 
 class MockViewPort implements ViewPort {
     private displayedContent = new Map<string, string[]>();
 
-    async display(editorId: string, text: string): Promise<void> {
-        if (!this.displayedContent.has(editorId)) {
-            this.displayedContent.set(editorId, []);
+    async display(sessionId: string, text: string): Promise<void> {
+        if (!this.displayedContent.has(sessionId)) {
+            this.displayedContent.set(sessionId, []);
         }
-        this.displayedContent.get(editorId)!.push(text);
+        this.displayedContent.get(sessionId)!.push(text);
     }
 
-    getDisplayCalls(editorId: string): string[] {
-        return this.displayedContent.get(editorId) || [];
+    getDisplayCalls(sessionId: string): string[] {
+        return this.displayedContent.get(sessionId) || [];
     }
 }
 ```
@@ -120,10 +126,12 @@ class MockViewPort implements ViewPort {
 ### Infrastructure Layer Tests
 
 **Files**:
+
 - `src/infrastructure/VsCodeDocumentPort.spec.ts`
 - `src/infrastructure/VsCodeViewPort.spec.ts`
 
 **Coverage**:
+
 - ✅ VS Code API integration (mocked)
 - ✅ Reading documents via `workspace.openTextDocument`
 - ✅ Writing documents via `WorkspaceEdit`
@@ -132,6 +140,7 @@ class MockViewPort implements ViewPort {
 - ✅ Special characters and edge cases
 
 **Mocking VS Code**:
+
 ```typescript
 jest.mock('vscode', () => ({
     Range: jest.fn().mockImplementation((startLine, startChar, endLine, endChar) => ({
@@ -158,12 +167,12 @@ jest.mock('vscode', () => ({
 
 ### Test Breakdown
 
-| Layer | Test File | Tests | Focus |
-|-------|-----------|-------|-------|
-| Domain | `EditorSession.spec.ts` | 13 | Pure domain logic |
-| Application | `DomainStoryEditorService.spec.ts` | 27 | Orchestration & guards |
-| Infrastructure | `VsCodeDocumentPort.spec.ts` | 10 | Document I/O |
-| Infrastructure | `VsCodeViewPort.spec.ts` | 10 | Webview communication |
+| Layer          | Test File                          | Tests | Focus                  |
+|----------------|------------------------------------|-------|------------------------|
+| Domain         | `EditorSession.spec.ts`            | 13    | Pure domain logic      |
+| Application    | `DomainStoryEditorService.spec.ts` | 27    | Orchestration & guards |
+| Infrastructure | `VsCodeDocumentPort.spec.ts`       | 10    | Document I/O           |
+| Infrastructure | `VsCodeViewPort.spec.ts`           | 10    | Webview communication  |
 
 ## Writing New Tests
 
@@ -254,16 +263,19 @@ Located at `tsconfig.spec.json`:
 
 ```json
 {
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "module": "commonjs",
-    "types": ["jest", "node"]
-  },
-  "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts"
-  ]
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "commonjs",
+        "types": [
+            "jest",
+            "node"
+        ]
+    },
+    "include": [
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+    ]
 }
 ```
 
@@ -285,10 +297,12 @@ Use descriptive test names:
 
 ```typescript
 // ✅ Good
-it('should prevent echo loop when syncing from webview', async () => { ... });
+it('should prevent echo loop when syncing from webview', async () => { ...
+});
 
 // ❌ Bad
-it('should work', () => { ... });
+it('should work', () => { ...
+});
 ```
 
 ### 2. Arrange-Act-Assert
@@ -299,10 +313,10 @@ Structure tests clearly:
 it('should update content', () => {
     // Arrange
     const session = new EditorSession('id', 'initial');
-    
+
     // Act
     session.applyLocalChange('updated');
-    
+
     // Assert
     expect(session.snapshot()).toBe('updated');
 });
@@ -314,11 +328,14 @@ Each test should verify one behavior:
 
 ```typescript
 // ✅ Good
-it('should update content', () => { ... });
-it('should emit event', () => { ... });
+it('should update content', () => { ...
+});
+it('should emit event', () => { ...
+});
 
 // ❌ Bad
-it('should update content and emit event and log', () => { ... });
+it('should update content and emit event and log', () => { ...
+});
 ```
 
 ### 4. Use Mocks for Ports Only
@@ -330,6 +347,7 @@ it('should update content and emit event and log', () => { ... });
 ### 5. Test Edge Cases
 
 Always test:
+
 - Empty strings
 - Null/undefined (if applicable)
 - Very long content
@@ -356,27 +374,29 @@ Add to `.vscode/launch.json`:
 
 ```json
 {
-  "type": "node",
-  "request": "launch",
-  "name": "Jest Debug",
-  "program": "${workspaceFolder}/node_modules/.bin/jest",
-  "args": [
-    "--runInBand",
-    "--testPathPattern=domain-story"
-  ],
-  "console": "integratedTerminal",
-  "internalConsoleOptions": "neverOpen"
+    "type": "node",
+    "request": "launch",
+    "name": "Jest Debug",
+    "program": "${workspaceFolder}/node_modules/.bin/jest",
+    "args": [
+        "--runInBand",
+        "--testPathPattern=domain-story"
+    ],
+    "console": "integratedTerminal",
+    "internalConsoleOptions": "neverOpen"
 }
 ```
 
 ## Coverage Reports
 
 Coverage reports are generated in:
+
 ```
 coverage/libs/vscode/domain-story/
 ```
 
 View coverage:
+
 - `lcov-report/index.html` - HTML report
 - `clover.xml` - Clover format (for CI)
 
@@ -385,11 +405,13 @@ View coverage:
 ### "reflect-metadata" Error
 
 If you see:
+
 ```
 tsyringe requires a reflect polyfill
 ```
 
 Ensure `src/test-setup.ts` exists and is referenced in `jest.config.ts`:
+
 ```typescript
 setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts']
 ```
@@ -407,6 +429,7 @@ jest.mock('vscode', () => ({
 ### Import Errors
 
 If imports fail, check:
+
 1. Path aliases in `tsconfig.base.json`
 2. Module resolution in `tsconfig.spec.json`
 3. Jest `moduleNameMapper` if needed
