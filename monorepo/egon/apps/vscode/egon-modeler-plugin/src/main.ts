@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { ExtensionContext } from "vscode";
-import { setContext } from "./global/helper";
+import { setContext } from "./helper";
 import { container } from "tsyringe";
-import { WebviewController } from "./global/WebviewController";
+import { WebviewController } from "./WebviewController";
 import { config } from "./main.config";
 
 export function activate(context: ExtensionContext) {
