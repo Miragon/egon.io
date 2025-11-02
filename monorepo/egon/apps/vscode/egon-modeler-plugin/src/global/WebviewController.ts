@@ -6,14 +6,12 @@ import {
     Range,
     TextDocument,
     TextDocumentChangeEvent,
-    Uri,
     WebviewPanel,
     window,
     workspace,
     WorkspaceEdit
 } from "vscode";
-import { DomainStoryEditorUseCase } from "../../application/port/in";
-import { domainStoryEditorUi, getContext } from "../helper/vscode";
+import { domainStoryEditorUi, getContext } from "./helper";
 import {
     Command,
     DisplayDomainStoryCommand,
@@ -32,8 +30,6 @@ export class WebviewController implements CustomTextEditorProvider {
     constructor(
         @inject("DomainStoryModelerViewType")
         viewType: string,
-        @inject("DomainStoryEditorUseCase")
-        protected readonly editorService: DomainStoryEditorUseCase,
     ) {
         const provider = window.registerCustomEditorProvider(viewType, this);
         getContext().subscriptions.push(provider);
@@ -45,12 +41,7 @@ export class WebviewController implements CustomTextEditorProvider {
         token: CancellationToken,
     ): Promise<void> {
         try {
-            const editorId = this.editorService.create(
-                document.uri.path,
-                document.uri.toString(),
-                document,
-            );
-            this.disposables.set(editorId, []);
+            this.disposables.set(document.uri.path, []);
 
             webviewPanel.webview.options = { enableScripts: true };
             webviewPanel.webview.html = domainStoryEditorUi(
@@ -59,23 +50,24 @@ export class WebviewController implements CustomTextEditorProvider {
             );
 
             // Subscribe to events
-            this.subscribeToMessageEvent(webviewPanel, this.disposables.get(editorId));
-            this.subscribeToDocumentChangeEvent(
-                webviewPanel,
-                this.disposables.get(editorId),
-            );
-            this.subscribeToTabChangeEvent(
+            this.subscribeToMessageEvent(
                 document,
                 webviewPanel,
-                this.disposables.get(editorId),
+                this.disposables.get(document.uri.path),
             );
-            this.subscribeToDisposeEvent(webviewPanel);
+            this.subscribeToDocumentChangeEvent(
+                document,
+                webviewPanel,
+                this.disposables.get(document.uri.path),
+            );
+            this.subscribeToDisposeEvent(document, webviewPanel);
         } catch (error) {
             console.error(error);
         }
     }
 
     private subscribeToMessageEvent(
+        document: TextDocument,
         webviewPanel: WebviewPanel,
         disposables?: Disposable[],
     ) {
@@ -85,13 +77,11 @@ export class WebviewController implements CustomTextEditorProvider {
                     `[${new Date(Date.now()).toJSON()}] Message received -> ${command.TYPE}`,
                 );
 
-                const editor = this.editorService.getActiveEditor();
-
                 switch (true) {
                     case command.TYPE === InitializeWebviewCommand.name: {
                         const command = new DisplayDomainStoryCommand(
-                            editor.id,
-                            editor.document.getText(),
+                            document.uri.path,
+                            document.getText(),
                         );
                         if (await webviewPanel.webview.postMessage(command)) {
                             console.log("DomainStoryModeler is ready!");
@@ -100,9 +90,9 @@ export class WebviewController implements CustomTextEditorProvider {
                     }
                     case command.TYPE === SyncDocumentCommand.name: {
                         const c = command as SyncDocumentCommand;
-                        if (c.editorId !== editor.id) {
+                        if (c.editorId !== document.uri.path) {
                             throw new Error(
-                                `Editor ID's do not match (${command.editorId} != ${editor.id})`,
+                                `Editor ID's do not match (${command.editorId} != ${document.uri.path})`,
                             );
                         }
                         this.isChangeDocumentEventBlocked = true;
@@ -110,11 +100,7 @@ export class WebviewController implements CustomTextEditorProvider {
 
                         // Update the content of the active editor
                         const edit = new WorkspaceEdit();
-                        edit.replace(
-                            Uri.parse(editor.uri),
-                            new Range(0, 0, 9999, 0),
-                            c.text,
-                        );
+                        edit.replace(document.uri, new Range(0, 0, 9999, 0), c.text);
                         if (await workspace.applyEdit(edit)) {
                             this.isChangeDocumentEventBlocked = false;
                             console.debug("SyncDocumentCommand -> released");
@@ -135,29 +121,28 @@ export class WebviewController implements CustomTextEditorProvider {
 
     /**
      * User edits the document via text editor.
+     * @param document
      * @param webviewPanel
      * @param disposables
      * @private
      */
     private subscribeToDocumentChangeEvent(
+        document: TextDocument,
         webviewPanel: WebviewPanel,
         disposables?: Disposable[],
     ) {
         workspace.onDidChangeTextDocument(
             (event: TextDocumentChangeEvent) => {
-                const editor = this.editorService.getActiveEditor();
-
-                const documentPath = editor.id;
                 console.debug("OnDidChangeTextDocument -> trigger");
                 if (
                     event.contentChanges.length !== 0 &&
-                    documentPath.split(".").pop() === this.extension &&
-                    documentPath === event.document.uri.path &&
+                    document.uri.path.split(".").pop() === this.extension &&
+                    document.uri.path === event.document.uri.path &&
                     !this.isChangeDocumentEventBlocked
                 ) {
                     console.debug("OnDidChangeTextDocument -> send");
                     const command = new DisplayDomainStoryCommand(
-                        editor.id,
+                        document.uri.path,
                         event.document.getText(),
                     );
                     webviewPanel.webview.postMessage(command);
@@ -169,40 +154,17 @@ export class WebviewController implements CustomTextEditorProvider {
     }
 
     /**
-     * User changes the tab.
+     * If a user closes a tab, we have to clean up.
      * @param document
      * @param webviewPanel
-     * @param disposables
      * @private
      */
-    private subscribeToTabChangeEvent(
-        document: TextDocument,
-        webviewPanel: WebviewPanel,
-        disposables?: Disposable[],
-    ) {
-        webviewPanel.onDidChangeViewState(
-            () => {
-                if (webviewPanel.active) {
-                    this.editorService.setActiveEditor(document.uri.path);
-                }
-            },
-            null,
-            disposables,
-        );
-    }
-
-    /**
-     * If a user closes a tab, we have to clean up.
-     * @param webviewPanel
-     * @private
-     */
-    private subscribeToDisposeEvent(webviewPanel: WebviewPanel) {
+    private subscribeToDisposeEvent(document: TextDocument, webviewPanel: WebviewPanel) {
         webviewPanel.onDidDispose(() => {
             webviewPanel.dispose();
-            const editor = this.editorService.getActiveEditor();
-            const subscriptions = this.disposables.get(editor.id);
+            const subscriptions = this.disposables.get(document.uri.path);
             subscriptions?.forEach((subscription) => subscription.dispose());
-            this.disposables.delete(editor.id);
+            this.disposables.delete(document.uri.path);
         });
     }
 }
