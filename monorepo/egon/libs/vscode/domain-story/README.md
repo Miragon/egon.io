@@ -19,10 +19,10 @@ This library provides a clean, maintainable architecture for handling bidirectio
 This library is already part of the monorepo. Import it using the path alias:
 
 ```typescript
-import { 
-    DomainStoryEditorService, 
-    VsCodeDocumentPort, 
-    VsCodeViewPort 
+import {
+    DomainStoryEditorService,
+    VsCodeDocumentPort,
+    VsCodeViewPort
 } from '@egon/domain-story';
 ```
 
@@ -32,10 +32,10 @@ import {
 
 ```typescript
 import { container } from "tsyringe";
-import { 
-    DomainStoryEditorService, 
-    DocumentPort, 
-    VsCodeDocumentPort 
+import {
+    DomainStoryEditorService,
+    DocumentPort,
+    VsCodeDocumentPort
 } from "@egon/domain-story";
 
 export function config() {
@@ -56,15 +56,15 @@ export function config() {
 
 ```typescript
 import { inject, singleton } from "tsyringe";
-import { 
+import {
     CustomTextEditorProvider,
     TextDocument,
     WebviewPanel,
     workspace
 } from "vscode";
-import { 
-    DomainStoryEditorService, 
-    VsCodeViewPort 
+import {
+    DomainStoryEditorService,
+    VsCodeViewPort
 } from "@egon/domain-story";
 
 @singleton()
@@ -72,39 +72,40 @@ export class WebviewController implements CustomTextEditorProvider {
     constructor(
         @inject(DomainStoryEditorService)
         private app: DomainStoryEditorService,
-    ) {}
+    ) {
+    }
 
     async resolveCustomTextEditor(
         document: TextDocument,
         webviewPanel: WebviewPanel,
     ): Promise<void> {
-        const editorId = document.uri.path;
-        
+        const documentId = document.uri.path;
+
         // Create view port for this webview
         const view = new VsCodeViewPort(webviewPanel);
-        
+
         // Register session
-        this.app.registerSession(editorId, document.getText(), view);
+        const sessionId = this.app.registerSession(documentId, document.getText(), view);
 
         // Handle initialization message from webview
         webviewPanel.webview.onDidReceiveMessage(async (command) => {
             if (command.TYPE === 'InitializeWebview') {
-                await this.app.initialize(editorId);
+                await this.app.initialize(sessionId);
             } else if (command.TYPE === 'SyncDocument') {
-                await this.app.syncFromWebview(editorId, command.text);
+                await this.app.syncFromWebview(sessionId, command.text);
             }
         });
 
         // Handle document changes (user edits text)
         workspace.onDidChangeTextDocument(async (event) => {
-            if (event.document.uri.path === editorId) {
-                await this.app.onDocumentChanged(editorId, event.document.getText());
+            if (event.document.uri.path === sessionId) {
+                await this.app.onDocumentChanged(sessionId, event.document.getText());
             }
         });
 
         // Cleanup on dispose
         webviewPanel.onDidDispose(() => {
-            this.app.dispose(editorId);
+            this.app.dispose(sessionId);
         });
     }
 }
@@ -129,7 +130,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation
 The core aggregate that manages the state of a single editor session:
 
 ```typescript
-const session = new EditorSession(editorId, initialText);
+const session = new EditorSession(sessionId, initialText);
 
 // Local change (user edits text document)
 const event = session.applyLocalChange(newText);
@@ -147,19 +148,19 @@ Orchestrates editor sessions and prevents echo loops:
 
 ```typescript
 // Register a new session
-service.registerSession(editorId, initialText, viewPort);
+service.registerSession(sessionId, initialText, viewPort);
 
 // Initialize webview with current content
-await service.initialize(editorId);
+await service.initialize(sessionId);
 
 // Sync from webview to document
-await service.syncFromWebview(editorId, text);
+await service.syncFromWebview(sessionId, text);
 
 // Handle document change (with echo prevention)
-await service.onDocumentChanged(editorId, text);
+await service.onDocumentChanged(sessionId, text);
 
 // Cleanup
-service.dispose(editorId);
+service.dispose(sessionId);
 ```
 
 ### Ports (Application Layer)
@@ -167,17 +168,20 @@ service.dispose(editorId);
 Interfaces that define contracts for infrastructure adapters:
 
 **DocumentPort** - Reading/writing VS Code documents:
+
 ```typescript
 interface DocumentPort {
-    read(editorId: string): Promise<string>;
-    write(editorId: string, text: string): Promise<void>;
+    read(documentId: string): Promise<string>;
+
+    write(documentId: string, text: string): Promise<void>;
 }
 ```
 
 **ViewPort** - Displaying content in webview:
+
 ```typescript
 interface ViewPort {
-    display(editorId: string, text: string): Promise<void>;
+    display(sessionId: string, text: string): Promise<void>;
 }
 ```
 
@@ -186,13 +190,13 @@ interface ViewPort {
 The library prevents infinite loops between document and webview updates using per-session guards:
 
 1. When webview updates document (`syncFromWebview`):
-   - Guard counter increments
-   - Document is updated
-   - Guard counter decrements
+    - Guard counter increments
+    - Document is updated
+    - Guard counter decrements
 
 2. When document changes (`onDocumentChanged`):
-   - If guard > 0: Skip (it's our own change)
-   - If guard = 0: Update webview (user's change)
+    - If guard > 0: Skip (it's our own change)
+    - If guard = 0: Update webview (user's change)
 
 This replaces the previous global `isChangeDocumentEventBlocked` flag.
 
@@ -201,12 +205,14 @@ This replaces the previous global `isChangeDocumentEventBlocked` flag.
 The library has comprehensive test coverage across all layers (60 tests).
 
 **Run tests**:
+
 ```bash
 npx nx run domain-story:test
 npx nx run domain-story:test --coverage
 ```
 
 **Test files**:
+
 - `src/domain/EditorSession.spec.ts` - Pure domain logic tests
 - `src/application/DomainStoryEditorService.spec.ts` - Orchestration & echo prevention
 - `src/infrastructure/VsCodeDocumentPort.spec.ts` - Document I/O tests
@@ -224,7 +230,7 @@ Create your own port implementations for different frameworks:
 import { ViewPort } from '@egon/domain-story';
 
 export class CustomViewPort implements ViewPort {
-    async display(editorId: string, text: string): Promise<void> {
+    async display(sessionId: string, text: string): Promise<void> {
         // Your custom implementation
     }
 }
@@ -247,21 +253,21 @@ export class EditorSession {
 
 ### DomainStoryEditorService
 
-| Method | Description |
-|--------|-------------|
-| `registerSession(editorId, initialText, view)` | Register a new editor session |
-| `initialize(editorId)` | Send current content to webview |
-| `syncFromWebview(editorId, text)` | Update document from webview (with guard) |
-| `onDocumentChanged(editorId, text)` | Handle document change (with echo prevention) |
-| `dispose(editorId)` | Cleanup session |
+| Method                                          | Description                                   |
+|-------------------------------------------------|-----------------------------------------------|
+| `registerSession(sessionId, initialText, view)` | Register a new editor session                 |
+| `initialize(sessionId)`                         | Send current content to webview               |
+| `syncFromWebview(sessionId, text)`              | Update document from webview (with guard)     |
+| `onDocumentChanged(sessionId, text)`            | Handle document change (with echo prevention) |
+| `dispose(sessionId)`                            | Cleanup session                               |
 
 ### EditorSession
 
-| Method | Description |
-|--------|-------------|
-| `snapshot()` | Get current content |
+| Method                   | Description                        |
+|--------------------------|------------------------------------|
+| `snapshot()`             | Get current content                |
 | `applyLocalChange(text)` | Apply local change (from document) |
-| `applyRemoteSync(text)` | Apply remote change (from webview) |
+| `applyRemoteSync(text)`  | Apply remote change (from webview) |
 
 ## License
 

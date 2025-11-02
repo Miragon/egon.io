@@ -61,17 +61,20 @@ The Domain Story library implements a clean Domain-Driven Design (DDD) architect
 **Purpose**: Pure business logic with zero external dependencies.
 
 **Components**:
+
 - `EditorSession`: Aggregate root that manages editor state and sync guard
 - `ContentUpdatedEvent`: Domain event emitted on changes
 - `ContentOrigin`: Value object ('local' | 'remote')
 
 **Rules**:
+
 - No dependencies on frameworks (VS Code, React, etc.)
 - No I/O operations
 - Only business logic and invariants
 - Fully unit testable without mocks
 
 **Example**:
+
 ```typescript
 export class EditorSession {
     constructor(
@@ -91,29 +94,32 @@ export class EditorSession {
 **Purpose**: Orchestrates use cases and defines contracts (ports) for infrastructure.
 
 **Components**:
+
 - `DomainStoryEditorService`: Application service managing sessions
 - `DocumentPort`: Interface for document I/O
 - `ViewPort`: Interface for webview communication
 
 **Rules**:
+
 - Depends on domain layer
 - No framework dependencies (only interfaces)
 - Coordinates workflows between domain and infrastructure
 - Contains business use cases
 
 **Example**:
+
 ```typescript
 @injectable()
 export class DomainStoryEditorService {
     constructor(private docs: DocumentPort) {}
 
-    async syncFromWebview(editorId: string, text: string): Promise<void> {
-        const state = this.get(editorId);
+    async syncFromWebview(sessionId: string, text: string): Promise<void> {
+        const state = this.get(sessionId);
         if (!state) return;
         
         state.guard++;  // Prevent echo
         state.session.applyRemoteSync(text);
-        await this.docs.write(editorId, text);
+        await this.docs.write(this.getDocumentIdFromSessionId(sessionId), text);
         state.guard--;
     }
 }
@@ -124,19 +130,22 @@ export class DomainStoryEditorService {
 **Purpose**: Implements ports using framework-specific code.
 
 **Components**:
+
 - `VsCodeDocumentPort`: Adapts VS Code workspace API
 - `VsCodeViewPort`: Adapts VS Code webview API
 
 **Rules**:
+
 - Implements application layer ports
 - Contains all VS Code dependencies
 - Can be swapped without changing domain/application
 
 **Example**:
+
 ```typescript
 export class VsCodeDocumentPort implements DocumentPort {
-    async write(editorId: string, text: string): Promise<void> {
-        const uri = Uri.file(editorId);
+    async write(documentId: string, text: string): Promise<void> {
+        const uri = Uri.file(documentId);
         const edit = new WorkspaceEdit();
         edit.replace(uri, new Range(0, 0, 9999, 0), text);
         await workspace.applyEdit(edit);
@@ -157,10 +166,10 @@ sequenceDiagram
     participant ViewPort
 
     Webview->>Controller: InitializeWebviewCommand
-    Controller->>Service: initialize(editorId)
+    Controller->>Service: initialize(sessionId)
     Service->>Session: snapshot()
     Session-->>Service: content
-    Service->>ViewPort: display(editorId, content)
+    Service->>ViewPort: display(sessionId, content)
     ViewPort->>Webview: DisplayDomainStoryCommand
 ```
 
@@ -174,22 +183,17 @@ sequenceDiagram
     participant Session
     participant DocumentPort
     participant VSCode
-
-    Webview->>Controller: SyncDocumentCommand(text)
-    Controller->>Service: syncFromWebview(editorId, text)
-    
-    Service->>Service: guard++
-    Service->>Session: applyRemoteSync(text)
-    Session-->>Service: ContentUpdatedEvent
-    
-    Service->>DocumentPort: write(editorId, text)
-    DocumentPort->>VSCode: WorkspaceEdit.replace()
-    VSCode-->>DocumentPort: success
-    
-    DocumentPort-->>Service: done
-    Service->>Service: guard--
-    
-    Note over VSCode,Service: Document change event fires,<br/>but guard > 0 so it's ignored
+    Webview ->> Controller: SyncDocumentCommand(text)
+    Controller ->> Service: syncFromWebview(sessionId, text)
+    Service ->> Service: guard++
+    Service ->> Session: applyRemoteSync(text)
+    Session -->> Service: ContentUpdatedEvent
+    Service ->> DocumentPort: write(documentId, text)
+    DocumentPort ->> VSCode: WorkspaceEdit.replace()
+    VSCode -->> DocumentPort: success
+    DocumentPort -->> Service: done
+    Service ->> Service: guard--
+    Note over VSCode, Service: Document change event fires,<br/>but guard > 0 so it's ignored
 ```
 
 ### Document → Webview Sync Flow
@@ -202,17 +206,13 @@ sequenceDiagram
     participant Session
     participant ViewPort
     participant Webview
-
-    VSCode->>Controller: onDidChangeTextDocument(event)
-    Controller->>Service: onDocumentChanged(editorId, text)
-    
-    Service->>Service: if guard > 0: return<br/>(ignore own changes)
-    
-    Service->>Session: applyLocalChange(text)
-    Session-->>Service: ContentUpdatedEvent
-    
-    Service->>ViewPort: display(editorId, text)
-    ViewPort->>Webview: postMessage(DisplayDomainStoryCommand)
+    VSCode ->> Controller: onDidChangeTextDocument(event)
+    Controller ->> Service: onDocumentChanged(sessionId, text)
+    Service ->> Service: if guard > 0: return<br/>(ignore own changes)
+    Service ->> Session: applyLocalChange(text)
+    Session -->> Service: ContentUpdatedEvent
+    Service ->> ViewPort: display(sessionId, text)
+    ViewPort ->> Webview: postMessage(DisplayDomainStoryCommand)
 ```
 
 ## Session State Management
@@ -248,7 +248,8 @@ interface SessionState {
 }
 
 // Managed by DomainStoryEditorService
-private sessions = new Map<editorId, SessionState>();
+private
+sessions = new Map<sessionId, SessionState>();
 ```
 
 ## Dependency Flow
@@ -312,24 +313,24 @@ User edits document
 ### Solution: Per-Session Guards
 
 ```typescript
-async syncFromWebview(editorId: string, text: string): Promise<void> {
-    const state = this.get(editorId);
+async syncFromWebview(sessionId: string, text: string): Promise<void> {
+    const state = this.get(sessionId);
     if (!state) return;
     
     state.guard++;  // 🔒 Lock: "We're updating the document"
     state.session.applyRemoteSync(text);
-    await this.docs.write(editorId, text);  // ← This triggers onDidChangeTextDocument
+    await this.docs.write(thisGetDocumentIdFromSessionId(sessionId), text);  // ← This triggers onDidChangeTextDocument
     state.guard--;  // 🔓 Unlock
 }
 
-async onDocumentChanged(editorId: string, text: string): Promise<void> {
-    const state = this.get(editorId);
+async onDocumentChanged(sessionId: string, text: string): Promise<void> {
+    const state = this.get(sessionId);
     if (!state || state.guard > 0) {  // ← Skip if locked
         return;  // "This change came from us, ignore it"
     }
     
     state.session.applyLocalChange(text);
-    await state.view.display(editorId, text);
+    await state.view.display(sessionId, text);
 }
 ```
 
@@ -461,17 +462,18 @@ export class EditorSession {
 
 ### Session Cleanup
 
-Always call `dispose(editorId)` when closing editors to prevent memory leaks:
+Always call `dispose(sessionId)` when closing editors to prevent memory leaks:
 
 ```typescript
 webviewPanel.onDidDispose(() => {
-    this.app.dispose(editorId);  // ← Essential
+    this.app.dispose(sessionId);  // ← Essential
 });
 ```
 
 ### Guard Overhead
 
 The guard mechanism adds minimal overhead:
+
 - Increment/decrement operations: O(1)
 - No async overhead
 - Per-session isolation prevents contention
@@ -481,8 +483,10 @@ The guard mechanism adds minimal overhead:
 ### From Old Architecture
 
 **Before** (global state):
+
 ```typescript
-private isChangeDocumentEventBlocked = false;
+private
+isChangeDocumentEventBlocked = false;
 
 this.isChangeDocumentEventBlocked = true;
 await workspace.applyEdit(edit);
@@ -490,8 +494,9 @@ this.isChangeDocumentEventBlocked = false;
 ```
 
 **After** (per-session guards):
+
 ```typescript
-await this.app.syncFromWebview(editorId, text);
+await this.app.syncFromWebview(sessionId, text);
 // Guard handled internally per session
 ```
 

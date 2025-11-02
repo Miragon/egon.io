@@ -25,8 +25,21 @@ ij_any_class_brace_style = next_line
 ij_any_method_brace_style = next_line
 
 [*.md]
-trim_trailing_whitespace = false
 max_line_length = off
+
+# intellij ( ij_programming-language_setting )
+ij_any_line_comment_add_space_on_reformat = false
+# spaces
+ij_any_spaces_within_method_parentheses = false
+ij_any_spaces_within_method_call_parentheses = false
+ij_any_spaces_within_if_parentheses = false
+ij_any_spaces_within_for_parentheses = false
+ij_any_spaces_within_while_parentheses = false
+ij_any_spaces_within_switch_parentheses = false
+ij_any_spaces_within_catch_parentheses = false
+# braces
+ij_any_class_brace_style = end_of_line
+ij_any_method_brace_style = end_of_line
 
 [*{json,yml,yaml}]
 indent_size = 2
