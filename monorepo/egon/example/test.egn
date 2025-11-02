@@ -18,7 +18,7 @@
   "dst": [
     {
       "type": "domainStory:activity",
-      "name": "",
+      "name": "update",
       "id": "connection_0288",
       "pickedColor": "black",
       "number": 1,
@@ -33,14 +33,42 @@
         },
         {
           "original": {
-            "x": 543,
+            "x": 562,
             "y": 141
           },
-          "x": 505,
+          "x": 524,
           "y": 141
         }
       ],
       "source": "shape_0589",
+      "target": "shape_6335",
+      "multipleNumberAllowed": false
+    },
+    {
+      "type": "domainStory:activity",
+      "name": "",
+      "id": "connection_5049",
+      "pickedColor": "black",
+      "number": 2,
+      "waypoints": [
+        {
+          "original": {
+            "x": 345,
+            "y": 356
+          },
+          "x": 366,
+          "y": 335
+        },
+        {
+          "original": {
+            "x": 562,
+            "y": 141
+          },
+          "x": 524,
+          "y": 179
+        }
+      ],
+      "source": "shape_7775",
       "target": "shape_6335"
     },
     {
@@ -52,10 +80,10 @@
       "waypoints": [
         {
           "original": {
-            "x": 543,
+            "x": 562,
             "y": 141
           },
-          "x": 586,
+          "x": 605,
           "y": 141
         },
         {
@@ -88,8 +116,15 @@
       "type": "domainStory:workObjectFolder",
       "name": "",
       "id": "shape_6335",
-      "x": 505,
+      "x": 524,
       "y": 103
+    },
+    {
+      "name": "",
+      "id": "shape_7775",
+      "type": "domainStory:actorPerson",
+      "x": 307,
+      "y": 318
     },
     {
       "info": ""
