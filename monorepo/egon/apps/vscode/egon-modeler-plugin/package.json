@@ -1,5 +1,6 @@
 {
-  "name": "egon-vscode-extension",
+  "name": "egon-modeler-plugin",
+  "publishName": "egon-vscode-extension",
   "displayName": "Egon.io — The Domain Story Modeler",
   "description": "Write your (domain) story in a visual way with Egon.io.",
   "license": "SEE LICENSE IN LICENSE",
@@ -41,6 +42,11 @@
     "diagram-js"
   ],
   "main": "main.js",
+  "private": true,
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production"
+  },
   "contributes": {
     "customEditors": [
       {

@@ -1,7 +1,7 @@
 /// <reference types='vitest' />
 import { defineConfig } from "vite";
-import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
-import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
+import tsconfigPaths from "vite-tsconfig-paths";
+import path from "path";
 
 export default defineConfig({
     root: __dirname,
@@ -15,7 +15,7 @@ export default defineConfig({
         host: "localhost",
     },
 
-    plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"])],
+    plugins: [tsconfigPaths()],
 
     esbuild: {
         minifyIdentifiers: false,
@@ -23,7 +23,8 @@ export default defineConfig({
     },
 
     build: {
-        // TODO: parse a webview uri to the diagram-js plugin
+        outDir: path.resolve(__dirname, "../../../dist/apps/vscode/egon-io/webview"),
+        emptyOutDir: false,
         assetsInlineLimit: 20_000,
         reportCompressedSize: true,
         commonjsOptions: {
