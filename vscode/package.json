@@ -26,7 +26,7 @@
     "dev:plugin": "yarn workspace egon-modeler-plugin dev",
     "serve": "yarn workspace egon-modeler-webview serve",
     "test": "jest --coverage --coverageReporters=clover",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
+    "lint": "eslint ."
   },
   "dependencies": {
     "bpmn-font": "^0.12.1",
