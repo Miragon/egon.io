@@ -39,7 +39,7 @@ window.onload = function () {
     let editorId: string;
     try {
         editorId = vscode.getState().editorId;
-    } catch (error: unknown) {
+    } catch {
         editorId = "";
     }
 

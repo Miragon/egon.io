@@ -1,6 +1,5 @@
 /// <reference types='vitest' />
 import { defineConfig } from "vite";
-import * as path from "path";
 import tsconfigPaths from "vite-tsconfig-paths";
 import dts from "vite-plugin-dts";
 

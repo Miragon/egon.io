@@ -1,30 +1,34 @@
-import nx from "@nx/eslint-plugin";
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import prettier from "eslint-config-prettier";
 
 export default [
-    ...nx.configs["flat/base"],
-    ...nx.configs["flat/typescript"],
-    ...nx.configs["flat/javascript"],
     {
-        ignores: ["**/dist"],
+        ignores: ["**/dist", "**/node_modules", "**/coverage"],
     },
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    prettier,
     {
-        files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-        rules: { },
-    },
-    {
-        files: [
-            "**/*.ts",
-            "**/*.tsx",
-            "**/*.cts",
-            "**/*.mts",
-            "**/*.js",
-            "**/*.jsx",
-            "**/*.cjs",
-            "**/*.mjs",
-        ],
-        // Override or add rules here
+        files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
         rules: {
             "@typescript-eslint/no-empty-function": "off",
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": "warn",
+        },
+    },
+    {
+        files: ["**/*.js", "**/*.cjs"],
+        languageOptions: {
+            globals: {
+                require: "readonly",
+                module: "readonly",
+                __dirname: "readonly",
+                Buffer: "readonly",
+            },
+        },
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
         },
     },
 ];
