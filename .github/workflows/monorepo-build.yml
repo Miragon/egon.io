@@ -62,7 +62,7 @@ jobs:
 
       - name: Build vsix egon-io
         working-directory: apps/vscode/egon-io
-        run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile .vscodeignore
+        run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile vscodeignore
 
       - uses: actions/upload-artifact@v4
         with:

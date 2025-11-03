@@ -113,9 +113,8 @@ module.exports = (env, argv) => {
                         },
                     },
                     {
-                        from: ".vscodeignore",
-                        to: "[name][ext]",
-                        context: __dirname,
+                        from: "vscodeignore",
+                        to: ".",
                     },
                     {
                         from: "egon-io-logo.png",
