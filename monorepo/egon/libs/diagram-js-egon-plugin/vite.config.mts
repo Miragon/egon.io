@@ -1,14 +1,21 @@
 /// <reference types='vitest' />
 import { defineConfig } from "vite";
 import * as path from "path";
-import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
-import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
+import tsconfigPaths from "vite-tsconfig-paths";
+import dts from "vite-plugin-dts";
 
 export default defineConfig({
     root: __dirname,
     cacheDir: "../../node_modules/.vite/libs/diagram-js-egon-plugin",
-    plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"])],
+    plugins: [
+        tsconfigPaths(),
+        dts({
+            outDir: "../../dist/libs/diagram-js-egon-plugin",
+            entryRoot: "src",
+        }),
+    ],
     build: {
+        outDir: "../../dist/libs/diagram-js-egon-plugin",
         reportCompressedSize: true,
         commonjsOptions: {
             transformMixedEsModules: true,
@@ -20,7 +27,7 @@ export default defineConfig({
             formats: ["es"],
         },
         rollupOptions: {
-            external: [],
+            external: ["diagram-js", "diagram-js-direct-editing", "diagram-js-minimap", "ids", "min-dash", "min-dom", "rxjs", "tiny-svg"],
             input: {
                 index: path.resolve(__dirname, "src/index.ts"),
                 style: path.resolve(__dirname, "src/styles.scss"),

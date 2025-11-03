@@ -1,5 +1,4 @@
 @import "diagram-js/assets/diagram-js.css";
-/* TODO: Find a better way to import the css files */
 @import "../../../../dist/libs/diagram-js-egon-plugin/style.css";
 
 html, body {

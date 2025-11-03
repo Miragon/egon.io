@@ -5,6 +5,10 @@
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
   "dependencies": {
     "diagram-js": "^15.2.4",
     "diagram-js-direct-editing": "^3.2.0",

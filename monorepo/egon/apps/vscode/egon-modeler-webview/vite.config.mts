@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     root: __dirname,
     cacheDir: "../../../node_modules/.vite/apps/vscode/egon-modeler-webview",
     server: {
@@ -16,6 +16,26 @@ export default defineConfig({
     },
 
     plugins: [tsconfigPaths()],
+
+    resolve: {
+        alias:
+            mode === "development"
+                ? {
+                      "@egon/diagram-js-egon-plugin": path.resolve(
+                          __dirname,
+                          "../../../dist/libs/diagram-js-egon-plugin"
+                      ),
+                      "@egon/vscode-domain-story": path.resolve(
+                          __dirname,
+                          "../../../dist/libs/vscode/domain-story"
+                      ),
+                      "@egon/vscode-data-transfer-objects": path.resolve(
+                          __dirname,
+                          "../../../dist/libs/vscode/data-transfer-objects"
+                      ),
+                  }
+                : {},
+    },
 
     esbuild: {
         minifyIdentifiers: false,
@@ -37,4 +57,4 @@ export default defineConfig({
             },
         },
     },
-});
+}));
