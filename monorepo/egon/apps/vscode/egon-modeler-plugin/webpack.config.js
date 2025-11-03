@@ -19,10 +19,13 @@ module.exports = (env, argv) => {
         },
         devtool: isDevelopment ? "source-map" : false,
         optimization: {
+            minimize: !isDevelopment,
             minimizer: [
                 new TerserPlugin({
                     extractComments: false,
                     terserOptions: {
+                        keep_classnames: true,
+                        keep_fnames: true,
                         format: {
                             comments: false,
                         },

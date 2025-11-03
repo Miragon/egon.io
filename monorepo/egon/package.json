@@ -10,14 +10,14 @@
     "libs/vscode/*"
   ],
   "scripts": {
-    "build": "npm-run-all -s build:libs build:webview build:plugin",
+    "build": "npm-run-all -s build:libs -p build:webview build:plugin",
     "build:libs": "npm-run-all -p build:lib:diagram-js build:lib:domain-story build:lib:dtos",
     "build:lib:diagram-js": "yarn workspace @egon/diagram-js-egon-plugin build",
     "build:lib:domain-story": "yarn workspace @egon/vscode-domain-story build",
     "build:lib:dtos": "yarn workspace @egon/vscode-data-transfer-objects build",
     "build:webview": "yarn workspace egon-modeler-webview build",
     "build:plugin": "yarn workspace egon-modeler-plugin build",
-    "dev": "npm-run-all -s build:libs -p dev:libs dev:webview dev:plugin",
+    "dev": "npm-run-all -s build:lib:diagram-js -p dev:libs dev:webview dev:plugin",
     "dev:libs": "npm-run-all -p dev:lib:diagram-js dev:lib:domain-story dev:lib:dtos",
     "dev:lib:diagram-js": "yarn workspace @egon/diagram-js-egon-plugin dev",
     "dev:lib:domain-story": "yarn workspace @egon/vscode-domain-story dev",
