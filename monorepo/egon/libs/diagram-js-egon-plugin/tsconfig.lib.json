@@ -13,6 +13,10 @@
       "node",
       "vite/client"
     ],
+    "typeRoots": [
+      "../../node_modules/@types",
+      "./src/types"
+    ],
     "jsx": "react"
   },
   "include": [

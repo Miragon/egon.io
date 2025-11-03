@@ -12,6 +12,9 @@ export default defineConfig({
         dts({
             outDir: "../../dist/libs/diagram-js-egon-plugin",
             entryRoot: "src",
+            include: ["src/**/*.ts", "src/**/*.tsx", "src/types/**/*.d.ts"],
+            tsconfigPath: "./tsconfig.lib.json",
+            copyDtsFiles: true,
         }),
     ],
     build: {

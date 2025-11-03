@@ -17,5 +17,6 @@ declare module "diagram-js-direct-editing" {
         activate(element: Element): boolean;
     }
 
+    const DirectEditingModule: any;
     export default DirectEditingModule;
 }
