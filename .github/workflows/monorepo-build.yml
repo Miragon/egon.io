@@ -14,7 +14,7 @@ jobs:
 
       - name: Corepack enable
         run: corepack enable
-        working-directory: monorepo/egon
+        working-directory: vscode
 
       - name: Setup NodeJS 20
         uses: actions/setup-node@v4
@@ -23,24 +23,24 @@ jobs:
 
       - name: Install dependencies
         run: yarn
-        working-directory: monorepo/egon
+        working-directory: vscode
 
       - name: Lint
         run: yarn lint
-        working-directory: monorepo/egon
+        working-directory: vscode
 
       - name: Test
         run: yarn test
-        working-directory: monorepo/egon
+        working-directory: vscode
 
       - name: Build
         run: yarn build
-        working-directory: monorepo/egon
+        working-directory: vscode
 
       - uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: monorepo/egon/dist
+          path: vscode/dist
 
   vsce-package:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
 
       - name: Build vsix egon-io
         working-directory: apps/vscode/egon-io
-        run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile vscodeignore
+        run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile .vscodeignore
 
       - uses: actions/upload-artifact@v4
         with:
