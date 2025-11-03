@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "declaration": true,
+    "target": "ES6",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2021"
+    ],
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "typeRoots": [
+      "../../node_modules/@types",
+      "./src/types"
+    ],
+    "jsx": "react"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ]
+}
