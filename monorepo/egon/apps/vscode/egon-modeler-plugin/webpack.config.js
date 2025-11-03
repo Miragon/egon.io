@@ -1,6 +1,7 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const DIST = path.resolve(__dirname, "../../../dist/apps/vscode/egon-io");
 
@@ -17,6 +18,18 @@ module.exports = (env, argv) => {
             clean: false,
         },
         devtool: isDevelopment ? "source-map" : false,
+        optimization: {
+            minimizer: [
+                new TerserPlugin({
+                    extractComments: false,
+                    terserOptions: {
+                        format: {
+                            comments: false,
+                        },
+                    },
+                }),
+            ],
+        },
         externals: {
             vscode: "commonjs vscode",
         },
@@ -31,15 +44,15 @@ module.exports = (env, argv) => {
                 ? {
                       "@egon/diagram-js-egon-plugin": path.resolve(
                           __dirname,
-                          "../../../dist/libs/diagram-js-egon-plugin"
+                          "../../../dist/libs/diagram-js-egon-plugin",
                       ),
                       "@egon/vscode-domain-story": path.resolve(
                           __dirname,
-                          "../../../dist/libs/vscode/domain-story"
+                          "../../../dist/libs/vscode/domain-story",
                       ),
                       "@egon/vscode-data-transfer-objects": path.resolve(
                           __dirname,
-                          "../../../dist/libs/vscode/data-transfer-objects"
+                          "../../../dist/libs/vscode/data-transfer-objects",
                       ),
                   }
                 : {},
@@ -97,8 +110,8 @@ module.exports = (env, argv) => {
                         },
                     },
                     {
-                        from: "vscodeignore",
-                        to: ".vscodeignore",
+                        from: ".vscodeignore",
+                        to: "[name][ext]",
                         context: __dirname,
                     },
                     {
