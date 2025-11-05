@@ -9,10 +9,18 @@ import { ElementRegistryService } from "../../domain/service/ElementRegistryServ
 import Canvas from "diagram-js/lib/core/Canvas";
 
 export class DomainStoryPopupService {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "canvas",
+        "eventBus",
+        "commandStack",
+        "domainStoryElementRegistryService",
+        "domainStoryNumberingRegistry",
+    ];
 
     private popupElement: HTMLElement | null = null;
-    private currentUpdateCallback: ((label: string, index: number | undefined, isMultiple: boolean) => void) | null = null;
+    private currentUpdateCallback:
+        | ((label: string, index: number | undefined, isMultiple: boolean) => void)
+        | null = null;
 
     constructor(
         private readonly canvas: Canvas,
@@ -43,7 +51,11 @@ export class DomainStoryPopupService {
         };
 
         // Store the update callback for outside click handling
-        this.currentUpdateCallback = (label: string, index: number | undefined, isMultiple: boolean) => {
+        this.currentUpdateCallback = (
+            label: string,
+            index: number | undefined,
+            isMultiple: boolean,
+        ) => {
             this.handleUpdate(element, label, index, isMultiple);
         };
 
@@ -167,11 +179,17 @@ export class DomainStoryPopupService {
 
         if (!clickedInsidePopup && this.currentUpdateCallback) {
             // Get current values from the popup inputs
-            const labelInput = this.popupElement.querySelector('input[name="label"]') as HTMLInputElement;
-            const indexInput = this.popupElement.querySelector('input[name="index"]') as HTMLInputElement;
-            const multipleInput = this.popupElement.querySelector('input[name="multiple"]') as HTMLInputElement;
+            const labelInput = this.popupElement.querySelector(
+                'input[name="label"]',
+            ) as HTMLInputElement;
+            const indexInput = this.popupElement.querySelector(
+                'input[name="index"]',
+            ) as HTMLInputElement;
+            const multipleInput = this.popupElement.querySelector(
+                'input[name="multiple"]',
+            ) as HTMLInputElement;
 
-            const label = labelInput?.value || '';
+            const label = labelInput?.value || "";
             const index = indexInput ? Number(indexInput.value) : undefined;
             const isMultiple = multipleInput?.checked || false;
 
@@ -195,11 +213,3 @@ export class DomainStoryPopupService {
         };
     }
 }
-
-DomainStoryPopupService.$inject = [
-    "canvas",
-    "eventBus",
-    "commandStack",
-    "domainStoryElementRegistryService",
-    "domainStoryNumberingRegistry",
-];

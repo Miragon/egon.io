@@ -8,7 +8,12 @@ import { DomainStoryModeling } from "../../modeling/DomainStoryModeling";
 import { DomainStoryNumberingRegistry } from "../../popup/DomainStoryNumberingRegistry";
 
 export class ActivityChangedHandler implements CommandHandler {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "modeling",
+        "domainStoryElementRegistryService",
+        "eventBus",
+        "domainStoryNumberingRegistry",
+    ];
 
     constructor(
         private readonly modeling: DomainStoryModeling,
@@ -63,7 +68,7 @@ export class ActivityChangedHandler implements CommandHandler {
 }
 
 export class ActivityDirectionChangedHandler implements CommandHandler {
-    static $inject: string[] = [];
+    static $inject: string[] = ["modeling", "eventBus"];
 
     constructor(
         private readonly modeling: DomainStoryModeling,
@@ -145,12 +150,3 @@ function revertAutomaticNumberGenerationChange(
         }
     }
 }
-
-ActivityChangedHandler.$inject = [
-    "modeling",
-    "domainStoryElementRegistryService",
-    "eventBus",
-    "domainStoryNumberingRegistry",
-];
-
-ActivityDirectionChangedHandler.$inject = ["modeling", "eventBus"];

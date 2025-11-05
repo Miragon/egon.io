@@ -6,7 +6,7 @@ import { GroupCanvasObject } from "../entities/groupCanvasObject";
 import { UsedIconList } from "../entities/UsedIconList";
 
 export class ElementRegistryService {
-    static $inject: string[] = [];
+    static $inject: string[] = ["elementRegistry"];
 
     private fullyInitialized = false;
 
@@ -56,18 +56,7 @@ export class ElementRegistryService {
         });
         return activities;
     }
-
-    getAllConnections(): ActivityCanvasObject[] {
-        const connections: ActivityCanvasObject[] = [];
-        this.getAllCanvasObjects().forEach((element) => {
-            const type = element.type;
-            if (type === ElementTypes.CONNECTION) {
-                connections.push(element as ActivityCanvasObject);
-            }
-        });
-        return connections;
-    }
-
+    
     getAllCanvasObjects(): CanvasObject[] {
         const allObjects: CanvasObject[] = [];
         const groupObjects: GroupCanvasObject[] = [];
@@ -215,5 +204,3 @@ export class ElementRegistryService {
         );
     }
 }
-
-ElementRegistryService.$inject = ["elementRegistry"];

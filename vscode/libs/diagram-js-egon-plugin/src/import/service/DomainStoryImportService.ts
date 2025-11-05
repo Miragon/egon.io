@@ -12,7 +12,12 @@ import { ElementTypes } from "../../domain/entities/elementTypes";
 import VersionBox from "../../ui/VersionBox";
 
 export class DomainStoryImportService {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "canvas",
+        "elementFactory",
+        "elementRegistry",
+        "eventBus",
+    ];
 
     private readonly elements: ElementLike[] = [];
 
@@ -32,8 +37,11 @@ export class DomainStoryImportService {
      * @param story
      */
     import(story: string) {
-        // console.log("[DEBUG] import()", story);
         const configAndDST: ConfigAndDST = JSON.parse(story);
+
+        // TODO:
+        // - inject IconSetImportExportService
+        // - import icons
 
         let domainStoryElements = configAndDST.dst;
 
@@ -175,10 +183,3 @@ function isOfTypeConnection(element: BusinessObject) {
 function isOfTypeGroup(element: BusinessObject | ElementLike) {
     return element && element.type === ElementTypes.GROUP;
 }
-
-DomainStoryImportService.$inject = [
-    "canvas",
-    "elementFactory",
-    "elementRegistry",
-    "eventBus",
-];

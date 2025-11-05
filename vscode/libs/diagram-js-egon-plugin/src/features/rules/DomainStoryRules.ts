@@ -162,6 +162,8 @@ function canConnectToAnnotation(source: Element, target: Element, connection: El
 }
 
 export class DomainStoryRules extends RuleProvider {
+    static override $inject: string[] = ["eventBus"];
+
     constructor(eventBus: EventBus) {
         super(eventBus);
     }
@@ -265,5 +267,3 @@ export class DomainStoryRules extends RuleProvider {
         return isBackground(target) || isGroup(shape) || isGroup(target);
     }
 }
-
-DomainStoryRules.$inject = ["eventBus"];

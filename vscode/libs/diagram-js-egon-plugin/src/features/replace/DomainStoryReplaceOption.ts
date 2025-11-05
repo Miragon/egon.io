@@ -10,7 +10,7 @@ export type ReplaceOption = {
 };
 
 export class DomainStoryReplaceOption {
-    static $inject: string[] = [];
+    static $inject: string[] = ["domainStoryIconDictionaryService"];
 
     constructor(private readonly iconDictionaryService: IconDictionaryService) {}
 
@@ -59,5 +59,3 @@ export class DomainStoryReplaceOption {
         return replaceOption;
     }
 }
-
-DomainStoryReplaceOption.$inject = ["domainStoryIconDictionaryService"];

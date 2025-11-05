@@ -7,6 +7,13 @@ import { Element, Shape } from "diagram-js/lib/model/Types";
 import { Rect } from "diagram-js/lib/util/Types";
 
 export class DomainStoryModeling extends Modeling {
+    static override $inject: string[] = [
+        "eventBus",
+        "elementFactory",
+        "commandStack",
+        "domainStoryRules",
+    ];
+
     constructor(
         eventBus: EventBus,
         elementFactory: ElementFactory,
@@ -68,10 +75,3 @@ export class DomainStoryModeling extends Modeling {
         this.removeElements([element]);
     }
 }
-
-DomainStoryModeling.$inject = [
-    "eventBus",
-    "elementFactory",
-    "commandStack",
-    "domainStoryRules",
-];

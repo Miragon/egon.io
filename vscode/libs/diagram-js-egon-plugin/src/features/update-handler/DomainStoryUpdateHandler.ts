@@ -9,7 +9,7 @@ import {
 } from "./handler/elementUpdateHandler";
 
 export class DomainStoryUpdateHandler {
-    static $inject: string[] = [];
+    static $inject: string[] = ["commandStack"];
 
     constructor(commandStack: CommandStack) {
         commandStack.registerHandler("activity.changed", ActivityChangedHandler);
@@ -25,5 +25,3 @@ export class DomainStoryUpdateHandler {
         );
     }
 }
-
-DomainStoryUpdateHandler.$inject = ["commandStack"];

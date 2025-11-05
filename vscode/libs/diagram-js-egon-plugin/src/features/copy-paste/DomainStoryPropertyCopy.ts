@@ -6,7 +6,7 @@ type CopiedProperty = boolean | Record<string, any>;
 const DISALLOWED_PROPERTIES = ["incoming", "outgoing"];
 
 export class DomainStoryPropertyCopy {
-    static $inject: string[] = [];
+    static $inject: string[] = ["eventBus"];
 
     constructor(private readonly eventBus: EventBus) {
         // copy extension elements last
@@ -161,5 +161,3 @@ export class DomainStoryPropertyCopy {
         return property;
     }
 }
-
-DomainStoryPropertyCopy.$inject = ["eventBus"];

@@ -13,7 +13,14 @@ import { IconDictionaryService } from "../../icon-set-config/service/IconDiction
 import { ElementTypes } from "../../domain/entities/elementTypes";
 
 export class DomainStoryPaletteProvider implements PaletteProvider {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "palette",
+        "create",
+        "elementFactory",
+        "spaceTool",
+        "lassoTool",
+        "domainStoryIconDictionaryService",
+    ];
 
     constructor(
         palette: Palette,
@@ -161,12 +168,3 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
         };
     }
 }
-
-DomainStoryPaletteProvider.$inject = [
-    "palette",
-    "create",
-    "elementFactory",
-    "spaceTool",
-    "lassoTool",
-    "domainStoryIconDictionaryService",
-];

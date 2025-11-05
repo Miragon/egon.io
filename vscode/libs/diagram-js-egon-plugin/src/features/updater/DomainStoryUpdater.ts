@@ -2,10 +2,7 @@ import ElementRegistry from "diagram-js/lib/core/ElementRegistry";
 import CommandInterceptor from "diagram-js/lib/command/CommandInterceptor";
 import EventBus from "diagram-js/lib/core/EventBus";
 import CroppingConnectionDocking from "diagram-js/lib/layout/CroppingConnectionDocking";
-import {
-    add as collectionAdd,
-    remove as collectionRemove,
-} from "diagram-js/lib/util/Collections";
+import { add as collectionAdd, remove as collectionRemove } from "diagram-js/lib/util/Collections";
 import { Point } from "diagram-js/lib/util/Types";
 import { assign, pick } from "min-dash";
 import { Connection, Shape } from "diagram-js/lib/model/Types";
@@ -14,6 +11,12 @@ import { reworkGroupElements } from "../../utils/util";
 import { isBackground, isGroup } from "../rules/DomainStoryRules";
 
 export class DomainStoryUpdater extends CommandInterceptor {
+    static override $inject: string[] = [
+        "eventBus",
+        "elementRegistry",
+        "connectionDocking",
+    ];
+
     constructor(
         eventBus: EventBus,
         private readonly elementRegistry: ElementRegistry,
@@ -220,5 +223,3 @@ export class DomainStoryUpdater extends CommandInterceptor {
         });
     }
 }
-
-DomainStoryUpdater.$inject = ["eventBus", "elementRegistry", "connectionDocking"];

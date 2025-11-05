@@ -6,7 +6,7 @@ import { ElementTypes } from "../../../domain/entities/elementTypes";
 import { reworkGroupElements, undoGroupRework } from "../../../utils/util";
 
 export class ElementColorChangeHandler implements CommandHandler {
-    static $inject: string[] = [];
+    static $inject: string[] = ["eventBus"];
 
     constructor(private readonly eventBus: EventBus) {}
 
@@ -58,7 +58,7 @@ export class ElementColorChangeHandler implements CommandHandler {
 }
 
 export class RemoveGroupWithoutChildrenHandler implements CommandHandler {
-    static $inject: string[] = [];
+    static $inject: string[] = ["eventBus"];
 
     constructor(private readonly eventBus: EventBus) {}
 
@@ -99,7 +99,3 @@ export class RemoveGroupWithoutChildrenHandler implements CommandHandler {
         ];
     }
 }
-
-ElementColorChangeHandler.$inject = ["eventBus"];
-
-RemoveGroupWithoutChildrenHandler.$inject = ["eventBus"];

@@ -5,7 +5,10 @@ import { ElementTypes } from "../../domain/entities/elementTypes";
 import { ElementRegistryService } from "../../domain/service/ElementRegistryService";
 
 export class LabelDictionaryService {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "domainStoryElementRegistryService",
+        "domainStoryIconDictionaryService",
+    ];
 
     activityLabels: LabelEntry[] = [];
     workObjektLabels: WorkObjectLabelEntry[] = [];
@@ -149,8 +152,3 @@ export class LabelDictionaryService {
     //     }
     // }
 }
-
-LabelDictionaryService.$inject = [
-    "domainStoryElementRegistryService",
-    "domainStoryIconDictionaryService",
-];
