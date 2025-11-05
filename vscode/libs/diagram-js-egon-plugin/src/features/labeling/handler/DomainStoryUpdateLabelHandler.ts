@@ -13,7 +13,7 @@ const NULL_DIMENSIONS = {
 };
 
 export class DomainStoryUpdateLabelHandler implements CommandHandler {
-    static $inject: string[] = [];
+    static $inject: string[] = ["modeling", "domainStoryTextRenderer"];
 
     constructor(
         private readonly modeling: DomainStoryModeling,
@@ -76,5 +76,3 @@ export class DomainStoryUpdateLabelHandler implements CommandHandler {
         return [label, labelTarget, number, numberTarget];
     }
 }
-
-DomainStoryUpdateLabelHandler.$inject = ["modeling", "domainStoryTextRenderer"];

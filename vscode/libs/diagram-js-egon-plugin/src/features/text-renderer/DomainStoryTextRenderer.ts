@@ -19,7 +19,8 @@ const LINE_HEIGHT_RATIO = 1.2;
 const MIN_TEXT_ANNOTATION_HEIGHT = 30;
 
 export class DomainStoryTextRenderer {
-    static $inject: string[] = [];
+    // TODO: Does a config exist???
+    static $inject: string[] = ["config.textRenderer"];
 
     private config: DomainStoryTextRendererConfig;
 
@@ -121,6 +122,3 @@ export class DomainStoryTextRenderer {
         return this.config.externalStyle;
     }
 }
-
-// TODO: Does a config exist???
-DomainStoryTextRenderer.$inject = ["config.textRenderer"];

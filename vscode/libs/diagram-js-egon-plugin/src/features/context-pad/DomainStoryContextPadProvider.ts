@@ -1,3 +1,4 @@
+import { assign, isArray } from "min-dash";
 import Connect from "diagram-js/lib/features/connect/Connect";
 import Create from "diagram-js/lib/features/create/Create";
 import Canvas from "diagram-js/lib/core/Canvas";
@@ -13,6 +14,8 @@ import ContextPadProvider, {
 } from "diagram-js/lib/features/context-pad/ContextPadProvider";
 import { Connection, Element } from "diagram-js/lib/model/Types";
 import { hasPrimaryModifier } from "diagram-js/lib/util/Mouse";
+import Rules from "diagram-js/lib/features/rules/Rules";
+
 import { DomainStoryElementFactory } from "../element-factory/DomainStoryElementFactory";
 import { DomainStoryModeling } from "../modeling/DomainStoryModeling";
 import { DomainStoryReplaceMenuProvider } from "../replace/DomainStoryReplaceMenuProvider";
@@ -20,12 +23,26 @@ import { DirtyFlagService } from "../../domain/service/DirtyFlagService";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 import { hexToRGBA, isHexWithAlpha, rgbaToHex } from "../../utils/colorConverter";
 import { ElementTypes } from "../../domain/entities/elementTypes";
-import Rules from "diagram-js/lib/features/rules/Rules";
-import { assign, isArray } from "min-dash";
 import { DomainStoryNumberingRegistry } from "../popup/DomainStoryNumberingRegistry";
 
 export class DomainStoryContextPadProvider implements ContextPadProvider<Element> {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "elementFactory",
+        "modeling",
+        "domainStoryReplaceMenuProvider",
+        "domainStoryNumberingRegistry",
+        "domainStoryDirtyFlagService",
+        "domainStoryIconDictionaryService",
+        "rules",
+        "connect",
+        "translate",
+        "create",
+        "canvas",
+        "contextPad",
+        "popupMenu",
+        "commandStack",
+        "eventBus",
+    ];
 
     private selectedElement: Element | undefined;
 
@@ -432,21 +449,3 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
         };
     }
 }
-
-DomainStoryContextPadProvider.$inject = [
-    "elementFactory",
-    "modeling",
-    "domainStoryReplaceMenuProvider",
-    "domainStoryNumberingRegistry",
-    "domainStoryDirtyFlagService",
-    "domainStoryIconDictionaryService",
-    "rules",
-    "connect",
-    "translate",
-    "create",
-    "canvas",
-    "contextPad",
-    "popupMenu",
-    "commandStack",
-    "eventBus",
-];

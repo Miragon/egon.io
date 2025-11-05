@@ -16,7 +16,7 @@ const MARKER_HIDDEN = "djs-element-hidden",
     MARKER_LABEL_HIDDEN = "djs-label-hidden";
 
 export class DomainStoryLabelEditingPreview {
-    static $inject: string[] = [];
+    static $inject: string[] = ["eventBus", "canvas"];
 
     private defaultLayer: SVGElement;
 
@@ -132,5 +132,3 @@ export class DomainStoryLabelEditingPreview {
         );
     }
 }
-
-DomainStoryLabelEditingPreview.$inject = ["eventBus", "canvas"];

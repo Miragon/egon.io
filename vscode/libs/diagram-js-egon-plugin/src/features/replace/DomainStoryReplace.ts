@@ -6,7 +6,7 @@ import { Shape } from "diagram-js/lib/model/Types";
  * service that allow replacing of elements.
  */
 export class DomainStoryReplace {
-    static $inject: string[] = [];
+    static $inject: string[] = ["modeling"];
 
     constructor(private readonly modeling: DomainStoryModeling) {}
 
@@ -43,5 +43,3 @@ export class DomainStoryReplace {
         return this.modeling.replaceShape(oldShape, newShapeData, {});
     }
 }
-
-DomainStoryReplace.$inject = ["modeling"];

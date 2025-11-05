@@ -32,7 +32,16 @@ const numbers = [];
 const DEFAULT_COLOR = "#000000";
 
 export class DomainStoryRenderer extends BaseRenderer {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "eventBus",
+        "styles",
+        "canvas",
+        "domainStoryTextRenderer",
+        "domainStoryNumberingRegistry",
+        "domainStoryElementRegistryService",
+        "domainStoryDirtyFlagService",
+        "domainStoryIconDictionaryService",
+    ];
 
     private rendererId = RENDERER_IDS.next();
 
@@ -847,14 +856,3 @@ export class DomainStoryRenderer extends BaseRenderer {
         return result;
     }
 }
-
-DomainStoryRenderer.$inject = [
-    "eventBus",
-    "styles",
-    "canvas",
-    "domainStoryTextRenderer",
-    "domainStoryNumberingRegistry",
-    "domainStoryElementRegistryService",
-    "domainStoryDirtyFlagService",
-    "domainStoryIconDictionaryService",
-];
