@@ -11,10 +11,12 @@ import LassoTool from "diagram-js/lib/features/lasso-tool/LassoTool";
 import Palette from "diagram-js/lib/features/palette/Palette";
 import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 import { ElementTypes } from "../../domain/entities/elementTypes";
+import EventBus from "diagram-js/lib/core/EventBus";
 
 export class DomainStoryPaletteProvider implements PaletteProvider {
     static $inject: string[] = [
         "palette",
+        "eventBus",
         "create",
         "elementFactory",
         "spaceTool",
@@ -24,6 +26,7 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
 
     constructor(
         palette: Palette,
+        eventBus: EventBus,
         private readonly create: Create,
         private readonly elementFactory: ElementFactory,
         private readonly spaceTool: SpaceTool,
@@ -31,6 +34,11 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
         private readonly iconDictionaryService: IconDictionaryService,
     ) {
         palette.registerProvider(this);
+
+        eventBus.on("dst.config.changed", () => {
+            // @ts-expect-error palette is not typed correctly
+            palette._update();
+        });
     }
 
     getPaletteEntries(): PaletteEntriesCallback | PaletteEntries {

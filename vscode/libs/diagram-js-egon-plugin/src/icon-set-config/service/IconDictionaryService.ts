@@ -1,5 +1,4 @@
 import { Dictionary } from "../../domain/entities/dictionary";
-import { namesOfDefaultIcons, NamesOfSelectedIcons } from "../../domain/entities/namesOfSelectedIcons";
 import { IconSet } from "../../domain/entities/iconSet";
 import { ElementTypes, getIconId } from "../../domain/entities/elementTypes";
 import { DomainStoryBusinessObject } from "../../domain/entities/domainStoryBusinessObject";
@@ -21,32 +20,7 @@ export class IconDictionaryService {
 
     private customIconSet?: IconSet;
 
-    constructor() {
-        let namesOfIcons: NamesOfSelectedIcons;
-
-        if (typeof this.customIconSet == "undefined") {
-            namesOfIcons = namesOfDefaultIcons;
-        } else {
-            namesOfIcons = new NamesOfSelectedIcons(
-                this.customIconSet.actors.keysArray(),
-                this.customIconSet.workObjects.keysArray(),
-            );
-        }
-
-        const allTypes = new Dictionary();
-        allTypes.appendDict(customIcons);
-
-        this.initDictionary(
-            namesOfIcons.actors,
-            allTypes,
-            this.selectedActorsDictionary,
-        );
-        this.initDictionary(
-            namesOfIcons.workObjects,
-            allTypes,
-            this.selectedWorkObjectsDictionary,
-        );
-    }
+    constructor() {}
 
     /** Load Icons from Configuration **/
     addIconsFromIconSetConfiguration(
@@ -204,17 +178,6 @@ export class IconDictionaryService {
         this.selectedWorkObjectsDictionary = iconSet.workObjects;
     }
 
-    private initDictionary(
-        selectedIconNames: string[],
-        allIcons: Dictionary,
-        dictionary: Dictionary,
-    ) {
-        dictionary.clear();
-        for (const key of selectedIconNames) {
-            dictionary.add(allIcons.get(key), key);
-        }
-    }
-
     private allInTypeDictionary(
         type: ElementTypes,
         elements: DomainStoryBusinessObject[],
@@ -252,13 +215,12 @@ export class IconDictionaryService {
     }
 
     /** Add new Icon(s) **/
-
-    private addNewIconsToDictionary(customIcons: Dictionary) {
-        customIcons.keysArray().forEach((key) => {
-            const custom = customIcons.get(key);
+    private addNewIconsToDictionary(newIcons: Dictionary) {
+        newIcons.keysArray().forEach((key) => {
+            const custom = newIcons.get(key);
             this.addIMGToIconDictionary(custom, key);
         });
-        this.addIconsToCss(customIcons);
+        this.addIconsToCss(newIcons);
     }
 
     private wrapSRCInSVG(src: string): string {
