@@ -70,11 +70,11 @@ export class IconSetImportExportService {
 
         this.iconDictionaryService.addIconsFromIconSetConfiguration(
             ElementTypes.ACTOR,
-            actorKeys.map((a) => ElementTypes.ACTOR + a),
+            actorKeys,
         );
         this.iconDictionaryService.addIconsFromIconSetConfiguration(
             ElementTypes.WORKOBJECT,
-            workObjectKeys.map((w) => ElementTypes.WORKOBJECT + w),
+            workObjectKeys,
         );
     }
 
