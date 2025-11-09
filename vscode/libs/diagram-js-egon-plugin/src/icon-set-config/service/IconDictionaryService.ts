@@ -1,15 +1,13 @@
 import { Dictionary } from "../../domain/entities/dictionary";
-import {
-    namesOfDefaultIcons,
-    NamesOfSelectedIcons,
-} from "../../domain/entities/namesOfSelectedIcons";
+import { namesOfDefaultIcons, NamesOfSelectedIcons } from "../../domain/entities/namesOfSelectedIcons";
 import { IconSet } from "../../domain/entities/iconSet";
-import { builtInIcons, customIcons } from "../domain/allIcons";
 import { ElementTypes, getIconId } from "../../domain/entities/elementTypes";
 import { DomainStoryBusinessObject } from "../../domain/entities/domainStoryBusinessObject";
 import { sanitizeIconName } from "../../utils/sanitizer";
 
 export const ICON_CSS_CLASS_PREFIX = "icon-domain-story-";
+
+const customIcons = new Dictionary();
 
 /**
  * The dictionaries hold icons (as SVG) and icon names as key-value pairs:
@@ -36,7 +34,6 @@ export class IconDictionaryService {
         }
 
         const allTypes = new Dictionary();
-        allTypes.addBuiltInIcons(builtInIcons);
         allTypes.appendDict(customIcons);
 
         this.initDictionary(
@@ -64,7 +61,6 @@ export class IconDictionaryService {
         }
 
         const allTypes = new Dictionary();
-        allTypes.addBuiltInIcons(builtInIcons);
         allTypes.appendDict(customIcons);
 
         iconTypes.forEach((name) => {
@@ -161,7 +157,6 @@ export class IconDictionaryService {
 
     getFullDictionary(): Dictionary {
         const fullDictionary = new Dictionary();
-        fullDictionary.appendDict(builtInIcons);
         fullDictionary.appendDict(customIcons);
         return fullDictionary;
     }
@@ -189,9 +184,7 @@ export class IconDictionaryService {
     }
 
     getIconSource(name: string): string {
-        if (builtInIcons.has(name)) {
-            return builtInIcons.get(name);
-        } else if (customIcons.has(name)) {
+        if (customIcons.has(name)) {
             return customIcons.get(name);
         }
         throw new Error(`[IconDictionaryService] Unsupported value name: ${name}`);
@@ -206,7 +199,9 @@ export class IconDictionaryService {
     }
 
     setIconSet(iconSet: IconSet): void {
-        this.customIconSet = iconSet;
+        // this.customIconSet = iconSet;
+        this.selectedActorsDictionary = iconSet.actors;
+        this.selectedWorkObjectsDictionary = iconSet.workObjects;
     }
 
     private initDictionary(

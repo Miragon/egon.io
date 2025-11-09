@@ -1,12 +1,12 @@
-import baseConfig from '../../eslint.config.mjs';
+import baseConfig from "../../eslint.config.mjs";
 
 export default [
     ...baseConfig,
     {
-        files: ['**/*.json'],
-        rules: { },
+        files: ["**/*.json"],
+        rules: {},
         languageOptions: {
-            parser: await import('jsonc-eslint-parser'),
+            parser: await import("jsonc-eslint-parser"),
         },
     },
 ];
