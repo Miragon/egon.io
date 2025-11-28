@@ -4,6 +4,7 @@ import { setContext } from "./helper";
 import { container } from "tsyringe";
 import { WebviewController } from "./WebviewController";
 import { config } from "./main.config";
+import { IconWatcherController } from "./IconWatcherController";
 
 export function activate(context: ExtensionContext) {
     // 1. Set the global application context
@@ -12,6 +13,7 @@ export function activate(context: ExtensionContext) {
     // 2. Configure the application
     config();
 
-    // 4. Start the application
+    // 3. Start the application
     container.resolve(WebviewController);
+    container.resolve(IconWatcherController);
 }
