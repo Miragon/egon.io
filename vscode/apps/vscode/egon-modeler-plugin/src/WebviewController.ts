@@ -14,14 +14,15 @@ import {
     SyncDocumentCommand,
 } from "@egon/data-transfer-objects";
 import { DomainStoryEditorService, VsCodeViewPort } from "@egon/domain-story";
+import { ReadIconService } from "./ReadIconService";
 
 @singleton()
 export class WebviewController implements CustomTextEditorProvider {
-    protected extension = "egn";
-
     constructor(
         @inject("DomainStoryModelerViewType")
         viewType: string,
+        @inject("DomainStoryModelerExtensionId")
+        protected extensionId: string,
         @inject(DomainStoryEditorService)
         private app: DomainStoryEditorService,
     ) {
@@ -42,6 +43,19 @@ export class WebviewController implements CustomTextEditorProvider {
 
             const editorId = document.uri.path;
             const disposables: Disposable[] = [];
+
+            const workspaceFolder = workspace.getWorkspaceFolder(document.uri);
+            if (workspaceFolder) {
+                const readIconService = new ReadIconService();
+                const egnFileWithIcons = await readIconService.read(
+                    workspaceFolder,
+                    document.getText(),
+                );
+                await workspace.fs.writeFile(
+                    document.uri,
+                    new TextEncoder().encode(egnFileWithIcons),
+                );
+            }
 
             const view = new VsCodeViewPort(webviewPanel);
             const sessionId = this.app.registerSession(
@@ -79,7 +93,7 @@ export class WebviewController implements CustomTextEditorProvider {
                 console.debug("OnDidChangeTextDocument -> trigger");
                 if (
                     event.contentChanges.length !== 0 &&
-                    document.uri.path.split(".").pop() === this.extension &&
+                    document.uri.path.split(".").pop() === this.extensionId &&
                     document.uri.path === event.document.uri.path
                 ) {
                     console.debug("OnDidChangeTextDocument -> send");

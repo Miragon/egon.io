@@ -1,9 +1,17 @@
 import { container } from "tsyringe";
-import { DomainStoryEditorService, DocumentPort, VsCodeDocumentPort } from "@egon/domain-story";
+import {
+    DocumentPort,
+    DomainStoryEditorService,
+    VsCodeDocumentPort,
+} from "@egon/domain-story";
 
 export function config() {
     container.register("DomainStoryModelerViewType", {
         useValue: "egon.io",
+    });
+
+    container.register("DomainStoryModelerExtensionId", {
+        useValue: "egn",
     });
 
     container.register<DocumentPort>("DocumentPort", {

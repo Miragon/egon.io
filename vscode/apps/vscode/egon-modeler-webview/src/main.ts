@@ -67,6 +67,7 @@ function onReceiveMessage(message: MessageEvent<Command>) {
             const c = command as DisplayDomainStoryCommand;
             try {
                 getDomainStoryModeler();
+                console.log("Update", c.text);
                 updateStory(c.text);
             } catch (error: unknown) {
                 if (error instanceof NoModelerError) {
@@ -81,6 +82,7 @@ function onReceiveMessage(message: MessageEvent<Command>) {
                         });
                     }
 
+                    console.log("Init", c.text);
                     initializeDomainStoryModeler(c.text, vscode.getState());
                 }
             }
