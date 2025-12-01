@@ -33,17 +33,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Corepack enable + ensure Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@stable --activate
+
       - name: Setup NodeJS 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "yarn"
           cache-dependency-path: "vscode/yarn.lock"
-
-      - name: Corepack enable + ensure Yarn
-        run: |
-          corepack enable
-          corepack prepare yarn@stable --activate
 
       - name: Install dependencies
         working-directory: vscode
