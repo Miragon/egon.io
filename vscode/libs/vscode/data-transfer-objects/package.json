@@ -1,0 +1,13 @@
+{
+  "name": "@egon/vscode-data-transfer-objects",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  }
+}
