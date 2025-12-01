@@ -1,4 +1,4 @@
-name: VsCode Release
+name: VS-Code Release
 
 on:
   workflow_dispatch:
@@ -41,8 +41,8 @@ jobs:
         id: version
         working-directory: vscode/apps/vscode/egon-modeler-plugin
         run: |
-          NEW_VERSION=$(npm version ${{ inputs.release-type }} --no-git-tag-version)
-          echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          NEW_VERSION=$(npm version ${{ inputs.release-type }} --no-git-tag-version | tr -d '\n')
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
           echo "New version: ${NEW_VERSION}"
 
       - name: Commit version bump
