@@ -7,7 +7,11 @@ import CommandStack from "diagram-js/lib/command/CommandStack";
 import { ActivityBusinessObject } from "../../domain/entities/activityBusinessObject";
 
 export class DomainStoryNumberingRegistry {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "eventBus",
+        "commandStack",
+        "domainStoryElementRegistryService",
+    ];
 
     /**
      * Specifies the position of the activity in the sequence.
@@ -203,9 +207,3 @@ export class DomainStoryNumberingRegistry {
         }
     }
 }
-
-DomainStoryNumberingRegistry.$inject = [
-    "eventBus",
-    "commandStack",
-    "domainStoryElementRegistryService",
-];

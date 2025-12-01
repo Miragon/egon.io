@@ -10,9 +10,22 @@ import { DomainStoryElementFactory } from "../../features/element-factory/Domain
 import { ConfigAndDST } from "../../export/domain/configAndDst";
 import { ElementTypes } from "../../domain/entities/elementTypes";
 import VersionBox from "../../ui/VersionBox";
+import {
+    FileConfiguration,
+    IconSetImportExportService,
+} from "../../icon-set-config/service/IconSetImportExportService";
+import { IconSet } from "../../domain/entities/iconSet";
+import { IconDictionaryService } from "../../icon-set-config/service/IconDictionaryService";
 
 export class DomainStoryImportService {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "eventBus",
+        "canvas",
+        "elementRegistry",
+        "elementFactory",
+        "domainStoryIconDictionaryService",
+        "domainStoryIconSetImportExportService",
+    ];
 
     private readonly elements: ElementLike[] = [];
 
@@ -21,10 +34,12 @@ export class DomainStoryImportService {
     private readonly importRepairService = new ImportRepairService();
 
     constructor(
-        private readonly canvas: Canvas,
-        private readonly elementFactory: DomainStoryElementFactory,
-        private readonly elementRegistry: ElementRegistry,
         private readonly eventBus: EventBus,
+        private readonly canvas: Canvas,
+        private readonly elementRegistry: ElementRegistry,
+        private readonly elementFactory: DomainStoryElementFactory,
+        private readonly iconDictionaryService: IconDictionaryService,
+        private readonly iconSetImportExportService: IconSetImportExportService,
     ) {}
 
     /**
@@ -32,10 +47,13 @@ export class DomainStoryImportService {
      * @param story
      */
     import(story: string) {
-        // console.log("[DEBUG] import()", story);
         const configAndDST: ConfigAndDST = JSON.parse(story);
 
         let domainStoryElements = configAndDST.dst;
+        const domainStoryIcons: FileConfiguration = configAndDST.domain;
+
+        const iconSet: IconSet =
+            this.iconSetImportExportService.createIconSetConfiguration(domainStoryIcons);
 
         this.importRepairService.removeWhitespacesFromIcons(domainStoryElements);
         this.importRepairService.removeUnnecessaryBpmnProperties(domainStoryElements);
@@ -84,6 +102,9 @@ export class DomainStoryImportService {
                 otherElementTypes.push(bo);
             }
         });
+
+        this.iconSetImportExportService.loadConfiguration(iconSet);
+        this.eventBus.fire("dst.config.changed", { iconSet });
 
         // add groups before shapes and other element types before connections so that connections
         // can already rely on the shapes being part of the diagram
@@ -175,10 +196,3 @@ function isOfTypeConnection(element: BusinessObject) {
 function isOfTypeGroup(element: BusinessObject | ElementLike) {
     return element && element.type === ElementTypes.GROUP;
 }
-
-DomainStoryImportService.$inject = [
-    "canvas",
-    "elementFactory",
-    "elementRegistry",
-    "eventBus",
-];

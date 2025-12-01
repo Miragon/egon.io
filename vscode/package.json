@@ -24,7 +24,8 @@
     "dev:lib:dtos": "yarn workspace @egon/vscode-data-transfer-objects dev",
     "dev:webview": "yarn workspace egon-modeler-webview dev",
     "dev:plugin": "yarn workspace egon-modeler-plugin dev",
-    "serve": "yarn workspace egon-modeler-webview serve",
+    "serve": "npm-run-all -s dev:lib:diagram-js -p \"dev:lib:diagram-js -- --watch\" serve:webview",
+    "serve:webview": "yarn workspace egon-modeler-webview serve",
     "test": "jest --coverage --coverageReporters=clover",
     "lint": "eslint ."
   },

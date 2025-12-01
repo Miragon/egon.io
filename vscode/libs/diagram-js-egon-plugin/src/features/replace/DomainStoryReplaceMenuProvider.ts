@@ -11,7 +11,7 @@ import PopupMenuProvider, {
 import { PopupMenuTarget } from "diagram-js/lib/features/popup-menu/PopupMenu";
 
 export class DomainStoryReplaceMenuProvider implements PopupMenuProvider {
-    static $inject: string[] = [];
+    static $inject: string[] = ["domainStoryReplace", "domainStoryReplaceOption"];
 
     constructor(
         private readonly domainStoryReplace: DomainStoryReplace,
@@ -89,8 +89,3 @@ export class DomainStoryReplaceMenuProvider implements PopupMenuProvider {
         };
     }
 }
-
-DomainStoryReplaceMenuProvider.$inject = [
-    "domainStoryReplace",
-    "domainStoryReplaceOption",
-];

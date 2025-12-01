@@ -14,7 +14,7 @@ import { isLabel } from "diagram-js/lib/util/ModelUtil";
 const LOW_PRIORITY = 750;
 
 export class DomainStoryCopyPaste {
-    static $inject: string[] = [];
+    static $inject: string[] = ["domainStoryPropertyCopy", "eventBus"];
 
     private references: Record<string, any> = {};
 
@@ -103,8 +103,6 @@ export class DomainStoryCopyPaste {
         );
     }
 }
-
-DomainStoryCopyPaste.$inject = ["domainStoryPropertyCopy", "eventBus"];
 
 function copyProperties(source: any, target: any, properties: any) {
     if (!isArray(properties)) {

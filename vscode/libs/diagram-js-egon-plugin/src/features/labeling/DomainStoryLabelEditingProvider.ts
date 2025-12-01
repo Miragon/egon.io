@@ -1,20 +1,21 @@
+import { assign } from "min-dash";
 import { Element, Shape } from "diagram-js/lib/model/Types";
+import { Rect } from "diagram-js/lib/util/Types";
 import Canvas from "diagram-js/lib/core/Canvas";
 import EventBus from "diagram-js/lib/core/EventBus";
 import { DirectEditing } from "diagram-js-direct-editing";
 import ResizeHandles from "diagram-js/lib/features/resize/ResizeHandles";
-import { Rect } from "diagram-js/lib/util/Types";
-import { assign } from "min-dash";
+import CommandStack from "diagram-js/lib/command/CommandStack";
+
 import { DomainStoryModeling } from "../modeling/DomainStoryModeling";
 import { DomainStoryTextRenderer } from "../text-renderer/DomainStoryTextRenderer";
 import { LabelDictionaryService } from "../../label-dictionary/service/LabelDictionaryService";
 import { ElementTypes } from "../../domain/entities/elementTypes";
+import { DomainStoryUpdateLabelHandler } from "./handler/DomainStoryUpdateLabelHandler";
 import { isBackground } from "../rules/DomainStoryRules";
-import { autocomplete, getLabel } from "./utils";
 import { is } from "../../utils/util";
 import { sanitizeTextForSVGExport } from "../../utils/sanitizer";
-import CommandStack from "diagram-js/lib/command/CommandStack";
-import { DomainStoryUpdateLabelHandler } from "./handler/DomainStoryUpdateLabelHandler";
+import { autocomplete, getLabel } from "./utils";
 
 let numberStash = 0;
 let stashUse = false;
@@ -37,7 +38,16 @@ export function focusElement(element: HTMLDivElement) {
 }
 
 export class DomainStoryLabelEditingProvider {
-    static $inject: string[] = [];
+    static $inject: string[] = [
+        "modeling",
+        "domainStoryTextRenderer",
+        "domainStoryLabelDictionaryService",
+        "eventBus",
+        "canvas",
+        "directEditing",
+        "resizeHandles",
+        "commandStack",
+    ];
 
     constructor(
         private readonly modeling: DomainStoryModeling,
@@ -285,14 +295,3 @@ export class DomainStoryLabelEditingProvider {
         );
     }
 }
-
-DomainStoryLabelEditingProvider.$inject = [
-    "modeling",
-    "domainStoryTextRenderer",
-    "domainStoryLabelDictionaryService",
-    "eventBus",
-    "canvas",
-    "directEditing",
-    "resizeHandles",
-    "commandStack",
-];

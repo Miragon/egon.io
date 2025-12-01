@@ -14,7 +14,7 @@ export class DomainStoryElementFactory extends ElementFactory<
     Root,
     Shape
 > {
-    static $inject: string[] = [];
+    static $inject: string[] = ["domainStoryIdFactory"];
 
     constructor(private readonly domainStoryIdFactory: DomainStoryIdFactory) {
         super();
@@ -95,5 +95,3 @@ export class DomainStoryElementFactory extends ElementFactory<
         return shapes[dstElementType] || shapes["__default"];
     }
 }
-
-DomainStoryElementFactory.$inject = ["domainStoryIdFactory"];
