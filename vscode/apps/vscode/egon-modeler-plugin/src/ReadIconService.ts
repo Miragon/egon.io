@@ -1,4 +1,4 @@
-import { RelativePattern, workspace, WorkspaceFolder } from "vscode";
+import { RelativePattern, Uri, workspace, WorkspaceFolder } from "vscode";
 import {
     ICON_BASE_PATH,
     SyncIconsFromSet,
@@ -11,17 +11,37 @@ export class ReadIconService {
 
     public async read(
         workspaceFolder: WorkspaceFolder,
+        documentUri: Uri,
         egnFileContent: string | undefined,
     ): Promise<string> {
+        const icons = await this.collectIconsInHierarchy(
+            workspaceFolder,
+            documentUri,
+        );
+        return this.syncIcons.execute(egnFileContent, icons);
+    }
+
+    private async collectIconsInHierarchy(
+        workspaceFolder: WorkspaceFolder,
+        documentUri: Uri,
+    ): Promise<Icon[]> {
         const pattern = new RelativePattern(
             workspaceFolder,
             `**/${ICON_BASE_PATH}/**/*.svg`,
         );
 
-        const uris = await workspace.findFiles(pattern);
+        const allIconUris = await workspace.findFiles(pattern);
+
+        const documentDir = Uri.joinPath(documentUri, "..");
+        const workspaceRoot = workspaceFolder.uri.path;
+        const documentPath = documentDir.path;
 
         const icons: Icon[] = [];
-        for (const uri of uris) {
+        for (const uri of allIconUris) {
+            if (!this.isIconVisibleToDocument(uri.path, workspaceRoot, documentPath)) {
+                continue;
+            }
+
             const meta = tryParseIconPath(uri.path);
             if (!meta) continue;
 
@@ -35,6 +55,22 @@ export class ReadIconService {
             });
         }
 
-        return this.syncIcons.execute(egnFileContent, icons);
+        return icons;
+    }
+
+    private isIconVisibleToDocument(
+        iconPath: string,
+        workspaceRoot: string,
+        documentDir: string,
+    ): boolean {
+        const iconDirMatch = iconPath.match(/(.*)\/\.egon\/icons\//);
+        if (!iconDirMatch) return false;
+
+        const iconBaseDir = iconDirMatch[1];
+
+        return (
+            iconBaseDir.startsWith(workspaceRoot) &&
+            documentDir.startsWith(iconBaseDir)
+        );
     }
 }

@@ -54,6 +54,9 @@ export class IconWatcherController {
         const folder = workspace.getWorkspaceFolder(svgUri);
         if (!folder) return;
 
+        const iconBaseDir = this.getIconBaseDir(svgUri.path);
+        if (!iconBaseDir) return;
+
         const rp = new RelativePattern(folder, `**/*.${this.extensionId}`);
         const egnUris = await workspace.findFiles(rp);
 
@@ -65,6 +68,10 @@ export class IconWatcherController {
         }
 
         for (const egnUri of egnUris) {
+            if (!this.isDocumentAffectedByIcon(egnUri.path, iconBaseDir)) {
+                continue;
+            }
+
             const data = await workspace.fs.readFile(egnUri);
             const text = new TextDecoder().decode(data);
 
@@ -78,4 +85,20 @@ export class IconWatcherController {
             await workspace.fs.writeFile(egnUri, new TextEncoder().encode(newText));
         }
     };
+
+    private getIconBaseDir(iconPath: string): string | null {
+        const match = iconPath.match(/(.*)\/\.egon\/icons\//);
+        return match ? match[1] : null;
+    }
+
+    private isDocumentAffectedByIcon(
+        documentPath: string,
+        iconBaseDir: string,
+    ): boolean {
+        const documentDir = documentPath.substring(
+            0,
+            documentPath.lastIndexOf("/"),
+        );
+        return documentDir.startsWith(iconBaseDir);
+    }
 }

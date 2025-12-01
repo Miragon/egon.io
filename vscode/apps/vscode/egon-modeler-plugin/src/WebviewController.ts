@@ -49,6 +49,7 @@ export class WebviewController implements CustomTextEditorProvider {
                 const readIconService = new ReadIconService();
                 const egnFileWithIcons = await readIconService.read(
                     workspaceFolder,
+                    document.uri,
                     document.getText(),
                 );
                 await workspace.fs.writeFile(
