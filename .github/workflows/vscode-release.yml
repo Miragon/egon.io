@@ -11,6 +11,10 @@ on:
           - patch
           - minor
           - major
+      dry-run:
+        description: "Run without pushing/releasing"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -69,18 +73,14 @@ jobs:
           PKG_NAME=$(node -e "console.log(require('$PKG_PATH').name)")
           echo "Detected workspace package name: $PKG_NAME"
 
-          case "${{ inputs.release-type }}" in
-            patch) FLAG="--patch" ;;
-            minor) FLAG="--minor" ;;
-            major) FLAG="--major" ;;
-            *)
-              echo "Invalid release-type: ${{ inputs.release-type }}" >&2
-              exit 1
-              ;;
-          esac
+          BUMP_TYPE="${{ inputs.release-type }}"
+          if [[ ! "$BUMP_TYPE" =~ ^(patch|minor|major)$ ]]; then
+            echo "Invalid release-type: $BUMP_TYPE" >&2
+            exit 1
+          fi
 
-          echo "Running: yarn workspace \"$PKG_NAME\" version $FLAG --no-git-tag-version --no-commit-hooks"
-          yarn workspace "$PKG_NAME" version $FLAG --no-git-tag-version --no-commit-hooks
+          echo "Running: yarn workspace \"$PKG_NAME\" version $BUMP_TYPE"
+          yarn workspace "$PKG_NAME" version "$BUMP_TYPE"
 
           NEW_VERSION=$(node -e "console.log(require('$PKG_PATH').version)")
           echo "New version: $NEW_VERSION"
@@ -114,7 +114,7 @@ jobs:
           fi
 
       - name: Commit & tag version bump
-        if: success()
+        if: success() && inputs.dry-run == false
         working-directory: vscode
         run: |
           set -euo pipefail
@@ -142,7 +142,7 @@ jobs:
           fi
 
       - name: Create Release
-        if: success() && steps.version.outputs.version != ''
+        if: success() && steps.version.outputs.version != '' && inputs.dry-run == false
         uses: softprops/action-gh-release@v2
         with:
           tag_name: vscode-${{ steps.version.outputs.version }}
