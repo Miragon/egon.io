@@ -18,7 +18,7 @@
       id="buttonImport"
       class="headerButton"
       title="Import story from file"
-      onclick="document.getElementById('import').click();"
+      onclick="document.getElementById('import').click()"
     >
       <span class="material-icons-outlined materialIconButton">
         file_upload
@@ -43,7 +43,7 @@
       accept=".dst, .svg, .egn, .svg"
       style="display: none"
       id="import"
-      onclick="this.value=null;"
+      onclick="this.value = null"
       (change)="import.emit()"
     />
     <button
@@ -67,7 +67,10 @@
       title="Label Dictionary"
       (click)="openLabelDictionary.emit()"
     >
-      <span class="material-icons materialIconButton" title="Label Dictionary">
+      <span
+        class="material-icons-outlined materialIconButton"
+        title="Label Dictionary"
+      >
         spellcheck
       </span>
       <div class="button-label">Dictionary</div>

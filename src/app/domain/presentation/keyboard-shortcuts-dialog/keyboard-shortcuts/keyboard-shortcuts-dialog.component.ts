@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {
   ShortcutDialogData,
   ShortCut,
@@ -9,6 +9,7 @@ import {
   selector: 'app-keyboard-shortcuts-dialog',
   templateUrl: './keyboard-shortcuts-dialog.component.html',
   styleUrl: './keyboard-shortcuts-dialog.component.scss',
+  standalone: false,
 })
 export class KeyboardShortcutsDialogComponent {
   title: string;

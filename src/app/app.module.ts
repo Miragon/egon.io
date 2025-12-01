@@ -1,8 +1,9 @@
 import {
-  APP_INITIALIZER,
   ApplicationRef,
   DoBootstrap,
   NgModule,
+  inject,
+  provideAppInitializer,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -20,7 +21,7 @@ import { UntypedFormBuilder } from '@angular/forms';
 import { IconDictionaryService } from 'src/app/tools/icon-set-config/services/icon-dictionary.service';
 import { AutosaveService } from './tools/autosave/services/autosave.service';
 import { MaterialModule } from './material.module';
-import { ColorPickerModule } from 'ngx-color-picker';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { DirtyFlagService } from './domain/services/dirty-flag.service';
 import { IconSetChangedService } from './tools/icon-set-config/services/icon-set-customization.service';
 import { initializeContextPadProvider } from './tools/modeler/diagram-js/features/context-pad/domainStoryContextPadProvider';
@@ -47,7 +48,7 @@ import { DragDirective } from './tools/import/directive/dragDrop.directive';
     BrowserModule,
     NoopAnimationsModule,
     MaterialModule,
-    ColorPickerModule,
+    ColorPickerDirective,
     WorkbenchModule,
     AutosaveModule,
     ExportModule,
@@ -65,18 +66,16 @@ import { DragDirective } from './tools/import/directive/dragDrop.directive';
       provide: MAT_CHECKBOX_DEFAULT_OPTIONS,
       useValue: { clickAction: 'noop' } as MatCheckboxDefaultOptions,
     },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initialize,
-      multi: true,
-      deps: [
-        DirtyFlagService,
-        IconDictionaryService,
-        IconSetImportExportService,
-        ElementRegistryService,
-        LabelDictionaryService,
-      ],
-    },
+    provideAppInitializer(() => {
+      const initializerFn = initialize(
+        inject(DirtyFlagService),
+        inject(IconDictionaryService),
+        inject(IconSetImportExportService),
+        inject(ElementRegistryService),
+        inject(LabelDictionaryService),
+      );
+      return initializerFn();
+    }),
     {
       provide: IconSetChangedService,
       useExisting: ImportDomainStoryService,
@@ -85,7 +84,7 @@ import { DragDirective } from './tools/import/directive/dragDrop.directive';
 })
 export class AppModule implements DoBootstrap {
   constructor(private autosaveService: AutosaveService) {
-    // autosaveService wird so automatisch initialisiert, auf keinen Fall entfernen!
+    // Needed to initialize autosaveService. Do not remove!
   }
 
   ngDoBootstrap(app: ApplicationRef): void {
