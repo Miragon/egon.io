@@ -1,10 +1,10 @@
-name: Release
+name: VsCode Release
 
 on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: 'Release type'
+        description: "Release type"
         required: true
         type: choice
         options:
@@ -30,7 +30,7 @@ jobs:
       - name: Setup NodeJS 20
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Configure Git
         run: |
@@ -39,7 +39,7 @@ jobs:
 
       - name: Bump version
         id: version
-        working-directory: apps/vscode/egon-modeler-plugin
+        working-directory: vscode/apps/vscode/egon-modeler-plugin
         run: |
           NEW_VERSION=$(npm version ${{ inputs.release-type }} --no-git-tag-version)
           echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
@@ -47,27 +47,32 @@ jobs:
 
       - name: Commit version bump
         run: |
-          git add apps/vscode/egon-modeler-plugin/package.json
+          git add vscode/apps/vscode/egon-modeler-plugin/package.json
           git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
           git push
 
       - name: Install dependencies
+        working-directory: vscode
         run: yarn
 
       - name: Lint
+        working-directory: vscode
         run: yarn lint
 
       - name: Test
+        working-directory: vscode
         run: yarn test
 
       - name: Build
+        working-directory: vscode
         run: yarn build
 
       - name: Install vsce
+        working-directory: vscode
         run: npm install -g @vscode/vsce@latest
 
       - name: Build vsix
-        working-directory: dist/apps/vscode/egon-io
+        working-directory: vscode/dist/apps/vscode/egon-io
         run: vsce package --out egon-io.vsix --yarn --no-dependencies
 
       - name: Create Release
@@ -76,4 +81,4 @@ jobs:
           tag_name: vscode-${{ steps.version.outputs.version }}
           name: vscode-${{ steps.version.outputs.version }}
           generate_release_notes: true
-          files: dist/apps/vscode/egon-io/egon-io.vsix
+          files: vscode/dist/apps/vscode/egon-io/egon-io.vsix
