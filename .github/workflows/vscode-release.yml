@@ -25,6 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Corepack enable
+        working-directory: vscode
         run: corepack enable
 
       - name: Setup NodeJS 20
@@ -73,7 +74,7 @@ jobs:
 
       - name: Build vsix
         working-directory: vscode/dist/apps/vscode/egon-io
-        run: vsce package --out egon-io.vsix --yarn --no-dependencies
+        run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile vscodeignore
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
