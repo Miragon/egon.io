@@ -25,13 +25,16 @@ jobs:
           fetch-depth: 0
 
       - name: Corepack enable
-        working-directory: vscode
         run: corepack enable
 
       - name: Setup NodeJS 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Install dependencies
+        working-directory: vscode
+        run: yarn
 
       - name: Configure Git
         run: |
@@ -45,16 +48,6 @@ jobs:
           NEW_VERSION=$(npm version ${{ inputs.release-type }} --no-git-tag-version | tr -d '\n')
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
           echo "New version: ${NEW_VERSION}"
-
-      - name: Commit version bump
-        run: |
-          git add vscode/apps/vscode/egon-modeler-plugin/package.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
-          git push
-
-      - name: Install dependencies
-        working-directory: vscode
-        run: yarn
 
       - name: Lint
         working-directory: vscode
@@ -75,6 +68,12 @@ jobs:
       - name: Build vsix
         working-directory: vscode/dist/apps/vscode/egon-io
         run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile vscodeignore
+
+      - name: Commit version bump
+        run: |
+          git add vscode/apps/vscode/egon-modeler-plugin/package.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
+          git push
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
