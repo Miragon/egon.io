@@ -12,7 +12,7 @@
 <br />
 <div align="center">
     <a href="https://egon.io/">
-        <img src="https://raw.githubusercontent.com/Miragon/egon.io/refs/heads/feat/add-vscode-plugin/monorepo/egon/images/egon-io-logo.png" alt="Egon.io Logo" height="180">
+        <img src="https://raw.githubusercontent.com/Miragon/egon.io/main/vscode/images/egon-io-logo.png" alt="Egon.io Logo" height="180">
     </a>
     <h3>Egon.io — The Domain Story Modeler</h3>
     <p>
