@@ -102,7 +102,18 @@ export class IconDictionaryService {
         const newIcons = new Dictionary();
         this.extractCustomIconsFromDictionary(config.actors, newIcons);
         this.extractCustomIconsFromDictionary(config.workObjects, newIcons);
-        this.addNewIconsToDictionary(newIcons);
+
+        // Add new icons to the global dictionary
+        newIcons.keysArray().forEach((key) => {
+            const custom = newIcons.get(key);
+            this.addIMGToIconDictionary(custom, key);
+        });
+
+        // Generate CSS for ALL custom icons in the current story's config
+        const allCurrentIcons = new Dictionary();
+        allCurrentIcons.appendDict(config.actors);
+        allCurrentIcons.appendDict(config.workObjects);
+        this.addIconsToCss(allCurrentIcons);
 
         this.addIconsToTypeDictionary(actors, workObjects);
     }
@@ -115,13 +126,16 @@ export class IconDictionaryService {
         const sheetEl = document.getElementById("iconsCss");
         customIcons.keysArray().forEach((key) => {
             const src = customIcons.get(key);
+            const base64Src = btoa(src);
+
             const iconStyle =
                 "." +
                 ICON_CSS_CLASS_PREFIX +
                 sanitizeIconName(key.toLowerCase()) +
-                '::before{ content: url("data:image/svg+xml;utf8,' +
-                this.wrapSRCInSVG(src) +
+                '::before{ content: url("data:image/svg+xml;base64,' +
+                base64Src +
                 '"); margin: 3px;}';
+
             // @ts-expect-error sheet does not exist on HtmlElement
             sheetEl?.sheet?.insertRule(iconStyle, sheetEl.sheet.cssRules.length);
         });
@@ -214,20 +228,7 @@ export class IconDictionaryService {
         });
     }
 
-    /** Add new Icon(s) **/
-    private addNewIconsToDictionary(newIcons: Dictionary) {
-        newIcons.keysArray().forEach((key) => {
-            const custom = newIcons.get(key);
-            this.addIMGToIconDictionary(custom, key);
-        });
-        this.addIconsToCss(newIcons);
-    }
 
-    private wrapSRCInSVG(src: string): string {
-        return (
-            "<svg viewBox='0 0 22 22' width='22' height='22' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><image width='22' height='22' xlink:href='" +
-            src +
-            "'/></svg>"
-        );
-    }
+
+
 }

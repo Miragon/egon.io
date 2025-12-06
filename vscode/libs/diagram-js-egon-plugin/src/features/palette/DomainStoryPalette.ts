@@ -60,6 +60,7 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
                 actions[key] = value;
             });
         });
+        console.log("actorTypes", actorTypes);
 
         actions["actor-separator"] = {
             group: "actor",

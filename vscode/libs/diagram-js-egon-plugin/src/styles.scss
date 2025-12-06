@@ -1,5 +1,9 @@
-@import "material-icons/iconfont/material-icons.css";
 @import "bpmn-font/dist/css/bpmn.css";
 @import "diagram-js-minimap/assets/diagram-js-minimap.css";
 
-@import "assets/icons.css";
+.djs-palette .entry::before {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+}
+

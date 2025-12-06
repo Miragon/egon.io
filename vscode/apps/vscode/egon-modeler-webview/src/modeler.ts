@@ -17,8 +17,16 @@ export interface ModelerConfig {
 export function createDomainStoryModeler(config: ModelerConfig): Diagram {
     const additionalModules = [EgonIo];
 
+    const container = document.getElementById("egon-io-container");
+    // Create the style element for dynamic icon CSS
+    if (!document.getElementById("iconsCss")) {
+        const style = document.createElement("style");
+        style.id = "iconsCss";
+        container?.appendChild(style);
+    }
+
     domainStoryModeler = new Diagram({
-        container: document.getElementById("egon-io-container"),
+        container,
         width: "100%",
         height: "100%",
         position: "relative",
