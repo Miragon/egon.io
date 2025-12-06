@@ -1,79 +1,151 @@
-name: Release
+name: VS-Code Release
 
 on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: 'Release type'
+        description: "Release type"
         required: true
         type: choice
         options:
           - patch
           - minor
           - major
+      dry-run:
+        description: "Run without pushing/releasing"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
+concurrency:
+  group: vscode-release
+  cancel-in-progress: false
+
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=2048"
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
 
-      - name: Corepack enable
-        run: corepack enable
+      - name: Corepack enable + ensure Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@stable --activate
 
       - name: Setup NodeJS 20
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+          cache: "yarn"
+          cache-dependency-path: "vscode/yarn.lock"
+
+      - name: Install dependencies
+        working-directory: vscode
+        run: yarn install --immutable
 
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Bump version
+      - name: Bump version (yarn workspace)
         id: version
-        working-directory: apps/vscode/egon-modeler-plugin
+        working-directory: vscode
         run: |
-          NEW_VERSION=$(npm version ${{ inputs.release-type }} --no-git-tag-version | tr -d '\n')
+          set -euo pipefail
+
+          PKG_PATH="./apps/vscode/egon-modeler-plugin/package.json"
+          if [ ! -f "$PKG_PATH" ]; then
+            echo "error: package.json not found at $PKG_PATH" >&2
+            exit 1
+          fi
+
+          PKG_NAME=$(node -e "console.log(require('$PKG_PATH').name)")
+          echo "Detected workspace package name: $PKG_NAME"
+
+          BUMP_TYPE="${{ inputs.release-type }}"
+          if [[ ! "$BUMP_TYPE" =~ ^(patch|minor|major)$ ]]; then
+            echo "Invalid release-type: $BUMP_TYPE" >&2
+            exit 1
+          fi
+
+          echo "Running: yarn workspace \"$PKG_NAME\" version $BUMP_TYPE"
+          yarn workspace "$PKG_NAME" version "$BUMP_TYPE"
+
+          NEW_VERSION=$(node -e "console.log(require('$PKG_PATH').version)")
+          echo "New version: $NEW_VERSION"
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "New version: ${NEW_VERSION}"
-
-      - name: Commit version bump
-        run: |
-          git add apps/vscode/egon-modeler-plugin/package.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
-          git push
-
-      - name: Install dependencies
-        run: yarn
 
       - name: Lint
+        working-directory: vscode
         run: yarn lint
 
       - name: Test
+        working-directory: vscode
         run: yarn test
 
       - name: Build
+        working-directory: vscode
         run: yarn build
 
       - name: Install vsce
-        run: npm install -g @vscode/vsce@latest
+        run: npm install -g @vscode/vsce@3.2.2
 
       - name: Build vsix
-        working-directory: dist/apps/vscode/egon-io
-        run: vsce package --out egon-io.vsix --yarn --no-dependencies
+        working-directory: vscode/dist/apps/vscode/egon-io
+        run: vsce package --out egon-io.vsix --yarn --no-dependencies --ignoreFile vscodeignore
+
+      - name: Ensure tag does not already exist
+        run: |
+          TAG="vscode-${{ steps.version.outputs.version }}"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists; aborting."
+            exit 1
+          fi
+
+      - name: Commit & tag version bump
+        if: success() && inputs.dry-run == false
+        working-directory: vscode
+        run: |
+          set -euo pipefail
+
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+          echo "Preparing to commit version ${NEW_VERSION}"
+
+          git add apps/vscode/egon-modeler-plugin/package.json .yarn/releases .yarn/versions || true
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit (package.json unchanged?)"
+          else
+            git commit -m "chore(release): bump version to ${NEW_VERSION}"
+            BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            echo "Pushing commit to origin/${BRANCH}"
+            git push origin "${BRANCH}" || {
+              echo "Push failed. Please rebase/merge and retry." >&2
+              exit 1
+            }
+
+            TAG="vscode-${NEW_VERSION}"
+            echo "Creating annotated tag ${TAG}"
+            git tag -a "${TAG}" -m "vscode release ${NEW_VERSION}"
+            git push origin "${TAG}"
+          fi
 
       - name: Create Release
+        if: success() && steps.version.outputs.version != '' && inputs.dry-run == false
         uses: softprops/action-gh-release@v2
         with:
           tag_name: vscode-${{ steps.version.outputs.version }}
           name: vscode-${{ steps.version.outputs.version }}
           generate_release_notes: true
-          files: dist/apps/vscode/egon-io/egon-io.vsix
+          files: vscode/dist/apps/vscode/egon-io/egon-io.vsix
