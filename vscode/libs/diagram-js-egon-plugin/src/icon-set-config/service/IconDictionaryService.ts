@@ -18,8 +18,6 @@ export class IconDictionaryService {
     private selectedActorsDictionary = new Dictionary();
     private selectedWorkObjectsDictionary = new Dictionary();
 
-    private customIconSet?: IconSet;
-
     constructor() {}
 
     /** Load Icons from Configuration **/
@@ -93,7 +91,6 @@ export class IconDictionaryService {
         collection.delete(name);
     }
 
-    // TODO: why are Business Objects required to update icon registries?
     updateIconRegistries(
         actors: DomainStoryBusinessObject[],
         workObjects: DomainStoryBusinessObject[],
@@ -125,16 +122,20 @@ export class IconDictionaryService {
     addIconsToCss(customIcons: Dictionary) {
         const sheetEl = document.getElementById("iconsCss");
         customIcons.keysArray().forEach((key) => {
-            const src = customIcons.get(key);
+            let src = customIcons.get(key);
+
+            // Remove width and height attributes from SVG tag to ensure consistent scaling
+            src = src.replace(/<svg[^>]+>/, (match: string) => {
+                return match.replace(/ (width|height)="[^"]*"/g, "");
+            });
+
             const base64Src = btoa(src);
 
-            const iconStyle =
-                "." +
-                ICON_CSS_CLASS_PREFIX +
-                sanitizeIconName(key.toLowerCase()) +
-                '::before{ content: url("data:image/svg+xml;base64,' +
-                base64Src +
-                '"); margin: 3px;}';
+            const iconStyle = `
+                .${ICON_CSS_CLASS_PREFIX}${sanitizeIconName(key.toLowerCase())}::before {
+                  mask-image: url('data:image/svg+xml;base64,${base64Src}');
+                }
+            `;
 
             // @ts-expect-error sheet does not exist on HtmlElement
             sheetEl?.sheet?.insertRule(iconStyle, sheetEl.sheet.cssRules.length);
@@ -187,7 +188,6 @@ export class IconDictionaryService {
     }
 
     setIconSet(iconSet: IconSet): void {
-        // this.customIconSet = iconSet;
         this.selectedActorsDictionary = iconSet.actors;
         this.selectedWorkObjectsDictionary = iconSet.workObjects;
     }
@@ -227,8 +227,4 @@ export class IconDictionaryService {
             }
         });
     }
-
-
-
-
 }
