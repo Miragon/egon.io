@@ -35,6 +35,7 @@ Open or create a new `.egn` file and start writing your *domain* story.
 **Custom Icons**
 You can add custom icons to your story by adding a `.egon/icons/actors` or `.egon/icons/work-objects` folder to your workspace.
 The folder should contain `.svg` files with the same name as the icon you want to use.
+See [here](docs/CustomIcons.md) for a more detailed description.
 
 **Useful Links**
 
