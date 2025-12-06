@@ -2,7 +2,7 @@ import { assign } from "min-dash";
 import PaletteProvider, {
     PaletteEntries,
     PaletteEntriesCallback,
-    PaletteEntry,
+    PaletteEntry
 } from "diagram-js/lib/features/palette/PaletteProvider";
 import Create from "diagram-js/lib/features/create/Create";
 import ElementFactory from "diagram-js/lib/core/ElementFactory";
@@ -60,7 +60,6 @@ export class DomainStoryPaletteProvider implements PaletteProvider {
                 actions[key] = value;
             });
         });
-        console.log("actorTypes", actorTypes);
 
         actions["actor-separator"] = {
             group: "actor",
