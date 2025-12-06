@@ -33,7 +33,8 @@ jobs:
             };
 
             for (const [prefix, label] of Object.entries(prefixMap)) {
-              if (title.toLowerCase().startsWith(`${prefix}:`)) {
+              const regex = new RegExp(`^${prefix}(\\(.+\\))?:`, 'i');
+              if (regex.test(title)) {
                 labelsToAdd.push(label);
                 break;
               }
