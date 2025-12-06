@@ -1,10 +1,10 @@
 import ConnectModule from "diagram-js/lib/features/connect";
 import CreateModule from "diagram-js/lib/features/create";
-import ContextPadModule from "diagram-js/lib/features/context-pad";
 import PopupMenuModule from "diagram-js/lib/features/popup-menu";
 import CommandStackModule from "diagram-js/lib/command";
 import TranslateModule from "diagram-js/lib/i18n/translate";
 import RulesModule from "diagram-js/lib/features/rules";
+import SchedulerModule from "diagram-js/lib/features/scheduler";
 
 import DomainStoryElementFactory from "../element-factory";
 import DomainStoryModeling from "../modeling";
@@ -13,6 +13,7 @@ import DomainStoryDirtyFlagService from "../../domain/service";
 import DomainStoryIconDictionaryService from "../../icon-set-config/service";
 
 import { DomainStoryContextPadProvider } from "./DomainStoryContextPadProvider";
+import { DomainStoryContextPad } from "./DomainStoryContextPad";
 
 export default {
     __depends__: [
@@ -25,10 +26,11 @@ export default {
         ConnectModule,
         CreateModule,
         TranslateModule,
-        ContextPadModule,
+        SchedulerModule,
         PopupMenuModule,
         CommandStackModule,
     ],
-    __init__: ["domainStoryContextPadProvider"],
+    __init__: ["contextPad", "domainStoryContextPadProvider"],
+    contextPad: ["type", DomainStoryContextPad],
     domainStoryContextPadProvider: ["type", DomainStoryContextPadProvider],
 };

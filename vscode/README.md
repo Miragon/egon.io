@@ -28,14 +28,19 @@
 
 This plugin integrates the open source tool [Egon.io](https://egon.io/) into Visual Studio Code.
 
-- See http://domainstorytelling.org for more information on Domain Storytelling.
-- For more information on how to use it, please refer to the [User Guide](https://egon.io/howto)
-
-> ‼️ This is a work in progress.
-
 ## Getting started
 
 Open or create a new `.egn` file and start writing your *domain* story.
+
+**Custom Icons**
+You can add custom icons to your story by adding a `.egon/icons/actors` or `.egon/icons/work-objects` folder to your workspace.
+The folder should contain `.svg` files with the same name as the icon you want to use.
+See [here](docs/CustomIcons.md) for a more detailed description.
+
+**Useful Links**
+
+- [Domain Storytelling](http://domainstorytelling.org)
+- [User Guide](https://egon.io/howto#palette)
 
 ## Contributing
 
@@ -76,9 +81,9 @@ Distributed under this [GPLv3](https://github.com/Miragon/egon.io/blob/dbd0fb34b
 
 [stars-url]: https://github.com/wps/egon.io/stargazers
 
-[issues-shield]: https://img.shields.io/github/issues/wps/egon.io.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/Miragon/egon.io.svg?style=for-the-badge
 
-[issues-url]: https://github.com/wps/egon.io/issues
+[issues-url]: https://github.com/Miragon/egon.io/issues
 
 [license-shield]: https://img.shields.io/badge/license-GPLv3-blue.svg?style=for-the-badge
 

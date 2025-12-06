@@ -39,7 +39,6 @@
     "ids": "^1.0.5",
     "inherits-browser": "^0.1.0",
     "lodash": "^4.17.21",
-    "material-icons": "^1.13.2",
     "min-dash": "^4.2.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.0",
