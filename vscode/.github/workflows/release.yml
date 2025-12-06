@@ -82,6 +82,10 @@ jobs:
           echo "Running: yarn workspace \"$PKG_NAME\" version $BUMP_TYPE"
           yarn workspace "$PKG_NAME" version "$BUMP_TYPE"
 
+          # Apply deferred version changes to package.json
+          echo "Applying version changes..."
+          yarn version apply --all
+
           NEW_VERSION=$(node -e "console.log(require('$PKG_PATH').version)")
           echo "New version: $NEW_VERSION"
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
