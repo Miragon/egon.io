@@ -467,7 +467,6 @@ __metadata:
     karma-jasmine: "npm:^5.1.0"
     karma-jasmine-html-reporter: "npm:^2.0.0"
     lodash: "npm:^4.17.21"
-    material-icons: "npm:^1.13.2"
     min-dash: "npm:^4.2.2"
     npm-run-all: "npm:^4.1.5"
     prettier: "npm:^3.4.1"
@@ -6960,13 +6959,6 @@ __metadata:
   dependencies:
     tmpl: "npm:1.0.5"
   checksum: 10c0/b0e6e599780ce6bab49cc413eba822f7d1f0dfebd1c103eaa3785c59e43e22c59018323cf9e1708f0ef5329e94a745d163fcbb6bff8e4c6742f9be9e86f3500c
-  languageName: node
-  linkType: hard
-
-"material-icons@npm:^1.13.2":
-  version: 1.13.14
-  resolution: "material-icons@npm:1.13.14"
-  checksum: 10c0/4c0f9a8ff02545ce7747c621b5ffa1738212628189c9419f4cd2e75f7f8cf9e98ed5f946724a2d7e169cfebc439875df0ba9f79ba94a574e16cbb0c5ce26e55a
   languageName: node
   linkType: hard
 
