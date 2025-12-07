@@ -465,7 +465,6 @@ __metadata:
   dependencies:
     diagram-js: "npm:^15.2.4"
     diagram-js-direct-editing: "npm:^3.2.0"
-    diagram-js-minimap: "npm:^5.2.0"
     ids: "npm:^1.0.5"
     min-dash: "npm:^4.2.2"
     min-dom: "npm:4.2.1"
@@ -4313,6 +4312,8 @@ __metadata:
 "egon-modeler-webview@workspace:apps/vscode/egon-modeler-webview":
   version: 0.0.0-use.local
   resolution: "egon-modeler-webview@workspace:apps/vscode/egon-modeler-webview"
+  dependencies:
+    diagram-js-minimap: "npm:^5.2.0"
   languageName: unknown
   linkType: soft
 

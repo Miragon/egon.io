@@ -1,14 +1,11 @@
 import { debounce } from "lodash";
-import {
-    DomainStoryDocument,
-    EgonClient,
-    ViewportData,
-} from "@egon/diagram-js-egon-plugin";
+import minimapModule from "diagram-js-minimap";
+import { DomainStoryDocument, EgonClient, ViewportData } from "@egon/diagram-js-egon-plugin";
 import {
     Command,
     DisplayDomainStoryCommand,
     InitializeWebviewCommand,
-    SyncDocumentCommand,
+    SyncDocumentCommand
 } from "@egon/data-transfer-objects";
 import { getVsCodeApi } from "./vscode/api";
 
@@ -83,12 +80,15 @@ async function initializeDomainStoryModeler(story: string, state: WebviewState) 
         throw new Error("Container for Egon.io modeler not found!");
     }
 
-    egonClient = await EgonClient.create({
-        container,
-        width: "100%",
-        height: "100%",
-        viewport: state.viewbox,
-    });
+    egonClient = await EgonClient.create(
+        {
+            container,
+            width: "100%",
+            height: "100%",
+            viewport: state.viewbox,
+        },
+        [minimapModule],
+    );
 
     if (story !== "") {
         importStory(story);
