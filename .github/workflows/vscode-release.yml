@@ -157,6 +157,7 @@ jobs:
           files: vscode/dist/apps/vscode/egon-io/egon-io.vsix
 
       - name: Publish extension
+        working-directory: vscode/dist/apps/vscode/egon-io
         run: vsce publish --yarn --no-dependencies
         env:
           VSCE_PAT: ${{ secrets.VSCE_PUBLISH }}
