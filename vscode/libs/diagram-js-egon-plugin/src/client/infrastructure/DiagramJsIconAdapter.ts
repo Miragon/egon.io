@@ -19,8 +19,10 @@ export class DiagramJsIconAdapter implements IconPort {
     private readonly iconDictionaryService: IconDictionaryService;
     private readonly iconSetImportExportService: IconSetImportExportService;
     private readonly eventBus: EventBus;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    private readonly callbackRegistry: Map<Function, Function> = new Map();
+    private readonly callbackRegistry: Map<
+        (icons: IconSet) => void,
+        (event?: unknown) => void
+    > = new Map();
 
     constructor(diagram: Diagram) {
         this.iconDictionaryService = diagram.get<IconDictionaryService>(
@@ -102,8 +104,9 @@ export class DiagramJsIconAdapter implements IconPort {
         this.eventBus.fire("dst.config.changed", { iconSet: this.getIcons() });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    private createDebouncedCallback(callback: (event?: any) => void): Function {
+    private createDebouncedCallback(
+        callback: (event?: unknown) => void,
+    ): (event?: unknown) => void {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
         return (event: any) => {
             if (timeoutId) clearTimeout(timeoutId);

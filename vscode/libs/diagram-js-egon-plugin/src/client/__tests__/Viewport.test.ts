@@ -1,4 +1,5 @@
-import { Viewport } from "../domain/model/Viewport";
+import { describe, expect, it } from "vitest";
+import { Viewport } from "../domain";
 
 describe("Viewport (Value Object)", () => {
     it("should be immutable", () => {

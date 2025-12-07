@@ -1,2 +1,2 @@
-export type { ModelerPort } from "./ModelerPort";
-export type { IconPort } from "./IconPort";
+export * from "./ModelerPort";
+export * from "./IconPort";

@@ -45,7 +45,7 @@ The client follows **Domain-Driven Design (DDD)** principles with three architec
 ### Basic Usage
 
 ```typescript
-import { EgonClient } from "@libs/diagram-js-egon-plugin";
+import {EgonClient} from "@libs/diagram-js-egon-plugin";
 
 const container = document.getElementById("egon-io-container");
 const client = new EgonClient({
@@ -70,7 +70,7 @@ client.on("viewport.changed", (viewport) => {
 
 // Icon management
 client.loadIcons({
-    actors: { Robot: "<svg>...</svg>" },
+    actors: {Robot: "<svg>...</svg>"},
 });
 
 // Clean up
@@ -80,11 +80,11 @@ client.destroy();
 ### With Additional Modules
 
 ```typescript
-import { EgonClient } from "@libs/diagram-js-egon-plugin";
+import {EgonClient} from "@libs/diagram-js-egon-plugin";
 import CustomModule from "./custom-module";
 
 const client = new EgonClient(
-    { container, width: "100%", height: "100%" },
+    {container, width: "100%", height: "100%"},
     [CustomModule], // Additional modules merged with defaults
 );
 ```
@@ -125,7 +125,9 @@ class Viewport {
     readonly height: number;
 
     equals(other: Viewport): boolean;
+
     toPlainObject(): ViewportData;
+
     static fromPlainObject(data: ViewportData): Viewport;
 }
 
@@ -138,6 +140,7 @@ interface ViewportData {
 ```
 
 **Properties:**
+
 - **Immutable**: All instances are frozen, preventing accidental mutations
 - **Value semantics**: Equality is based on content, not identity
 - **Conversion methods**: Convert to/from plain objects for serialization
@@ -225,21 +228,28 @@ export class EgonClient {
 
     // Document operations
     import(document: DomainStoryDocument): void;
+
     export(): DomainStoryDocument;
 
     // Event subscription
     on<E extends EgonEventName>(event: E, callback: EgonEventMap[E]): void;
+
     off<E extends EgonEventName>(event: E, callback: EgonEventMap[E]): void;
 
     // Viewport
     getViewport(): ViewportData;
+
     setViewport(viewport: ViewportData): void;
 
     // Icon management
     loadIcons(icons: Partial<IconSetData>): void;
+
     addIcon(category: IconCategory, name: string, svg: string): void;
+
     removeIcon(category: IconCategory, name: string): void;
+
     getIcons(): IconSet;
+
     hasIcon(category: IconCategory, name: string): boolean;
 
     // Lifecycle
@@ -256,13 +266,21 @@ Abstract contracts that infrastructure adapters implement:
 ```typescript
 interface ModelerPort {
     import(document: DomainStoryDocument): void;
+
     export(): DomainStoryDocument;
+
     getViewport(): ViewportData;
+
     setViewport(viewport: ViewportData): void;
+
     onStoryChanged(callback: () => void): void;
+
     onViewportChanged(callback: (viewport: ViewportData) => void): void;
+
     offStoryChanged(callback: () => void): void;
+
     offViewportChanged(callback: (viewport: ViewportData) => void): void;
+
     destroy(): void;
 }
 ```
@@ -272,11 +290,17 @@ interface ModelerPort {
 ```typescript
 interface IconPort {
     loadIcons(icons: Partial<IconSetData>): void;
+
     addIcon(category: IconCategory, name: string, svg: string): void;
+
     removeIcon(category: IconCategory, name: string): void;
+
     getIcons(): IconSet;
+
     hasIcon(category: IconCategory, name: string): boolean;
+
     onIconsChanged(callback: (icons: IconSet) => void): void;
+
     offIconsChanged(callback: (icons: IconSet) => void): void;
 }
 ```
@@ -307,6 +331,7 @@ Implements `ModelerPort` using diagram-js:
 - Tracks callback registry for proper cleanup
 
 **Key responsibilities:**
+
 - Initialize diagram-js with EgonPlugin
 - Map modeler events to port callbacks
 - Handle CSS initialization for icons
@@ -322,6 +347,7 @@ Implements `IconPort` using existing services:
 - Fires internal events for icon changes
 
 **Key responsibilities:**
+
 - Load icon configurations using existing services
 - Add/remove individual icons
 - Query current icon state
@@ -334,14 +360,24 @@ Implements `IconPort` using existing services:
 ### Constructor
 
 ```typescript
-new EgonClient(config: EgonClientConfig, additionalModules?: ModuleDeclaration[])
+new EgonClient(
+    config
+:
+EgonClientConfig,
+    additionalModules ? : ModuleDeclaration[],
+    ports ? : EgonClientPorts
+)
 ```
 
 **Parameters:**
+
 - `config` - Configuration object with container and optional dimensions/viewport
 - `additionalModules` - Optional diagram-js modules to load alongside defaults
+- `ports` - Optional port injection for testing (bypasses adapter creation)
 
 **Throws**: Error if document is invalid during import
+
+**Note**: The `ports` parameter is primarily for testing. When provided, `EgonClient` uses the injected ports instead of creating real infrastructure adapters. See [Testing](#testing) for details.
 
 ### Document Operations
 
@@ -353,8 +389,8 @@ Imports a domain story document into the diagram. Clears any existing content be
 const document: DomainStoryDocument = {
     domain: {
         name: "My Domain",
-        actors: { Person: "<svg>...</svg>" },
-        workObjects: { Document: "<svg>...</svg>" },
+        actors: {Person: "<svg>...</svg>"},
+        workObjects: {Document: "<svg>...</svg>"},
     },
     dst: [],
 };
@@ -363,6 +399,7 @@ client.import(document);
 ```
 
 **Effects:**
+
 - Clears existing diagram content
 - Registers icons from domain configuration
 - Renders story elements on canvas
@@ -404,6 +441,7 @@ client.on("icons.changed", (icons: IconSet) => {
 ```
 
 **Event types:**
+
 - `"story.changed"` - Fired when diagram elements change (debounced 100ms)
 - `"viewport.changed"` - Fired when viewport changes (debounced 100ms)
 - `"icons.changed"` - Fired when icon set changes (debounced 100ms)
@@ -413,7 +451,8 @@ client.on("icons.changed", (icons: IconSet) => {
 Unsubscribe from an event.
 
 ```typescript
-const handler = () => { /* ... */ };
+const handler = () => { /* ... */
+};
 client.on("story.changed", handler);
 // ... later
 client.off("story.changed", handler);
@@ -449,6 +488,7 @@ client.setViewport({
 ```
 
 **Parameters:**
+
 - `x`, `y` - Canvas offset
 - `width`, `height` - Visible area dimensions
 
@@ -473,11 +513,12 @@ client.loadIcons({
 
 // Load only actors
 client.loadIcons({
-    actors: { CustomActor: "<svg>...</svg>" },
+    actors: {CustomActor: "<svg>...</svg>"},
 });
 ```
 
 **Effects:**
+
 - Registers icons in `IconDictionaryService`
 - Updates CSS for icon rendering
 - Fires `icons.changed` event
@@ -492,11 +533,13 @@ client.addIcon("workObject", "Database", "<svg>...</svg>");
 ```
 
 **Parameters:**
+
 - `category` - `"actor"` or `"workObject"`
 - `name` - Icon identifier (e.g., "Person", "Document")
 - `svg` - SVG content as string
 
 **Effects:**
+
 - Registers icon in type-specific dictionary
 - Generates CSS for rendering
 - Fires `icons.changed` event
@@ -510,6 +553,7 @@ client.removeIcon("actor", "Robot");
 ```
 
 **Parameters:**
+
 - `category` - `"actor"` or `"workObject"`
 - `name` - Icon identifier
 
@@ -538,6 +582,7 @@ if (client.hasIcon("actor", "Robot")) {
 ```
 
 **Parameters:**
+
 - `category` - `"actor"` or `"workObject"`
 - `name` - Icon identifier
 
@@ -555,6 +600,7 @@ client.destroy();
 ```
 
 **Effects:**
+
 - Clears all event listeners
 - Destroys diagram-js instance
 - Releases DOM references
@@ -572,10 +618,10 @@ Most common pattern - icons are included in the story document:
 const document: DomainStoryDocument = {
     domain: {
         name: "My Domain",
-        actors: { Person: "<svg>...</svg>" },
-        workObjects: { Document: "<svg>...</svg>" },
+        actors: {Person: "<svg>...</svg>"},
+        workObjects: {Document: "<svg>...</svg>"},
     },
-    dst: [ /* story elements */ ],
+    dst: [ /* story elements */],
 };
 
 client.import(document);
@@ -591,7 +637,7 @@ Load custom icons before importing a story:
 ```typescript
 // Load workspace-specific icons
 client.loadIcons({
-    actors: { CustomActor: "<svg>...</svg>" },
+    actors: {CustomActor: "<svg>...</svg>"},
 });
 
 // Now import story that uses these icons
@@ -599,6 +645,7 @@ client.import(story);
 ```
 
 **When to use:**
+
 - Loading icons from `.egon/icons/` folder
 - Using shared icon sets across multiple stories
 - Dynamically loading icons based on configuration
@@ -615,6 +662,7 @@ client.addIcon("workObject", "Database", "<svg>...</svg>");
 ```
 
 **When to use:**
+
 - Runtime icon generation
 - User-uploaded custom icons
 - Lazy-loading icon libraries
@@ -696,12 +744,14 @@ client.on("story.changed", () => {
 
 ```typescript
 // Good
-const handleChange = () => { /* ... */ };
+const handleChange = () => { /* ... */
+};
 client.on("story.changed", handleChange);
 client.off("story.changed", handleChange);
 
 // Bad - can't unsubscribe
-client.on("story.changed", () => { /* ... */ });
+client.on("story.changed", () => { /* ... */
+});
 ```
 
 2. **Unsubscribe when done**:
@@ -741,18 +791,34 @@ client.on("story.changed", () => {
 ```typescript
 // Main API
 export class EgonClient {
-    constructor(config: EgonClientConfig, additionalModules?: ModuleDeclaration[]);
+    constructor(
+        config: EgonClientConfig,
+        additionalModules?: ModuleDeclaration[],
+        ports?: EgonClientPorts
+    );
+
     import(document: DomainStoryDocument): void;
+
     export(): DomainStoryDocument;
+
     on<E extends EgonEventName>(event: E, callback: EgonEventMap[E]): void;
+
     off<E extends EgonEventName>(event: E, callback: EgonEventMap[E]): void;
+
     getViewport(): ViewportData;
+
     setViewport(viewport: ViewportData): void;
+
     loadIcons(icons: Partial<IconSetData>): void;
+
     addIcon(category: IconCategory, name: string, svg: string): void;
+
     removeIcon(category: IconCategory, name: string): void;
+
     getIcons(): IconSet;
+
     hasIcon(category: IconCategory, name: string): boolean;
+
     destroy(): void;
 }
 
@@ -762,6 +828,12 @@ export interface EgonClientConfig {
     readonly width?: string;
     readonly height?: string;
     readonly viewport?: ViewportData;
+}
+
+// Port injection for testing
+export interface EgonClientPorts {
+    modelerPort: ModelerPort;
+    iconPort: IconPort;
 }
 
 // Events
@@ -817,19 +889,22 @@ export interface IconMap {
 The adapters maintain a callback registry to track wrapped callbacks:
 
 ```typescript
-private readonly callbackRegistry: Map<Function, Function> = new Map();
+private readonly
+callbackRegistry: Map<Function, Function> = new Map();
 ```
 
 **Why?** Diagram-js events are wrapped with debouncing. When unsubscribing, we need to find the wrapped version to properly remove it.
 
 ```typescript
-on(event, callback) {
+on(event, callback)
+{
     const wrapped = debounce(callback);
     this.callbackRegistry.set(callback, wrapped);
     this.eventBus.on(event, wrapped);
 }
 
-off(event, callback) {
+off(event, callback)
+{
     const wrapped = this.callbackRegistry.get(callback);
     if (wrapped) {
         this.eventBus.off(event, wrapped);
@@ -843,12 +918,20 @@ off(event, callback) {
 Icon rendering requires a `<style>` element in the container:
 
 ```typescript
-private initializeContainer(container: HTMLElement): void {
-    if (!container.querySelector("#iconsCss")) {
-        const style = document.createElement("style");
-        style.id = "iconsCss";
-        container.appendChild(style);
-    }
+private
+initializeContainer(container
+:
+HTMLElement
+):
+void {
+    if(!
+container.querySelector("#iconsCss")
+)
+{
+    const style = document.createElement("style");
+    style.id = "iconsCss";
+    container.appendChild(style);
+}
 }
 ```
 
@@ -866,8 +949,8 @@ Each `EgonClient` manages a single diagram-js instance. Multiple clients require
 
 ```typescript
 // Create two separate modelers
-const client1 = new EgonClient({ container: div1 });
-const client2 = new EgonClient({ container: div2 });
+const client1 = new EgonClient({container: div1});
+const client2 = new EgonClient({container: div2});
 
 // They are independent
 client1.import(doc1);
@@ -889,12 +972,21 @@ client2.import(doc2);
 Depend on abstractions (ports), not implementations:
 
 ```typescript
-// EgonClient depends on ports, not concrete adapters
+// EgonClient depends on port interfaces, not concrete adapters
 export class EgonClient {
-    constructor(
-        private modelerPort: ModelerPort,
-        private iconPort: IconPort,
-    ) { }
+    private readonly modelerPort: ModelerPort;
+    private readonly iconPort: IconPort;
+
+    constructor(config: EgonClientConfig, additionalModules?: ModuleDeclaration[], ports?: EgonClientPorts) {
+        if (ports) {
+            // Use injected ports (for testing)
+            this.modelerPort = ports.modelerPort;
+            this.iconPort = ports.iconPort;
+        } else {
+            // Create infrastructure adapters (production)
+            // Uses dynamic imports to avoid module resolution in tests
+        }
+    }
 }
 ```
 
@@ -933,7 +1025,7 @@ Hide diagram-js event names from consumers:
 
 ```typescript
 export function setupModeler(container: HTMLElement) {
-    const client = new EgonClient({ container });
+    const client = new EgonClient({container});
 
     // Load initial story
     client.import(getInitialStory());
@@ -1001,54 +1093,6 @@ async function loadWorkspaceIcons(workspacePath: string) {
 
 ---
 
-## Migration Guide
-
-### From Direct diagram-js Usage
-
-**Before:**
-
-```typescript
-import EgonIo from "@libs/diagram-js-egon-plugin";
-import Diagram from "diagram-js";
-
-const diagram = new Diagram({
-    container,
-    modules: [EgonIo],
-});
-
-const importService = diagram.get("domainStoryImportService");
-importService.import(jsonString);
-
-diagram.get("eventBus").on("commandStack.changed", debounce(callback, 100));
-```
-
-**After:**
-
-```typescript
-import { EgonClient } from "@libs/diagram-js-egon-plugin";
-
-const client = new EgonClient({ container });
-client.import(document);
-client.on("story.changed", callback);
-```
-
-### From Old API
-
-If using deprecated services:
-
-```typescript
-// Old way (deprecated)
-const importService = diagram.get("domainStoryImportService");
-const exportService = diagram.get("domainStoryExportService");
-
-// New way
-const client = new EgonClient({ container });
-client.import(document);
-const exported = client.export();
-```
-
----
-
 ## Troubleshooting
 
 ### Icons Not Rendering
@@ -1056,15 +1100,17 @@ const exported = client.export();
 **Problem**: Added icons but they don't appear.
 
 **Check**:
+
 1. Icon is registered: `client.hasIcon("actor", "IconName")`
 2. Icon exists in current set: `Object.keys(client.getIcons().actors)`
 3. Elements using icon exist on canvas
 
-**Solution**: 
+**Solution**:
+
 ```typescript
 // Ensure icons are registered
 client.loadIcons({
-    actors: { Person: mySvg },
+    actors: {Person: mySvg},
 });
 
 // Create element that uses the icon
@@ -1075,15 +1121,19 @@ client.loadIcons({
 **Problem**: Callback never invoked.
 
 **Check**:
+
 1. Correct event name: `"story.changed"` not `"storyChanged"`
 2. Correct callback signature
 3. Not unsubscribed accidentally
 
 **Solution**:
+
 ```typescript
 // Use correct names and signatures
-client.on("story.changed", () => { /* no params */ });
-client.on("viewport.changed", (viewport: ViewportData) => { });
+client.on("story.changed", () => { /* no params */
+});
+client.on("viewport.changed", (viewport: ViewportData) => {
+});
 ```
 
 ### Memory Leaks
@@ -1091,18 +1141,101 @@ client.on("viewport.changed", (viewport: ViewportData) => { });
 **Problem**: Application memory grows over time.
 
 **Check**:
+
 1. Calling `client.destroy()` on cleanup
 2. Unsubscribing from events: `client.off(...)`
 3. Not creating multiple instances unnecessarily
 
 **Solution**:
+
 ```typescript
-const client = new EgonClient({ container });
+const client = new EgonClient({container});
 
 // Cleanup when done
 return () => {
     client.destroy();
 };
+```
+
+---
+
+## Testing
+
+### Unit Testing with Port Injection
+
+`EgonClient` supports constructor injection for testing. Instead of creating real diagram-js adapters, you can provide mock ports:
+
+```typescript
+import {describe, it, expect, vi} from "vitest";
+import {EgonClient} from "@libs/diagram-js-egon-plugin";
+import type {ModelerPort, IconPort} from "@libs/diagram-js-egon-plugin";
+
+function createMockPorts() {
+    const mockModelerPort: ModelerPort = {
+        import: vi.fn(),
+        export: vi.fn(),
+        getViewport: vi.fn().mockReturnValue({x: 0, y: 0, width: 100, height: 100}),
+        setViewport: vi.fn(),
+        onStoryChanged: vi.fn(),
+        onViewportChanged: vi.fn(),
+        offStoryChanged: vi.fn(),
+        offViewportChanged: vi.fn(),
+        destroy: vi.fn(),
+    };
+
+    const mockIconPort: IconPort = {
+        loadIcons: vi.fn(),
+        addIcon: vi.fn(),
+        removeIcon: vi.fn(),
+        getIcons: vi.fn().mockReturnValue({actors: {}, workObjects: {}}),
+        hasIcon: vi.fn(),
+        onIconsChanged: vi.fn(),
+        offIconsChanged: vi.fn(),
+    };
+
+    return {mockModelerPort, mockIconPort};
+}
+
+describe("EgonClient", () => {
+    it("should delegate import to modeler port", () => {
+        const container = document.createElement("div");
+        const {mockModelerPort, mockIconPort} = createMockPorts();
+
+        // Use constructor injection to provide mock ports
+        const client = new EgonClient(
+            {container},
+            [], // No additional modules
+            {modelerPort: mockModelerPort, iconPort: mockIconPort}
+        );
+
+        const doc = {domain: {name: "", actors: {}, workObjects: {}}, dst: []};
+        client.import(doc);
+
+        expect(mockModelerPort.import).toHaveBeenCalledWith(doc);
+    });
+});
+```
+
+### Benefits of Port Injection
+
+1. **No DOM dependencies** - Tests run without jsdom complexities
+2. **No diagram-js initialization** - Avoids ESM/CJS module issues
+3. **Fast execution** - No real canvas rendering
+4. **Focused testing** - Test EgonClient logic in isolation
+
+### Test Framework
+
+The library uses **Vitest** for testing, which provides native ESM support and avoids the module resolution issues common with Jest + diagram-js.
+
+```bash
+# Run tests
+yarn workspace @egon/diagram-js-egon-plugin test
+
+# Run with coverage
+yarn workspace @egon/diagram-js-egon-plugin test:coverage
+
+# Watch mode
+yarn workspace @egon/diagram-js-egon-plugin test:watch
 ```
 
 ---

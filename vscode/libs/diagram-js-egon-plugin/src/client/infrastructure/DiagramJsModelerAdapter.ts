@@ -21,8 +21,10 @@ export class DiagramJsModelerAdapter implements ModelerPort {
     private readonly diagram: Diagram;
     private readonly eventBus: EventBus;
     private readonly canvas: Canvas;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    private readonly callbackRegistry: Map<Function, Function> = new Map();
+    private readonly callbackRegistry: Map<
+        (() => void) | ((viewport: ViewportData) => void),
+        (event?: unknown) => void
+    > = new Map();
 
     constructor(
         container: HTMLElement,
@@ -122,9 +124,11 @@ export class DiagramJsModelerAdapter implements ModelerPort {
         this.canvas.setRootElement(root);
     }
 
-    private createDebouncedCallback(callback: (event?: any) => void): Function {
+    private createDebouncedCallback(
+        callback: (event?: unknown) => void,
+    ): (event?: unknown) => void {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        return (event: any) => {
+        return (event?: unknown) => {
             if (timeoutId) clearTimeout(timeoutId);
             timeoutId = setTimeout(() => callback(event), DEFAULT_DEBOUNCE_MS);
         };

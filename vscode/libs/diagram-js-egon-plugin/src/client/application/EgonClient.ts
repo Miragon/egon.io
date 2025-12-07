@@ -2,9 +2,8 @@ import type { ModuleDeclaration } from "didi";
 
 import { EgonClientConfig } from "./EgonClientConfig";
 import { IconPort, ModelerPort } from "./ports";
-import { DiagramJsIconAdapter, DiagramJsModelerAdapter } from "../infrastructure";
 
-import { DomainStoryDocument, IconCategory, IconSet, IconSetData, ViewportData } from "../domain";
+import type { DomainStoryDocument, IconCategory, IconSet, IconSetData, ViewportData } from "../domain";
 
 /**
  * User-friendly event types exposed by EgonClient.
@@ -16,6 +15,15 @@ export type EgonEventMap = {
 };
 
 export type EgonEventName = keyof EgonEventMap;
+
+/**
+ * Optional port injection for testing purposes.
+ * When provided, EgonClient will use these ports instead of creating adapters.
+ */
+export interface EgonClientPorts {
+    modelerPort: ModelerPort;
+    iconPort: IconPort;
+}
 
 /**
  * EgonClient - Application Service / Facade
@@ -34,18 +42,44 @@ export class EgonClient {
     private readonly modelerPort: ModelerPort;
     private readonly iconPort: IconPort;
 
-    constructor(config: EgonClientConfig, additionalModules: ModuleDeclaration[] = []) {
-        // Create infrastructure adapters
-        // Note: In a full DI setup, these would be injected
-        const modelerAdapter = new DiagramJsModelerAdapter(
-            config.container,
-            config.width ?? "100%",
-            config.height ?? "100%",
-            additionalModules,
-        );
+    /**
+     * Creates a new EgonClient instance.
+     *
+     * @param config - Configuration options for the client
+     * @param additionalModules - Optional array of additional diagram-js modules
+     * @param ports - Optional port injection for testing (bypasses adapter creation)
+     */
+    constructor(
+        config: EgonClientConfig,
+        additionalModules: ModuleDeclaration[] = [],
+        ports?: EgonClientPorts,
+    ) {
+        if (ports) {
+            // Use injected ports (for testing)
+            this.modelerPort = ports.modelerPort;
+            this.iconPort = ports.iconPort;
+        } else {
+            // Create infrastructure adapters (production path)
+            // Dynamic import to avoid module resolution issues in test environments
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const {
+                DiagramJsModelerAdapter,
+            } = require("../infrastructure/DiagramJsModelerAdapter");
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const {
+                DiagramJsIconAdapter,
+            } = require("../infrastructure/DiagramJsIconAdapter");
 
-        this.modelerPort = modelerAdapter;
-        this.iconPort = new DiagramJsIconAdapter(modelerAdapter.getDiagram());
+            const modelerAdapter = new DiagramJsModelerAdapter(
+                config.container,
+                config.width ?? "100%",
+                config.height ?? "100%",
+                additionalModules,
+            );
+
+            this.modelerPort = modelerAdapter;
+            this.iconPort = new DiagramJsIconAdapter(modelerAdapter.getDiagram());
+        }
 
         // Apply the initial viewport if provided
         if (config.viewport) {

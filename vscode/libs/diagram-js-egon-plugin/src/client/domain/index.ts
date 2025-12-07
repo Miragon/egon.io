@@ -1,23 +1,4 @@
-// Value Objects
-export { Viewport, type ViewportData } from "./model/Viewport";
-
-// Type Definitions
-export type {
-    IconMap,
-    IconSet,
-    IconSetData,
-    IconCategory,
-} from "./model/IconTypes";
-export type {
-    DomainStoryDocument,
-    DomainConfiguration,
-    DomainStoryElement,
-} from "./model/DomainStoryDocument";
-
-// Domain Events
-export type {
-    StoryChangedEvent,
-    ViewportChangedEvent,
-    IconsChangedEvent,
-    DomainEvent,
-} from "./events/DomainEvents";
+export * from "./model/Viewport";
+export * from "./model/IconTypes";
+export * from "./model/DomainStoryDocument";
+export * from "./events/DomainEvents";
