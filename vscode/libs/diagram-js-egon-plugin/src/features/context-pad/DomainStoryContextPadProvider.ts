@@ -2,15 +2,13 @@ import { assign, isArray } from "min-dash";
 import Connect from "diagram-js/lib/features/connect/Connect";
 import Create from "diagram-js/lib/features/create/Create";
 import Canvas from "diagram-js/lib/core/Canvas";
-import ContextPad, {
-    ContextPadTarget,
-} from "diagram-js/lib/features/context-pad/ContextPad";
+import ContextPad, { ContextPadTarget } from "diagram-js/lib/features/context-pad/ContextPad";
 import PopupMenu from "diagram-js/lib/features/popup-menu/PopupMenu";
 import CommandStack from "diagram-js/lib/command/CommandStack";
 import EventBus from "diagram-js/lib/core/EventBus";
 import ContextPadProvider, {
     ContextPadEntries,
-    ContextPadEntry,
+    ContextPadEntry
 } from "diagram-js/lib/features/context-pad/ContextPadProvider";
 import { Connection, Element } from "diagram-js/lib/model/Types";
 import { hasPrimaryModifier } from "diagram-js/lib/util/Mouse";
@@ -109,7 +107,7 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
 
         if (element["type"].includes(ElementTypes.WORKOBJECT)) {
             entries.set(...this.addDelete([element]));
-            entries.set(...this.addColorChange());
+            // entries.set(...this.addColorChange());
             entries.set(...this.addConnectWithActivity());
             entries.set(...this.addTextAnnotation());
             entries = new Map([...entries, ...this.addActors()]);
@@ -117,7 +115,7 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
             entries.set(...this.addChangeWorkObjectTypeMenu());
         } else if (element["type"].includes(ElementTypes.ACTOR)) {
             entries.set(...this.addDelete([element]));
-            entries.set(...this.addColorChange());
+            // entries.set(...this.addColorChange());
             entries.set(...this.addConnectWithActivity());
             entries.set(...this.addTextAnnotation());
             entries = new Map([...entries, ...this.addWorkObjects()]);
@@ -125,14 +123,14 @@ export class DomainStoryContextPadProvider implements ContextPadProvider<Element
         } else if (element["type"].includes(ElementTypes.GROUP)) {
             entries.set(...this.addDeleteGroupWithoutChildren());
             entries.set(...this.addTextAnnotation());
-            entries.set(...this.addColorChange());
+            // entries.set(...this.addColorChange());
         } else if (element["type"].includes(ElementTypes.ACTIVITY)) {
             entries.set(...this.addDelete([element]));
             entries.set(...this.addChangeDirection());
-            entries.set(...this.addColorChange());
+            // entries.set(...this.addColorChange());
         } else if (element["type"].includes(ElementTypes.TEXTANNOTATION)) {
             entries.set(...this.addDelete([element]));
-            entries.set(...this.addColorChange());
+            // entries.set(...this.addColorChange());
         } else if (element["type"].includes(ElementTypes.CONNECTION)) {
             entries.set(...this.addDelete([element]));
         }
