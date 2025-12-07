@@ -1849,53 +1849,67 @@ describe("EgonClient Integration", () => {
 ## Implementation Checklist
 
 ### Phase 1: Domain Layer (Types Only)
-- [ ] Create `src/client/domain/` directory structure
-- [ ] Implement `Viewport` value object with immutability
-- [ ] Define `IconTypes.ts` (interfaces only: `IconSet`, `IconSetData`, `IconCategory`, `IconMap`)
-- [ ] Define `DomainStoryDocument` value object interface
-- [ ] Define domain events (`StoryChangedEvent`, `ViewportChangedEvent`, `IconsChangedEvent`)
-- [ ] Write unit tests for `Viewport` value object
+- [x] Create `src/client/domain/` directory structure
+- [x] Implement `Viewport` value object with immutability
+- [x] Define `IconTypes.ts` (interfaces only: `IconSet`, `IconSetData`, `IconCategory`, `IconMap`)
+- [x] Define `DomainStoryDocument` value object interface
+- [x] Define domain events (`StoryChangedEvent`, `ViewportChangedEvent`, `IconsChangedEvent`)
+- [x] Write unit tests for `Viewport` value object
+- [x] Create `src/client/domain/index.ts` with public exports
 
 **Note:** Do NOT create `Icon` entity or `IconRegistry` aggregate. Icons are stored in the existing `IconDictionaryService`.
 
 ### Phase 2: Application Layer (Ports)
-- [ ] Create `src/client/application/` directory structure
-- [ ] Define `ModelerPort` interface
-- [ ] Define `IconPort` interface
-- [ ] Define `EgonClientConfig` configuration type
+- [x] Create `src/client/application/` directory structure
+- [x] Define `ModelerPort` interface
+- [x] Define `IconPort` interface
+- [x] Define `EgonClientConfig` configuration type
+- [x] Create `src/client/application/ports/index.ts` with port exports
+- [x] Create `src/client/application/index.ts` with application layer exports
 
 ### Phase 3: Infrastructure Layer (Adapters)
-- [ ] Create `src/client/infrastructure/` directory structure
-- [ ] Implement `DiagramJsModelerAdapter` (implements `ModelerPort`)
-- [ ] Implement `DiagramJsIconAdapter` (implements `IconPort`)
-- [ ] Write integration tests with mock diagram-js
+- [x] Create `src/client/infrastructure/` directory structure
+- [x] Implement `DiagramJsModelerAdapter` (implements `ModelerPort`)
+- [x] Implement `DiagramJsIconAdapter` (implements `IconPort`)
+- [x] Create `src/client/infrastructure/index.ts` with adapter exports
+- [ ] Write integration tests with actual diagram-js (deferred due to DOM requirements)
 
 ### Phase 4: Application Service
-- [ ] Implement `EgonClient` application service
-- [ ] Wire up port implementations in constructor
-- [ ] Implement document operations (`import`, `export`)
-- [ ] Implement event subscription (`on`, `off`)
-- [ ] Implement viewport operations
-- [ ] Implement icon management methods
-- [ ] Write integration tests for `EgonClient`
+- [x] Implement `EgonClient` application service
+- [x] Wire up port implementations in constructor
+- [x] Implement document operations (`import`, `export`)
+- [x] Implement event subscription (`on`, `off`)
+- [x] Implement viewport operations
+- [x] Implement icon management methods
+- [x] Create `src/client/index.ts` with public client module exports
+- [ ] Write integration tests for `EgonClient` (deferred due to DOM requirements)
 
 ### Phase 5: Public API & Exports
-- [ ] Update `src/index.ts` with new exports
-- [ ] Add deprecation notices to old exports
-- [ ] Ensure backward compatibility
+- [x] Update `src/index.ts` with new exports
+- [x] Add deprecation notices to old exports (`DomainStoryImportService`, `DomainStoryExportService`)
+- [x] Ensure backward compatibility (all old exports preserved)
+- [x] Export `EgonClient` as primary entry point
+- [x] Export type definitions from client domain layer
 
 ### Phase 6: Testing
-- [ ] Unit tests for `Viewport` value object (pure logic, no mocks)
-- [ ] Unit tests for `EgonClient` application service (mock ports)
-- [ ] Integration tests for `DiagramJsModelerAdapter`
-- [ ] Integration tests for `DiagramJsIconAdapter` (verify delegation to `IconDictionaryService`)
-- [ ] Integration tests for full EgonClient flow
+- [x] Unit tests for `Viewport` value object (pure logic, no mocks)
+- [ ] Unit tests for `EgonClient` application service (mock ports) - deferred due to ESM/CommonJS issues
+- [ ] Integration tests for `DiagramJsModelerAdapter` - requires DOM
+- [ ] Integration tests for `DiagramJsIconAdapter` - requires DOM
+- [ ] Integration tests for full EgonClient flow - requires DOM
 - [ ] Test document import with icons
 - [ ] Test document import without icons (icons loaded separately)
 - [ ] Verify palette updates when icons are loaded
 - [ ] Verify context pad updates when icons are loaded
 
-### Phase 7: Migration & Documentation
+### Phase 7: Build & Verification
+- [x] Build succeeds with `yarn build:libs`
+- [x] All TypeScript declarations generated correctly
+- [x] Client module properly exported from main index.ts
+- [x] Test suite passes with new tests
+- [ ] Migrate webview to use new `EgonClient` API (next phase)
+
+### Phase 8: Migration & Documentation (Next)
 - [ ] Update webview to use new `EgonClient` API
 - [ ] Update documentation/README
 - [ ] Add migration guide examples
