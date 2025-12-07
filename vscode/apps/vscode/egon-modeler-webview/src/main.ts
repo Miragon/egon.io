@@ -1,7 +1,7 @@
 import { debounce } from "lodash";
 import {
-    EgonClient,
     DomainStoryDocument,
+    EgonClient,
     ViewportData,
 } from "@egon/diagram-js-egon-plugin";
 import {
@@ -77,13 +77,13 @@ function sendStoryChanges(): void {
  * @param story JSON string of the domain story document
  * @param state Current webview state with editorId and optional viewport
  */
-function initializeDomainStoryModeler(story: string, state: WebviewState): void {
+async function initializeDomainStoryModeler(story: string, state: WebviewState) {
     const container = document.getElementById("egon-io-container");
     if (!container) {
         throw new Error("Container for Egon.io modeler not found!");
     }
 
-    egonClient = new EgonClient({
+    egonClient = await EgonClient.create({
         container,
         width: "100%",
         height: "100%",
@@ -108,7 +108,7 @@ function initializeDomainStoryModeler(story: string, state: WebviewState): void 
 /**
  * Listen to messages from the backend.
  */
-function onReceiveMessage(message: MessageEvent<Command>): void {
+async function onReceiveMessage(message: MessageEvent<Command>) {
     const command = message.data;
 
     switch (true) {
@@ -130,7 +130,7 @@ function onReceiveMessage(message: MessageEvent<Command>): void {
                         });
                     }
 
-                    initializeDomainStoryModeler(c.text, vscode.getState());
+                    await initializeDomainStoryModeler(c.text, vscode.getState());
                 }
             }
             break;

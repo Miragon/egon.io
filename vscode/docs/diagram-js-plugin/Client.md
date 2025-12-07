@@ -48,7 +48,7 @@ The client follows **Domain-Driven Design (DDD)** principles with three architec
 import {EgonClient} from "@libs/diagram-js-egon-plugin";
 
 const container = document.getElementById("egon-io-container");
-const client = new EgonClient({
+const client = await EgonClient.create({
     container,
     width: "100%",
     height: "100%",
@@ -83,7 +83,7 @@ client.destroy();
 import {EgonClient} from "@libs/diagram-js-egon-plugin";
 import CustomModule from "./custom-module";
 
-const client = new EgonClient(
+const client = await EgonClient.create(
     {container, width: "100%", height: "100%"},
     [CustomModule], // Additional modules merged with defaults
 );
@@ -92,7 +92,7 @@ const client = new EgonClient(
 ### With Initial Viewport
 
 ```typescript
-const client = new EgonClient({
+const client = await EgonClient.create({
     container,
     width: "100%",
     height: "100%",
@@ -360,7 +360,7 @@ Implements `IconPort` using existing services:
 ### Constructor
 
 ```typescript
-new EgonClient(
+await EgonClient.create(
     config
 :
 EgonClientConfig,
@@ -949,8 +949,8 @@ Each `EgonClient` manages a single diagram-js instance. Multiple clients require
 
 ```typescript
 // Create two separate modelers
-const client1 = new EgonClient({container: div1});
-const client2 = new EgonClient({container: div2});
+const client1 = await EgonClient.create({container: div1});
+const client2 = await EgonClient.create({container: div2});
 
 // They are independent
 client1.import(doc1);
@@ -1024,8 +1024,8 @@ Hide diagram-js event names from consumers:
 ### Setup and Teardown
 
 ```typescript
-export function setupModeler(container: HTMLElement) {
-    const client = new EgonClient({container});
+export async function setupModeler(container: HTMLElement) {
+    const client = await EgonClient.create({container});
 
     // Load initial story
     client.import(getInitialStory());
@@ -1149,7 +1149,7 @@ client.on("viewport.changed", (viewport: ViewportData) => {
 **Solution**:
 
 ```typescript
-const client = new EgonClient({container});
+const client = await EgonClient.create({container});
 
 // Cleanup when done
 return () => {
@@ -1197,12 +1197,12 @@ function createMockPorts() {
 }
 
 describe("EgonClient", () => {
-    it("should delegate import to modeler port", () => {
+    it("should delegate import to modeler port", async () => {
         const container = document.createElement("div");
         const {mockModelerPort, mockIconPort} = createMockPorts();
 
         // Use constructor injection to provide mock ports
-        const client = new EgonClient(
+        const client = await EgonClient.create(
             {container},
             [], // No additional modules
             {modelerPort: mockModelerPort, iconPort: mockIconPort}

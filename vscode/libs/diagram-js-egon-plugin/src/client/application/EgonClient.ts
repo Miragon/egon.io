@@ -39,8 +39,16 @@ export interface EgonClientPorts {
  * - Hides infrastructure complexity from consumers
  */
 export class EgonClient {
-    private readonly modelerPort: ModelerPort;
-    private readonly iconPort: IconPort;
+    private constructor(
+        private readonly modelerPort: ModelerPort,
+        private readonly iconPort: IconPort,
+        viewport?: ViewportData,
+    ) {
+        // Apply the initial viewport if provided
+        if (viewport) {
+            this.setViewport(viewport);
+        }
+    }
 
     /**
      * Creates a new EgonClient instance.
@@ -49,42 +57,33 @@ export class EgonClient {
      * @param additionalModules - Optional array of additional diagram-js modules
      * @param ports - Optional port injection for testing (bypasses adapter creation)
      */
-    constructor(
+    static async create(
         config: EgonClientConfig,
         additionalModules: ModuleDeclaration[] = [],
         ports?: EgonClientPorts,
-    ) {
+    ): Promise<EgonClient> {
         if (ports) {
-            // Use injected ports (for testing)
-            this.modelerPort = ports.modelerPort;
-            this.iconPort = ports.iconPort;
-        } else {
-            // Create infrastructure adapters (production path)
-            // Dynamic import to avoid module resolution issues in test environments
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const {
-                DiagramJsModelerAdapter,
-            } = require("../infrastructure/DiagramJsModelerAdapter");
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const {
-                DiagramJsIconAdapter,
-            } = require("../infrastructure/DiagramJsIconAdapter");
-
-            const modelerAdapter = new DiagramJsModelerAdapter(
-                config.container,
-                config.width ?? "100%",
-                config.height ?? "100%",
-                additionalModules,
-            );
-
-            this.modelerPort = modelerAdapter;
-            this.iconPort = new DiagramJsIconAdapter(modelerAdapter.getDiagram());
+            return new EgonClient(ports.modelerPort, ports.iconPort, config.viewport);
         }
 
-        // Apply the initial viewport if provided
-        if (config.viewport) {
-            this.setViewport(config.viewport);
-        }
+        // dynamic ESM import (works in browser and node ESM)
+        const { DiagramJsModelerAdapter } = await import(
+            "../infrastructure/DiagramJsModelerAdapter"
+        );
+        const { DiagramJsIconAdapter } = await import(
+            "../infrastructure/DiagramJsIconAdapter"
+        );
+
+        const modelerAdapter = new DiagramJsModelerAdapter(
+            config.container,
+            config.width ?? "100%",
+            config.height ?? "100%",
+            additionalModules,
+        );
+
+        const iconAdapter = new DiagramJsIconAdapter(modelerAdapter.getDiagram());
+
+        return new EgonClient(modelerAdapter, iconAdapter, config.viewport);
     }
 
     // --- Document Operations ---

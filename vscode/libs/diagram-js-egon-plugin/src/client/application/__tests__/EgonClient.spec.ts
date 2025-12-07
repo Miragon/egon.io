@@ -40,7 +40,7 @@ describe("EgonClient (Application Service)", () => {
     let client: EgonClient;
     let container: HTMLElement;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         container = document.createElement("div");
         document.body.appendChild(container);
 
@@ -55,7 +55,7 @@ describe("EgonClient (Application Service)", () => {
         };
 
         // Use constructor injection to provide mock ports
-        client = new EgonClient(config, [], {
+        client = await EgonClient.create(config, [], {
             modelerPort: mockModelerPort,
             iconPort: mockIconPort,
         });
@@ -67,7 +67,7 @@ describe("EgonClient (Application Service)", () => {
     });
 
     describe("constructor with initial viewport", () => {
-        it("should set initial viewport when provided in config", () => {
+        it("should set initial viewport when provided in config", async () => {
             const initialViewport: ViewportData = {
                 x: 10,
                 y: 20,
@@ -81,7 +81,7 @@ describe("EgonClient (Application Service)", () => {
 
             const ports = createMockPorts();
             // Create client with viewport config to trigger setViewport call
-            new EgonClient(config, [], {
+            await EgonClient.create(config, [], {
                 modelerPort: ports.mockModelerPort,
                 iconPort: ports.mockIconPort,
             });
