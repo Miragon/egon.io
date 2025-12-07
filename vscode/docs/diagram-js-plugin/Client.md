@@ -361,11 +361,9 @@ Implements `IconPort` using existing services:
 
 ```typescript
 await EgonClient.create(
-    config
-:
-EgonClientConfig,
-    additionalModules ? : ModuleDeclaration[],
-    ports ? : EgonClientPorts
+    config: EgonClientConfig,
+    additionalModules? : ModuleDeclaration[],
+    ports? : EgonClientPorts
 )
 ```
 
