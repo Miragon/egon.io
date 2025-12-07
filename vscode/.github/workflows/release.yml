@@ -35,7 +35,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Corepack enable + ensure Yarn
         run: |
@@ -57,6 +58,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/${{ github.repository }}
 
       - name: Bump version (yarn workspace)
         id: version
@@ -153,3 +155,8 @@ jobs:
           name: vscode-${{ steps.version.outputs.version }}
           generate_release_notes: true
           files: vscode/dist/apps/vscode/egon-io/egon-io.vsix
+
+      - name: Publish extension
+        run: vsce publish --yarn --no-dependencies
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PUBLISH }}
