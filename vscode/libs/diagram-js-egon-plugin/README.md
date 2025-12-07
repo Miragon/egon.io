@@ -1,11 +1,85 @@
-# diagram-js-egon-plugin
+<div id="top"></div>
 
-This library was generated with [Nx](https://nx.dev).
+<!-- PROJECT SHIELDS -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+<!-- END OF PROJECT SHIELDS -->
 
-## Building
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+    <a href="https://egon.io/">
+        <img src="https://raw.githubusercontent.com/Miragon/egon.io/main/vscode/images/egon-io-logo.png" alt="Egon.io Logo" height="180">
+    </a>
+    <h3>Egon.io — Diagram-js Plugin</h3>
+    <p>
+        <i>A <b>diagram-js</b> plugin to create and edit Domain Stories.</i>
+        <br />
+        <a href="https://github.com/Miragon/egon.io/issues">Report Bug</a>
+        ·
+        <a href="https://github.com/Miragon/egon.io/pulls">Request Feature</a>
+    </p>
+</div>
 
-Run `nx build diagram-js-egon-plugin` to build the library.
+## About The Project
 
-## Running unit tests
+<!-- add a description of the project -->
 
-Run `nx test diagram-js-egon-plugin` to execute the unit tests via [Jest](https://jestjs.io).
+## Getting started
+
+<!-- add a description of how to use the plugin via the [client api](src/client) -->
+
+**Useful Links**
+
+- [Domain Storytelling](http://domainstorytelling.org)
+- [User Guide](https://egon.io/howto#palette)
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn,
+inspire, and create.
+Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please open an issue with the tag
+`enhancement`, fork the repo and create a pull request.
+You can also simply open an issue with the tag `enhancement`.
+Please use semantic commit messages as described
+in [here](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716).  
+Don't forget to give the project a star! Thanks again!
+
+1. Open an issue with the tag "enhancement"
+2. Fork the Project
+3. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+4. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the Branch (`git push origin feature/AmazingFeature`)
+6. Open a Pull Request
+
+## License
+
+Distributed under this [GPLv3](https://github.com/Miragon/egon.io/blob/dbd0fb34b29e9e1f38e29feb2075bfdff2bfef88/monorepo/egon/LICENSE).
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
+[contributors-shield]: https://img.shields.io/github/contributors/wps/egon.io.svg?style=for-the-badge
+
+[contributors-url]: https://github.com/wps/egon.io/graphs/contributors
+
+[forks-shield]: https://img.shields.io/github/forks/wps/egon.io.svg?style=for-the-badge
+
+[forks-url]: https://github.com/wps/egon.io/network/members
+
+[stars-shield]: https://img.shields.io/github/stars/wps/egon.io.svg?style=for-the-badge
+
+[stars-url]: https://github.com/wps/egon.io/stargazers
+
+[issues-shield]: https://img.shields.io/github/issues/Miragon/egon.io.svg?style=for-the-badge
+
+[issues-url]: https://github.com/Miragon/egon.io/issues
+
+[license-shield]: https://img.shields.io/badge/license-GPLv3-blue.svg?style=for-the-badge
+
+[license-url]: https://github.com/Miragon/egon.io/blob/dbd0fb34b29e9e1f38e29feb2075bfdff2bfef88/monorepo/egon/LICENSE

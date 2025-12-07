@@ -28,6 +28,16 @@ export default defineConfig((configEnv) => {
                 copyDtsFiles: true,
             }),
         ],
+        test: {
+            globals: true,
+            environment: "jsdom",
+            include: ["src/**/*.{test,spec}.{ts,tsx}"],
+            coverage: {
+                provider: "v8",
+                reporter: ["text", "json", "html"],
+                reportsDirectory: "../../coverage/libs/diagram-js-egon-plugin",
+            },
+        },
         build: {
             outDir: "../../dist/libs/diagram-js-egon-plugin",
             reportCompressedSize: true,

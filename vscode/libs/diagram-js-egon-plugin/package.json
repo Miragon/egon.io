@@ -7,12 +7,15 @@
   "types": "./index.d.ts",
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --mode development"
+    "dev": "vite build --mode development",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
+  "license": "LGPL-3.0-or-later",
   "dependencies": {
     "diagram-js": "^15.2.4",
     "diagram-js-direct-editing": "^3.2.0",
-    "diagram-js-minimap": "^5.2.0",
     "ids": "^1.0.5",
     "min-dash": "^4.2.2",
     "min-dom": "4.2.1",
