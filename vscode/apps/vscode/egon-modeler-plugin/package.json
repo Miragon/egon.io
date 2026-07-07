@@ -30,7 +30,7 @@
   "engines": {
     "vscode": "^1.76.0"
   },
-  "icon": "assets/miragon-logo.png",
+  "icon": "assets/egon-io-logo.png",
   "categories": [
     "Visualization",
     "Other"
