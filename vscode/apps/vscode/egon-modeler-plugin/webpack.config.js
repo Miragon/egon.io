@@ -117,14 +117,19 @@ module.exports = (env, argv) => {
                         to: ".",
                     },
                     {
-                        from: "miragon-logo.png",
-                        to: "assets/miragon-logo.png",
+                        from: "egon-io-logo.png",
+                        to: "assets/egon-io-logo.png",
                         context: path.resolve(__dirname, "../../../images"),
                     },
                     {
                         from: "style.css",
                         to: "assets/style.css",
                         context: path.resolve(__dirname, "src"),
+                    },
+                    {
+                        from: "media",
+                        to: "media",
+                        context: __dirname,
                     },
                     {
                         from: "LICENSE",

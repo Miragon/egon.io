@@ -30,7 +30,7 @@
   "engines": {
     "vscode": "^1.76.0"
   },
-  "icon": "assets/miragon-logo.png",
+  "icon": "assets/egon-io-logo.png",
   "categories": [
     "Visualization",
     "Other"
@@ -62,6 +62,37 @@
       }
     ],
     "menus": {},
-    "configuration": {}
+    "configuration": {},
+    "walkthroughs": [
+      {
+        "id": "getStarted",
+        "title": "Get Started with Egon.io",
+        "description": "Model Domain Stories visually in VS Code — actors, work objects, and a numbered sequence of activities, all saved as a plain-text .egn file.",
+        "steps": [
+          {
+            "id": "create",
+            "title": "Create your first domain story",
+            "description": "Create a file and save it as `.egn` to open it in the Egon.io modeler.\n[New file](command:workbench.action.files.newUntitledFile)",
+            "media": {
+              "markdown": "media/walkthrough/create.md"
+            },
+            "completionEvents": [
+              "onStepSelected"
+            ]
+          },
+          {
+            "id": "learn",
+            "title": "Learn the basics",
+            "description": "Drag actors and work objects from the palette, connect them into a numbered story, and let the text file stay in sync as your source of truth.",
+            "media": {
+              "markdown": "media/walkthrough/learn.md"
+            },
+            "completionEvents": [
+              "onStepSelected"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
