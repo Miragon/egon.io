@@ -127,6 +127,11 @@ module.exports = (env, argv) => {
                         context: path.resolve(__dirname, "src"),
                     },
                     {
+                        from: "media",
+                        to: "media",
+                        context: __dirname,
+                    },
+                    {
                         from: "LICENSE",
                         to: "[name][ext]",
                         context: path.resolve(__dirname, "../../.."),
