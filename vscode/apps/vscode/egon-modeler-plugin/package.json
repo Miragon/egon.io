@@ -42,6 +42,9 @@
     "diagram-js"
   ],
   "main": "main.js",
+  "activationEvents": [
+    "onCustomEditor:egon.io"
+  ],
   "private": true,
   "scripts": {
     "dev": "webpack --mode development --watch",
