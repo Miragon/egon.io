@@ -7,15 +7,20 @@ import {
   has,
   sortBy,
 } from "min-dash";
+import {
+  PROPERTY_COPY_CAN_COPY_PROPERTIES_EVENT,
+  PROPERTY_COPY_CAN_COPY_PROPERTY_EVENT,
+  PROPERTY_COPY_CAN_SET_COPIED_PROPERTY_EVENT,
+} from "../diagramJSConstants";
 
-var DISALLOWED_PROPERTIES = ["incoming", "outgoing"];
+const DISALLOWED_PROPERTIES = ["incoming", "outgoing"];
 
 export default function PropertyCopy(eventBus) {
   this._eventBus = eventBus;
 
   // copy extension elements last
-  eventBus.on("propertyCopy.canCopyProperties", function (context) {
-    var propertyNames = context.propertyNames;
+  eventBus.on(PROPERTY_COPY_CAN_COPY_PROPERTIES_EVENT, function (context) {
+    const propertyNames = context.propertyNames;
 
     if (!propertyNames || !propertyNames.length) {
       return;
@@ -27,8 +32,8 @@ export default function PropertyCopy(eventBus) {
   });
 
   // default check whether property can be copied
-  eventBus.on("propertyCopy.canCopyProperty", function (context) {
-    var propertyName = context.propertyName;
+  eventBus.on(PROPERTY_COPY_CAN_COPY_PROPERTY_EVENT, function (context) {
+    const propertyName = context.propertyName;
 
     if (propertyName && DISALLOWED_PROPERTIES.indexOf(propertyName) !== -1) {
       // disallow copying property
@@ -44,14 +49,14 @@ PropertyCopy.prototype.copyElement = function (
   targetElement,
   propertyNames,
 ) {
-  var self = this;
+  const self = this;
 
   if (propertyNames && !isArray(propertyNames)) {
     propertyNames = [propertyNames];
   }
 
-  var canCopyProperties = this._eventBus.fire(
-    "propertyCopy.canCopyProperties",
+  const canCopyProperties = this._eventBus.fire(
+    PROPERTY_COPY_CAN_COPY_PROPERTIES_EVENT,
     {
       propertyNames: propertyNames,
       sourceElement: sourceElement,
@@ -69,20 +74,20 @@ PropertyCopy.prototype.copyElement = function (
 
   // copy properties
   forEach(propertyNames, function (propertyName) {
-    var sourceProperty;
+    let sourceProperty;
 
     if (has(sourceElement, propertyName)) {
       sourceProperty = sourceElement.get(propertyName);
     }
 
-    var copiedProperty = self.copyProperty(
+    const copiedProperty = self.copyProperty(
       sourceProperty,
       targetElement,
       propertyName,
     );
 
-    var canSetProperty = self._eventBus.fire(
-      "propertyCopy.canSetCopiedProperty",
+    const canSetProperty = self._eventBus.fire(
+      PROPERTY_COPY_CAN_SET_COPIED_PROPERTY_EVENT,
       {
         parent: targetElement,
         property: copiedProperty,
@@ -107,14 +112,17 @@ PropertyCopy.prototype.copyProperty = function (
   parent,
   propertyName,
 ) {
-  var self = this;
+  const self = this;
 
   // allow others to copy property
-  var copiedProperty = this._eventBus.fire("propertyCopy.canCopyProperty", {
-    parent: parent,
-    property: property,
-    propertyName: propertyName,
-  });
+  let copiedProperty = this._eventBus.fire(
+    PROPERTY_COPY_CAN_COPY_PROPERTY_EVENT,
+    {
+      parent: parent,
+      property: property,
+      propertyName: propertyName,
+    },
+  );
 
   // return if copying is NOT allowed
   if (copiedProperty === false) {

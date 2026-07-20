@@ -6,21 +6,23 @@ import {
 } from './icon-set-customization.service';
 import { IconDictionaryService } from './icon-dictionary.service';
 import { MockProvider, MockProviders } from 'ng-mocks';
-import { TitleService } from '../../title/services/title.service';
+import { PropertiesService } from 'src/app/tools/properties/services/properties.service';
 import { ImportDomainStoryService } from '../../import/services/import-domain-story.service';
 import { Dictionary } from '../../../domain/entities/dictionary';
-import { Observable, of } from 'rxjs';
 import {
   INITIAL_ICON_SET_NAME,
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS,
 } from '../../../domain/entities/constants';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ElementRegistryService } from 'src/app/domain/services/element-registry.service';
-import { IconSet } from '../../../domain/entities/iconSet';
+import { ElementRegistryService } from 'src/app/tools/modeler/services/element-registry.service';
+import { IconSet } from 'src/app/domain/entities/icon-set';
 import { IconSetImportExportService } from 'src/app/tools/icon-set-config/services/icon-set-import-export.service';
 import { AutosaveService } from 'src/app/tools/autosave/services/autosave.service';
 import { Subject } from 'rxjs';
+import { signal } from '@angular/core';
+import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
 
 describe(IconSetCustomizationService.name, () => {
   let service: IconSetCustomizationService;
@@ -44,7 +46,7 @@ describe(IconSetCustomizationService.name, () => {
       ],
     );
     const autosaveServiceMock = jasmine.createSpyObj(AutosaveService.name, [], {
-      importConfigChanged$: of(),
+      importConfigChanged: signal(undefined),
     });
     const iconSetImportExportServiceMock = jasmine.createSpyObj(
       IconSetImportExportService.name,
@@ -66,17 +68,17 @@ describe(IconSetCustomizationService.name, () => {
       ['getUsedIcons'],
     );
 
-    const actorDefaultDictionary = new Dictionary();
+    const actorDefaultDictionary = new Dictionary<string>();
     actorDefaultDictionary.set('actorkey', 'actorSvg');
     const INITIAL_ICON_SET_CONFIGURATION = {
       name: INITIAL_ICON_SET_NAME,
       actors: actorDefaultDictionary,
-      workObjects: new Dictionary(),
+      workObjects: new Dictionary<string>(),
     };
 
     TestBed.configureTestingModule({
       providers: [
-        MockProviders(TitleService),
+        MockProviders(PropertiesService),
         {
           provide: MatSnackBar,
           useValue: matSnackbarMock,
@@ -88,9 +90,7 @@ describe(IconSetCustomizationService.name, () => {
         MockProvider(ImportDomainStoryService),
         MockProvider(IconSetChangedService, {
           iconConfigurationChanged(): Observable<IconSet> {
-            const iconSetConfiguration: IconSet =
-              INITIAL_ICON_SET_CONFIGURATION;
-            return of(iconSetConfiguration);
+            return of(INITIAL_ICON_SET_CONFIGURATION);
           },
         }),
         {
@@ -113,8 +113,18 @@ describe(IconSetCustomizationService.name, () => {
       IconDictionaryService,
     ) as jasmine.SpyObj<IconDictionaryService>;
 
-    iconDictionarySpy.getFullDictionary.and.returnValue(new Dictionary());
-    iconDictionarySpy.getIconsAssignedAs.and.returnValue(new Dictionary());
+    const fullDictionary = new Dictionary<string>();
+    fullDictionary.set('Person', 'svg1');
+    fullDictionary.set('Pet', 'svg2');
+    fullDictionary.set('Document', 'svg3');
+    fullDictionary.set('Call', 'svg4');
+    fullDictionary.set('actorkey', 'actorSvg');
+
+    iconDictionarySpy.getFullDictionary.and.returnValue(fullDictionary);
+
+    iconDictionarySpy.getIconsAssignedAs.and.returnValue(
+      new Dictionary<string>(),
+    );
     elementRegistryServiceMock.getUsedIcons.and.returnValue({
       actors: [],
       workObjects: [],
@@ -132,8 +142,8 @@ describe(IconSetCustomizationService.name, () => {
   });
 
   describe('import icon set', () => {
-    const actors = new Dictionary();
-    const workObjects = new Dictionary();
+    const actors = new Dictionary<string>();
+    const workObjects = new Dictionary<string>();
 
     actors.set('Person', 'svg1');
     actors.set('Pet', 'svg2');
@@ -153,8 +163,8 @@ describe(IconSetCustomizationService.name, () => {
 
       service.importConfiguration(customConfig);
 
-      const selectedActors = service.selectedActors$.value;
-      const selectedWorkObjects = service.selectedWorkObjects$.value;
+      const selectedActors = service.selectedActorsSignal();
+      const selectedWorkObjects = service.selectedWorkObjectsSignal();
 
       expect(selectedActors).toContain('Person');
       expect(selectedActors).toContain('Pet');

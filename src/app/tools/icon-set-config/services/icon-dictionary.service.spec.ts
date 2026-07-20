@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { IconDictionaryService } from 'src/app/tools/icon-set-config/services/icon-dictionary.service';
-import { ElementTypes } from '../../../domain/entities/elementTypes';
+import { ElementTypes } from 'src/app/domain/entities/element-types';
 import { INITIAL_ICON_SET_NAME } from '../../../domain/entities/constants';
 import { Dictionary } from '../../../domain/entities/dictionary';
-import { testBusinessObject } from '../../../domain/entities/businessObject';
 import { builtInIcons } from '../domain/builtInIcons';
-import { IconSet } from '../../../domain/entities/iconSet';
+import { IconSet } from 'src/app/domain/entities/icon-set';
 
 describe('IconDictionaryService', () => {
   let service: IconDictionaryService;
@@ -49,17 +48,17 @@ describe('IconDictionaryService', () => {
     });
 
     it('should initialize Dictionaries with customized icon set', () => {
-      const actor = structuredClone(testBusinessObject);
-      actor.type = ElementTypes.ACTOR + 'Dollar';
+      const actorType = 'Dollar';
+      const workObjectType = 'Gavel';
 
-      const workObject = structuredClone(testBusinessObject);
-      workObject.type = ElementTypes.WORKOBJECT + 'Gavel';
+      const actorsDict = new Dictionary<string>();
+      const workObjectsDict = new Dictionary<string>();
 
-      const actorsDict = new Dictionary();
-      const workObjectsDict = new Dictionary();
-
-      actorsDict.set('Dollar', actor);
-      workObjectsDict.set('Gavel', workObject);
+      actorsDict.set(actorType, ElementTypes.ACTOR + actorType);
+      workObjectsDict.set(
+        workObjectType,
+        ElementTypes.WORKOBJECT + workObjectType,
+      );
 
       const customizedIconSet: IconSet = {
         name: INITIAL_ICON_SET_NAME,
@@ -109,8 +108,8 @@ describe('IconDictionaryService', () => {
   });
 
   describe('updateIconRegistries', () => {
-    const actorsDict = new Dictionary();
-    const workObjectsDict = new Dictionary();
+    const actorsDict = new Dictionary<string>();
+    const workObjectsDict = new Dictionary<string>();
 
     actorsDict.set('TestCustomActor', 'svg1');
     workObjectsDict.set('TestCustomWorkObject', 'svg2');
@@ -121,7 +120,7 @@ describe('IconDictionaryService', () => {
       workObjects: workObjectsDict,
     };
 
-    it('from iconset file', () => {
+    it('from IconSet file', () => {
       expect(
         service.getIconsAssignedAs(ElementTypes.ACTOR).isEmpty(),
       ).toBeTrue();

@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { BusinessObject } from 'src/app/domain/entities/businessObject';
-import { ElementRegistryService } from 'src/app/domain/services/element-registry.service';
-import { ElementTypes } from 'src/app/domain/entities/elementTypes';
+import { BusinessObject } from 'src/app/domain/entities/business-object';
+import { ElementRegistryService } from 'src/app/tools/modeler/services/element-registry.service';
+import { ElementTypes } from 'src/app/domain/entities/element-types';
 import { StorySentence } from 'src/app/tools/replay/domain/storySentence';
 import {
   CONNECTION_PATH_DOM_SELECTOR,
+  DISPLAY_BLOCK,
+  DISPLAY_NONE,
   HIGHLIGHT_LABEL_FONT_WEIGHT,
   HIGHLIGHT_NUMBER_BACKGROUND_COLOR,
   HIGHLIGHT_NUMBER_COLOR,
@@ -14,6 +16,17 @@ import {
   NUMBER_COLOR,
   STROKE_WIDTH,
 } from '../domain/replayConstants';
+import {
+  LABEL_CSS_CLASS,
+  LABEL_NUMBER_CSS_CLASS,
+} from 'src/app/tools/modeler/diagram-js/features/diagramJSConstants';
+
+const MINIMAP_CSS_CLASS = 'djs-minimap';
+
+const QUERY_SELECTOR_PREFIX = '[data-element-id=';
+const QUERY_SELECTOR_POSTFIX = ']';
+
+const DEFAULT_COLOR = 'black';
 
 @Injectable({
   providedIn: 'root',
@@ -33,62 +46,77 @@ export class DomManipulationService {
       .map((e) => e.businessObject)
       .forEach((element) => {
         const domObject = document.querySelector(
-          '[data-element-id=' + element.id + ']',
+          QUERY_SELECTOR_PREFIX + element.id + QUERY_SELECTOR_POSTFIX,
         );
         // @ts-ignore
-        domObject.style.display = 'block';
+        domObject.style.display = DISPLAY_BLOCK;
       });
   }
 
-  showSentence(
-    replaySentence: StorySentence,
-    previousSentence?: StorySentence,
-  ): void {
+  showSentence(replaySentence: StorySentence): void {
     this.removeHighlights();
-    const notShown = this.getAllNotShown(replaySentence.objects);
-
-    notShown.forEach((element) => {
-      const domObject = document.querySelector(
-        '[data-element-id=' + element.id + ']',
-      );
-      if (domObject) {
-        // @ts-ignore
-        domObject.style.display = 'none';
-      }
-    });
+    this.elementRegistryService
+      .getAllBusinessObjectsFromCanvasNotIn(replaySentence.objects)
+      .forEach((element) => {
+        const domObject = document.querySelector(
+          QUERY_SELECTOR_PREFIX + element.id + QUERY_SELECTOR_POSTFIX,
+        );
+        if (domObject) {
+          // @ts-ignore
+          domObject.style.display = DISPLAY_NONE;
+        }
+      });
 
     this.highlightSentence(
-      previousSentence
-        ? replaySentence.objects.filter(
-            (o) => !previousSentence.objects.includes(o),
-          )
-        : replaySentence.objects,
+      replaySentence.objects.filter((o) =>
+        replaySentence.highlightedObjects.includes(o.id),
+      ),
     );
 
     replaySentence.objects.forEach((element) => {
       const domObject = document.querySelector(
-        '[data-element-id=' + element.id + ']',
+        QUERY_SELECTOR_PREFIX + element.id + QUERY_SELECTOR_POSTFIX,
       );
       if (domObject) {
         // @ts-ignore
-        domObject.style.display = 'block';
+        domObject.style.display = DISPLAY_BLOCK;
       }
     });
   }
 
-  private getNumberDomForActivity(activity: SVGPathElement): any {
-    const numberText =
-      activity.parentElement?.getElementsByClassName('djs-labelNumber')[0] ??
-      '';
-    const circle = (numberText as HTMLElement)?.previousSibling ?? '';
+  getRenderedNumbers(): HTMLElement[] {
+    const elementsByClassName = document.getElementsByClassName(
+      LABEL_NUMBER_CSS_CLASS,
+    );
+    const renderedNumberRegistry: HTMLElement[] = [];
+    for (let i = 0; i < elementsByClassName.length; i++) {
+      if (!elementsByClassName[i].closest('.' + MINIMAP_CSS_CLASS)) {
+        renderedNumberRegistry.push(elementsByClassName[i] as HTMLElement);
+      }
+    }
+    return renderedNumberRegistry;
+  }
+
+  private getNumberDomForActivity(activity: SVGPathElement): {
+    numberBackgroundDom: HTMLElement | undefined;
+    numberTextDom: HTMLElement | undefined;
+  } {
+    const numberText = activity.parentElement?.getElementsByClassName(
+      LABEL_NUMBER_CSS_CLASS,
+    )[0] as HTMLElement;
+    const circle = (numberText as HTMLElement)?.previousSibling as HTMLElement;
     return {
       numberBackgroundDom: circle,
       numberTextDom: numberText,
     };
   }
 
-  private getLabelDomForActivity(activity: SVGPathElement): any {
-    return activity.parentElement?.getElementsByClassName('djs-label')[0] ?? '';
+  private getLabelDomForActivity(
+    activity: SVGPathElement,
+  ): HTMLElement | undefined {
+    return activity.parentElement?.getElementsByClassName(
+      LABEL_CSS_CLASS,
+    )[0] as HTMLElement;
   }
 
   private removeHighlights(): void {
@@ -97,7 +125,7 @@ export class DomManipulationService {
 
     allActivities.forEach((activity) => {
       const querySelector = document.querySelector(
-        '[data-element-id=' + activity.id + ']',
+        QUERY_SELECTOR_PREFIX + activity.id + QUERY_SELECTOR_POSTFIX,
       );
       if (querySelector) {
         const activityDomObject = querySelector.getElementsByTagName(
@@ -105,7 +133,7 @@ export class DomManipulationService {
         )[0];
 
         activityDomObject.style.stroke =
-          activity.businessObject.pickedColor || 'black';
+          activity.businessObject.pickedColor || DEFAULT_COLOR;
         activityDomObject.style.strokeWidth = STROKE_WIDTH;
 
         const activityLabelDom = this.getLabelDomForActivity(activityDomObject);
@@ -123,14 +151,18 @@ export class DomManipulationService {
     });
 
     allConnections.forEach((connection) => {
-      // @ts-ignore
-      const connectionDomObject = document
-        .querySelector('[data-element-id=' + connection.id + ']')
-        .getElementsByTagName(CONNECTION_PATH_DOM_SELECTOR)[0];
+      const querySelector = document.querySelector(
+        QUERY_SELECTOR_PREFIX + connection.id + QUERY_SELECTOR_POSTFIX,
+      );
+      if (querySelector) {
+        const connectionDomObject = querySelector.getElementsByTagName(
+          CONNECTION_PATH_DOM_SELECTOR,
+        )[0];
 
-      connectionDomObject.style.stroke =
-        connection.businessObject.pickedColor || 'black';
-      connectionDomObject.style.strokeWidth = '1.5';
+        connectionDomObject.style.stroke =
+          connection.businessObject.pickedColor || DEFAULT_COLOR;
+        connectionDomObject.style.strokeWidth = STROKE_WIDTH;
+      }
     });
   }
 
@@ -139,7 +171,7 @@ export class DomManipulationService {
       .filter((e) => e.type === ElementTypes.ACTIVITY)
       .forEach((activity) => {
         const querySelector = document.querySelector(
-          '[data-element-id=' + activity.id + ']',
+          QUERY_SELECTOR_PREFIX + activity.id + QUERY_SELECTOR_POSTFIX,
         );
         if (querySelector) {
           const activityDomObject = querySelector.getElementsByTagName(
@@ -162,19 +194,5 @@ export class DomManipulationService {
           }
         }
       });
-  }
-
-  private getAllNotShown(shownElements: BusinessObject[]): BusinessObject[] {
-    const notShownElements: BusinessObject[] = [];
-    const allObjects = this.elementRegistryService
-      .getAllCanvasObjects()
-      .concat(this.elementRegistryService.getAllGroups());
-
-    allObjects.forEach((element) => {
-      if (!shownElements.includes(element.businessObject)) {
-        notShownElements.push(element.businessObject);
-      }
-    });
-    return notShownElements;
   }
 }

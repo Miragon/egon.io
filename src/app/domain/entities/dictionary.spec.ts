@@ -13,17 +13,16 @@ const testObject = {
 describe('Dict', () => {
   it('should create empty Dictionary', () => {
     // when
-    const dict = new Dictionary();
+    const dict = new Dictionary<string>();
 
     // then
     expect(dict).toBeTruthy();
     expect(dict.length).toEqual(0);
-    expect(dict.size()).toEqual(0);
   });
 
   it('should add Entries', () => {
     // given
-    const dict = new Dictionary();
+    const dict = new Dictionary<string>();
 
     // when
     dict.set(key1, value1);
@@ -32,14 +31,14 @@ describe('Dict', () => {
     // then
     expect(dict.length === 2);
     expect(dict.get(key1)).toEqual(value1);
-    expect(dict.get(key2)).toEqual(value2);
+    expect(dict.find(key2)).toEqual(value2);
     expect(dict.has(key1)).toBeTruthy();
     expect(dict.has(key2)).toBeTruthy();
   });
 
   it('should put Entry', () => {
     // given
-    const dict1 = new Dictionary();
+    const dict1 = new Dictionary<string>();
     const entry = new Entry(value1, key1);
 
     // when
@@ -50,21 +49,10 @@ describe('Dict', () => {
     expect(dict1.get(key1)).toEqual(value1);
   });
 
-  it('should add Each', () => {
-    // given
-    const dict1 = new Dictionary();
-
-    // when
-    dict1.addEach(testObject);
-
-    // then
-    expect(dict1.has(key1)).toBeTruthy();
-  });
-
   it('should append Dict', () => {
     // given
-    const dict1 = new Dictionary();
-    const dict2 = new Dictionary();
+    const dict1 = new Dictionary<string>();
+    const dict2 = new Dictionary<string>();
 
     dict1.set(key1, value1);
 
@@ -77,7 +65,7 @@ describe('Dict', () => {
 
   it('should get keysArray', () => {
     // given
-    const dict1 = new Dictionary();
+    const dict1 = new Dictionary<string>();
 
     dict1.set(key1, value1);
 
@@ -91,7 +79,7 @@ describe('Dict', () => {
 
   it('should delete entries', () => {
     // given
-    const dict1 = new Dictionary();
+    const dict1 = new Dictionary<string>();
 
     dict1.set(key1, value1);
     dict1.set(key2, value2);
@@ -101,13 +89,13 @@ describe('Dict', () => {
 
     // then
     expect(dict1.length === 1);
-    expect(dict1.get(key1)).toBeFalsy();
-    expect(dict1.get(key2)).toBeTruthy();
+    expect(dict1.has(key1)).toBeFalsy();
+    expect(dict1.has(key2)).toBeTruthy();
   });
 
   it('should clear dict', () => {
     // given
-    const dict1 = new Dictionary();
+    const dict1 = new Dictionary<string>();
 
     dict1.set(key1, value1);
 

@@ -2,14 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { assign } from 'min-dash';
 import DomainStoryModeler from 'src/app/tools/modeler/diagram-js';
 import { InitializerService } from './initializer.service';
-import { ElementRegistryService } from '../../../domain/services/element-registry.service';
+import { ElementRegistryService } from 'src/app/tools/modeler/services/element-registry.service';
 import { IconDictionaryService } from '../../icon-set-config/services/icon-dictionary.service';
 import { IconSetImportExportService } from '../../icon-set-config/services/icon-set-import-export.service';
-import { BusinessObject } from '../../../domain/entities/businessObject';
-import { ActivityBusinessObject } from '../../../domain/entities/activityBusinessObject';
+import { BusinessObject } from 'src/app/domain/entities/business-object';
+import { ActivityBusinessObject } from 'src/app/domain/entities/activity-business-object';
 import { updateMultipleNumberRegistry } from 'src/app/tools/modeler/diagram-js/features/numbering/numbering';
-import { IconSet } from '../../../domain/entities/iconSet';
-import { StorageService } from '../../../domain/services/storage.service';
+import { IconSet } from 'src/app/domain/entities/icon-set';
+import { StorageService } from '../../../utils/services/storage.service';
 import {
   SNACKBAR_DURATION_LONGER,
   SNACKBAR_INFO,
@@ -17,12 +17,21 @@ import {
 } from '../../../domain/entities/constants';
 import { environment } from '../../../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DirtyFlagService } from 'src/app/domain/services/dirty-flag.service';
+import { DirtyFlagService } from 'src/app/tools/modeler/services/dirty-flag.service';
+import { DiagramJsElementRegistry } from 'src/app/tools/modeler/diagram-js/type-interfaces/diagram-js-element-registry';
+import { DiagramJsCommandStack } from 'src/app/tools/modeler/diagram-js/type-interfaces/diagram-js-command-stack';
+import { DiagramJsContextPad } from 'src/app/tools/modeler/diagram-js/type-interfaces/diagram-js-context-pad';
+import { DiagramJsPalette } from 'src/app/tools/modeler/diagram-js/type-interfaces/diagram-js-palette';
+import { DiagramJsEventBus } from 'src/app/tools/modeler/diagram-js/type-interfaces/diagram-js-event-bus';
+import { DiagramJsSelection } from 'src/app/tools/modeler/diagram-js/type-interfaces/diagram-js-selection';
+import { EVENT_COMMANDSTACK_CHANGED } from 'src/app/tools/modeler/diagram-js/features/diagramJSConstants';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModelerService {
+  private readonly DEBOUNCE_TIMEOUT = 500;
+
   private readonly initializerService = inject(InitializerService);
   private readonly elementRegistryService = inject(ElementRegistryService);
   private readonly iconDictionaryService = inject(IconDictionaryService);
@@ -34,14 +43,16 @@ export class ModelerService {
   private readonly snackbar = inject(MatSnackBar);
 
   private modeler: any;
-  private elementRegistry: any;
-  private commandStack: any;
-  private contextPad: any;
-  private palette: any;
-  private eventBus: any;
-  private selection: any;
+  private elementRegistry: DiagramJsElementRegistry | undefined;
+  private commandStack: DiagramJsCommandStack | undefined;
+  private contextPad: DiagramJsContextPad | undefined;
+  private palette: DiagramJsPalette | undefined;
+  private eventBus: DiagramJsEventBus | undefined;
+  private selection: DiagramJsSelection | undefined;
 
   private encoded: string | undefined;
+
+  private timer: NodeJS.Timeout | undefined;
 
   postInit(): void {
     this.checkCurrentVersion();
@@ -71,29 +82,27 @@ export class ModelerService {
     }
 
     this.initializerService.initializeDomainStoryModelerEventHandlers(
-      this.commandStack,
-      this.eventBus,
+      this.commandStack!,
+      this.eventBus!,
     );
     this.initializerService.propagateDomainStoryModelerClassesToServices(
-      this.commandStack,
-      this.elementRegistry,
-      this.contextPad,
-      this.palette,
-      this.selection,
-      this.eventBus,
+      this.commandStack!,
+      this.elementRegistry!,
+      this.contextPad!,
+      this.palette!,
+      this.selection!,
+      this.eventBus!,
     );
 
-    const exportArtifacts = this.debounce(this.saveSVG, 500);
+    const exportArtifacts = this.saveSvgAfterDelay();
     if (this.modeler.get) {
       this.modeler.on('commandStack.changed', exportArtifacts);
     }
 
-    this.initializerService.initiateEventBusListeners(this.eventBus);
+    this.initializerService.initiateEventBusListeners(this.eventBus!);
 
     // expose modeler to window for debugging purposes
     assign(window, { egon: this.modeler });
-
-    this.startDebounce();
   }
 
   private checkCurrentVersion() {
@@ -165,24 +174,15 @@ export class ModelerService {
 
   commandStackChanged(): void {
     // to update the title of the svg, we need to tell the command stack, that a value has changed
-    this.eventBus.fire(
-      'commandStack.changed',
-      this.debounce(this.saveSVG, 500),
-    );
+    this.eventBus!.fire(EVENT_COMMANDSTACK_CHANGED, this.saveSvgAfterDelay());
   }
 
-  startDebounce(): void {
-    this.debounce(this.saveSVG, 500);
-  }
-
-  debounce(fn: any, timeout: number): any {
+  // executes the function after a set timeout. Used because the modeler is event-based => we need to wait for the command stack to finish
+  saveSvgAfterDelay(): () => void {
     return () => {
-      let timer = setTimeout(() => {
-        // tslint:disable-next-line:no-unused-expression
-        fn(this.modeler).then((svg: string) => {
-          this.encoded = svg;
-        }) as Promise<any>;
-      }, timeout);
+      this.timer = setTimeout(() => {
+        return this.saveSVG(this.modeler) as Promise<string>;
+      }, this.DEBOUNCE_TIMEOUT);
     };
   }
 
@@ -193,6 +193,7 @@ export class ModelerService {
   async saveSVG(modeler: any): Promise<any> {
     try {
       const result = await modeler.saveSVG();
+      this.encoded = result.svg;
       return result.svg;
     } catch (err) {
       alert('There was an error saving the SVG.\n' + err);
@@ -213,9 +214,8 @@ export class ModelerService {
     if (fitToScreen) {
       this.fitStoryToScreen();
     }
-    this.elementRegistryService.correctInitialize();
     this.commandStackChanged();
-    this.startDebounce();
+    this.saveSvgAfterDelay();
     this.dirtyFlagService.makeClean();
   }
 

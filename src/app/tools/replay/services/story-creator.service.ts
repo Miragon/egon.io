@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { ElementTypes } from '../../../domain/entities/elementTypes';
-import { ActivityCanvasObject } from '../../../domain/entities/activityCanvasObject';
-import { BusinessObject } from '../../../domain/entities/businessObject';
-import { CanvasObject } from '../../../domain/entities/canvasObject';
-import { ElementRegistryService } from '../../../domain/services/element-registry.service';
+import { ElementTypes } from 'src/app/domain/entities/element-types';
+import { ActivityCanvasObject } from 'src/app/domain/entities/activity-canvas-object';
+import { BusinessObject } from 'src/app/domain/entities/business-object';
+import { CanvasObject } from 'src/app/domain/entities/canvas-object';
+import { ElementRegistryService } from 'src/app/tools/modeler/services/element-registry.service';
 import { StorySentence } from '../domain/storySentence';
 import { Dictionary } from '../../../domain/entities/dictionary';
-import { ActivityBusinessObject } from '../../../domain/entities/activityBusinessObject';
+import { ActivityBusinessObject } from 'src/app/domain/entities/activity-business-object';
 
 @Injectable({
   providedIn: 'root',
@@ -14,14 +14,18 @@ import { ActivityBusinessObject } from '../../../domain/entities/activityBusines
 export class StoryCreatorService {
   private readonly elementRegistryService = inject(ElementRegistryService);
 
-  traceActivitiesAndCreateStory(): StorySentence[] {
-    const tracedActivityMap = new Dictionary();
+  traceActivitiesAndCreateStory(): {
+    storyWithoutGroups: StorySentence[];
+    storyWithGroups: StorySentence[] | undefined;
+    storyWithGroupsInLastSentence: StorySentence[];
+  } {
+    const tracedActivityMap = new Dictionary<ActivityCanvasObject[]>();
     const story: StorySentence[] = [];
     const activities = this.elementRegistryService.getActivitiesFromActors();
     const tracedActivityMapKeys: number[] = [];
     activities.forEach((activity) => {
       const activityNumber = Number(activity.businessObject.number); // Sometimes the activityNumber is a string for some reason
-      const tracedItem = tracedActivityMap.get(`${activityNumber}`) ?? [];
+      const tracedItem = tracedActivityMap.find(`${activityNumber}`) ?? [];
       if (!tracedActivityMapKeys.includes(activityNumber)) {
         tracedActivityMapKeys.push(activityNumber);
       }
@@ -34,18 +38,60 @@ export class StoryCreatorService {
       this.createSentence(tracedActivityMap, key, story, storyIndex);
       storyIndex++;
     });
-
-    this.addGroupsToLastSentence(story);
-    return story;
+    return this.createStoryWithGroups(story);
   }
 
+  private createStoryWithGroups(story: StorySentence[]): {
+    storyWithoutGroups: StorySentence[];
+    storyWithGroups: StorySentence[] | undefined;
+    storyWithGroupsInLastSentence: StorySentence[];
+  } {
+    const groups = this.elementRegistryService.getAllGroups() as CanvasObject[];
+    const annotationsForGroups: CanvasObject[] = [];
+    groups.forEach((group) =>
+      this.addTextAnnotationsForActorOrGroup(group, annotationsForGroups),
+    );
+
+    let storyWithGroups: StorySentence[] | undefined;
+
+    const storyWithGroupsInLastSentence: StorySentence[] = JSON.parse(
+      JSON.stringify(story),
+    );
+
+    if (groups.length > 0) {
+      storyWithGroups = JSON.parse(JSON.stringify(story));
+      if (groups.length > 0 && story.length > 0) {
+        storyWithGroups!.forEach((sentence) => {
+          sentence.objects = sentence.objects
+            .concat(groups.map((g) => g.businessObject))
+            .concat(annotationsForGroups.map((a) => a.businessObject));
+        });
+      }
+    }
+    if (groups.length > 0 && storyWithGroupsInLastSentence.length > 0) {
+      storyWithGroupsInLastSentence[
+        storyWithGroupsInLastSentence.length - 1
+      ].objects = storyWithGroupsInLastSentence[
+        storyWithGroupsInLastSentence.length - 1
+      ].objects
+        .concat(groups.map((g) => g.businessObject))
+        .concat(annotationsForGroups.map((a) => a.businessObject));
+    }
+
+    return {
+      storyWithoutGroups: story,
+      storyWithGroups,
+      storyWithGroupsInLastSentence,
+    };
+  }
   private createSentence(
-    tracedActivityMap: Dictionary,
+    tracedActivityMap: Dictionary<ActivityCanvasObject[]>,
     tracedActivityMapKey: number,
     story: StorySentence[],
     storyIndex: number,
   ): void {
-    let tracedActivity = tracedActivityMap.get(`${tracedActivityMapKey}`) ?? [];
+    const tracedActivity: ActivityCanvasObject[] =
+      tracedActivityMap.get(`${tracedActivityMapKey}`) ?? [];
     const sentenceObjects = this.getSentenceObjects(tracedActivity);
     const highlightedElements = sentenceObjects.map((t) => t.id);
     if (storyIndex > 0) {
@@ -72,7 +118,7 @@ export class StoryCreatorService {
       // find all activity numbers of the ActivityBusinessObject
       // and returned the highest one
       const allActivityNumbers = sentence.objects.map((businessObject) => {
-        if (businessObject.type.includes('activity')) {
+        if (businessObject.type.includes(ElementTypes.ACTIVITY)) {
           const activity = businessObject as ActivityBusinessObject;
           return activity.number ?? 0;
         } else {
@@ -119,7 +165,7 @@ export class StoryCreatorService {
       for (const checkTarget of parallelSentenceTargetObjects) {
         if (
           checkTarget.businessObject &&
-          !checkTarget.businessObject.type.includes('actor') &&
+          !checkTarget.businessObject.type.includes(ElementTypes.ACTOR) &&
           checkTarget.outgoing
         ) {
           // check the target for each outgoing activity
@@ -159,18 +205,5 @@ export class StoryCreatorService {
         objectTextAnnotations.push(connection, connection.target);
       }
     });
-  }
-
-  private addGroupsToLastSentence(story: StorySentence[]): void {
-    const groups = this.elementRegistryService.getAllGroups() as CanvasObject[];
-    const annotationsForGroups: CanvasObject[] = [];
-    groups.forEach((group) =>
-      this.addTextAnnotationsForActorOrGroup(group, annotationsForGroups),
-    );
-    if (groups.length > 0 && story.length > 0) {
-      story[story.length - 1].objects = story[story.length - 1].objects
-        .concat(groups.map((g) => g.businessObject))
-        .concat(annotationsForGroups.map((a) => a.businessObject));
-    }
   }
 }

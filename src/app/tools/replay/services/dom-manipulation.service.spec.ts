@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { DomManipulationService } from 'src/app/tools/replay/services/dom-manipulation.service';
-import { ElementRegistryService } from '../../../domain/services/element-registry.service';
+import { ElementRegistryService } from 'src/app/tools/modeler/services/element-registry.service';
 import { preBuildTestStory } from '../../../utils/testHelpers.spec';
 
 describe('DomManipulationService', () => {
@@ -11,12 +11,13 @@ describe('DomManipulationService', () => {
 
   beforeEach(() => {
     const elementRegistryServiceMock = jasmine.createSpyObj(
-      'ElementRegsitryService',
+      'ElementRegistryService',
       [
         'getAllCanvasObjects',
         'getAllGroups',
         'getAllActivities',
         'getAllConnections',
+        'getAllBusinessObjectsFromCanvasNotIn',
       ],
     );
 
@@ -44,6 +45,9 @@ describe('DomManipulationService', () => {
     elementRegistryServiceSpy.getAllActivities.and.returnValue([]);
     elementRegistryServiceSpy.getAllGroups.and.returnValue([]);
     elementRegistryServiceSpy.getAllCanvasObjects.and.returnValue([]);
+    elementRegistryServiceSpy.getAllBusinessObjectsFromCanvasNotIn.and.returnValue(
+      [],
+    );
   });
 
   it('showAll', () => {
@@ -56,11 +60,14 @@ describe('DomManipulationService', () => {
   });
 
   it('showSentence', () => {
-    domManipulationService.showSentence(preBuildTestStory(2)[1]);
+    domManipulationService.showSentence(
+      preBuildTestStory(2).storyWithGroups[1],
+    );
 
-    expect(elementRegistryServiceSpy.getAllCanvasObjects).toHaveBeenCalled();
+    expect(
+      elementRegistryServiceSpy.getAllBusinessObjectsFromCanvasNotIn,
+    ).toHaveBeenCalled();
     expect(elementRegistryServiceSpy.getAllActivities).toHaveBeenCalled();
-    expect(elementRegistryServiceSpy.getAllGroups).toHaveBeenCalled();
     expect(elementRegistryServiceSpy.getAllConnections).toHaveBeenCalled();
   });
 });

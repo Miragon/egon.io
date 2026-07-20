@@ -132,22 +132,6 @@ body {
   }
 }
 
-.headline {
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-.headerButton {
-  background-color: transparent;
-  border: none;
-  letter-spacing: 0.05em;
-}
-
-.headerButton:hover {
-  color: #0093ac;
-  cursor: pointer;
-}
-
 .spacer {
   flex: 1 1 auto;
 }
@@ -158,13 +142,6 @@ body {
 
 .mr-10 {
   margin-right: 10px !important;
-}
-
-.materialIconButton {
-  font-size: 24px !important;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin-top: 9px;
 }
 
 .dense-8 {
@@ -181,6 +158,18 @@ a {
 }
 
 /* Material Design */
+
+:root {
+  @include mat.expansion-overrides(
+    (
+      header-indicator-color: black,
+      /* corner radius set to 0 to make extension panel look like the toolbar in "settings" */
+        container-shape: 0,
+      /* if height is changed, also change height of the toolbar in "settings" */
+        header-collapsed-state-height: 40px,
+    )
+  );
+}
 
 mat-dialog-actions.mdc-dialog__actions {
   padding: 0 24px 20px 24px;

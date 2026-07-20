@@ -1,7 +1,8 @@
 "use strict";
 
-import { ElementTypes } from "src/app/domain/entities/elementTypes";
+import { ElementTypes } from "src/app/domain/entities/element-types";
 import { is } from "../util/util";
+import { EVENT_ELEMENT_CHANGED } from "../diagramJSConstants";
 
 function getLabelAttr(semantic) {
   if (
@@ -127,7 +128,7 @@ export function createAutocompleteForEdit(
       this.value = this.innerHTML;
     }
 
-    let searchterm = this.value?.toUpperCase() | "";
+    let searchterm = this.value?.toUpperCase() ? this.value.toUpperCase() : "";
     currentFocus = -1;
 
     clearOldAutocompleteList();
@@ -190,7 +191,7 @@ export function createAutocompleteForEdit(
       if (currentFocus > -1) {
         businessElement.businessObject.name =
           workObjectNamesFilteredBySearchterm[currentFocus];
-        eventBus.fire("element.changed", { element: businessElement });
+        eventBus.fire(EVENT_ELEMENT_CHANGED, { element: businessElement });
 
         // remove obsolete listener
         // it is always added when opening the editingBox with the associated businessObject as Context

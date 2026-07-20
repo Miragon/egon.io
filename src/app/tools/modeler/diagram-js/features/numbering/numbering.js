@@ -1,9 +1,8 @@
 "use strict";
 
 import { angleBetween } from "src/app/utils/mathExtensions";
+import { EVENT_ELEMENT_CHANGED } from "../diagramJSConstants";
 
-// TODO with the current approach occurring multipleNumbers override each Other, a proper handling of multiple numbers is needed for the registry
-let numberRegistry = [];
 let multipleNumberRegistry = [false];
 
 let canvasElementRegistry;
@@ -100,10 +99,8 @@ export function generateAutomaticNumber(elementActivity, commandStack) {
   });
   for (let i = 0; i < usedNumbers.length; i++) {
     if (!usedNumbers.includes(i)) {
-      if (!usedNumbers.includes(i)) {
-        wantedNumber = i;
-        i = usedNumbers.length;
-      }
+      wantedNumber = i;
+      i = usedNumbers.length;
     }
   }
   if (wantedNumber === -1) {
@@ -191,23 +188,12 @@ export function getNumbersAndIDs() {
   return iDWithNumber;
 }
 
-export function addNumberToRegistry(renderedNumber, number) {
-  numberRegistry[number] = renderedNumber;
-}
-
 export function setNumberIsMultiple(number, multi) {
   multipleNumberRegistry[number] = multi;
 }
 
-/**
- * @returns copy of registry
- */
-export function getNumberRegistry() {
-  return numberRegistry.slice(0);
-}
-
-export function getMultipleNumberRegistry() {
-  return multipleNumberRegistry.slice(0);
+export function isNumberMultiple(number) {
+  return multipleNumberRegistry[number];
 }
 
 function setNumberOfActivity(elementArray, wantedNumber, eventBus) {
@@ -218,7 +204,7 @@ function setNumberOfActivity(elementArray, wantedNumber, eventBus) {
         if (businessObject) {
           businessObject.number = wantedNumber;
         }
-        eventBus.fire("element.changed", { element });
+        eventBus.fire(EVENT_ELEMENT_CHANGED, { element });
       }
     });
   }

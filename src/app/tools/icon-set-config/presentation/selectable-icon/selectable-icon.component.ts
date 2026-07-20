@@ -9,15 +9,14 @@ import { SelectableIcon } from '../../domain/selectableIcon';
 import { BehaviorSubject } from 'rxjs';
 import { IconSetCustomizationService } from '../../services/icon-set-customization.service';
 
-import { CommonModule } from '@angular/common';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-selectable-icon',
   templateUrl: './selectable-icon.component.html',
   styleUrls: ['./selectable-icon.component.scss'],
-  standalone: true,
-  imports: [CommonModule, MatButtonToggleModule],
+
+  imports: [MatButtonToggleModule],
 })
 export class SelectableIconComponent implements OnInit, AfterViewChecked {
   @Input()
@@ -59,9 +58,6 @@ export class SelectableIconComponent implements OnInit, AfterViewChecked {
       this.isWorkObject = value.isWorkObject;
       this.isNone = !(value.isActor || value.isWorkObject);
     });
-    this.isActor = this.icon.value.isActor;
-    this.isWorkObject = this.icon.value.isWorkObject;
-    this.isNone = !(this.icon.value.isActor || this.icon.value.isWorkObject);
   }
 
   ngAfterViewChecked(): void {

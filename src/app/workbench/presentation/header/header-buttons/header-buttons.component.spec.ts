@@ -3,17 +3,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeaderButtonsComponent } from './header-buttons.component';
 import { MockProviders } from 'ng-mocks';
 import { SettingsService } from '../../../services/settings/settings.service';
-import { TitleService } from '../../../../tools/title/services/title.service';
+import { PropertiesService } from 'src/app/tools/properties/services/properties.service';
 import { ModelerService } from '../../../../tools/modeler/services/modeler.service';
-import { DirtyFlagService } from '../../../../domain/services/dirty-flag.service';
-import { ElementRegistryService } from '../../../../domain/services/element-registry.service';
-import { DialogService } from '../../../../domain/services/dialog.service';
+import { DirtyFlagService } from 'src/app/tools/modeler/services/dirty-flag.service';
+import { ElementRegistryService } from 'src/app/tools/modeler/services/element-registry.service';
+import { DialogService } from 'src/app/tools/dialog/services/dialog.service';
 import { ReplayService } from '../../../../tools/replay/services/replay.service';
 import { ExportService } from '../../../../tools/export/services/export.service';
 import { ImportDomainStoryService } from '../../../../tools/import/services/import-domain-story.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { StoryCreatorService } from '../../../../tools/replay/services/story-creator.service';
 import { preBuildTestStory } from '../../../../utils/testHelpers.spec';
+import { signal } from '@angular/core';
 
 describe('HeaderButtonsComponent', () => {
   let component: HeaderButtonsComponent;
@@ -32,11 +33,14 @@ describe('HeaderButtonsComponent', () => {
       preBuildTestStory(2),
     );
 
-    replayService = jasmine.createSpyObj('replayService', [
-      'startReplay',
-      'stopReplay',
-      'isReplayable',
-    ]);
+    replayService = jasmine.createSpyObj(
+      'replayService',
+      ['startReplay', 'stopReplay', 'isReplayable'],
+      {
+        currentSentence: signal(1),
+        maxSentenceNumber: signal(2),
+      },
+    );
     replayService.isReplayable.and.returnValue(true);
 
     snackbar = jasmine.createSpyObj('snackbar', ['open']);
@@ -49,7 +53,7 @@ describe('HeaderButtonsComponent', () => {
         { provide: MatSnackBar, useValue: snackbar },
         MockProviders(
           SettingsService,
-          TitleService,
+          PropertiesService,
           ModelerService,
           DirtyFlagService,
           ElementRegistryService,

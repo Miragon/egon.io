@@ -8,8 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { SettingsService } from 'src/app/workbench/services/settings/settings.service';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { TitleService } from './tools/title/services/title.service';
+import { PropertiesService } from 'src/app/tools/properties/services/properties.service';
 import { ExportService } from './tools/export/services/export.service';
 import { ReplayService } from './tools/replay/services/replay.service';
 import { environment } from '../environments/environment';
@@ -33,22 +32,22 @@ import {
 } from './domain/entities/constants';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ModelerService } from './tools/modeler/services/modeler.service';
-import { DirtyFlagService } from './domain/services/dirty-flag.service';
+import { DirtyFlagService } from 'src/app/tools/modeler/services/dirty-flag.service';
 
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HeaderComponent } from './workbench/presentation/header/header/header.component';
 import { SettingsComponent } from './workbench/presentation/settings/settings.component';
 import { DragDirective } from './tools/import/directive/dragDrop.directive';
 import { ImportDomainStoryService } from 'src/app/tools/import/services/import-domain-story.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { OPEN_COLOR_PICKER_EVENT } from 'src/app/tools/modeler/diagram-js/features/diagramJSConstants';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: true,
+
   imports: [
-    CommonModule,
     HeaderComponent,
     SettingsComponent,
     DragDirective,
@@ -57,8 +56,6 @@ import { ImportDomainStoryService } from 'src/app/tools/import/services/import-d
   ],
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  showSettings$: Observable<boolean> | BehaviorSubject<boolean>;
-  showDescription$: Observable<boolean>;
   version: string = environment.version;
   color: string = BLACK;
 
@@ -84,7 +81,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   ];
 
   private readonly settingsService = inject(SettingsService);
-  private readonly titleService = inject(TitleService);
   private readonly exportService = inject(ExportService);
   private readonly autosaveService = inject(AutosaveService);
   private readonly cd = inject(ChangeDetectorRef);
@@ -95,17 +91,28 @@ export class AppComponent implements OnInit, AfterViewInit {
   private readonly importDomainStoryService = inject(ImportDomainStoryService);
   private readonly activatedRoute = inject(ActivatedRoute);
 
+  showSettings = this.settingsService.showSettings;
+
   constructor() {
-    this.showSettings$ = new BehaviorSubject(false);
-    this.showDescription$ = new BehaviorSubject(true);
+    this.importDomainStoryService
+      .automatedImportSuccessFull$()
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        // A timeout is needed to make sure that the import and all asynchronous tasks are finished before the replay is started.
+        setTimeout(() => {
+          this.replayService.startReplay(true);
+        }, 100);
+      });
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       const modifierPressed = e.ctrlKey || e.metaKey;
+
+      const filename = this.exportService.getFilename();
       if (modifierPressed && e.key === 's' && !e.altKey) {
         e.preventDefault();
         e.stopPropagation();
         if (this.exportService.isDomainStoryExportable()) {
-          this.exportService.downloadDST();
+          this.exportService.downloadEGN(filename);
         }
       }
 
@@ -113,7 +120,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         e.preventDefault();
         e.stopPropagation();
         if (this.exportService.isDomainStoryExportable()) {
-          this.exportService.downloadSVG(true, true, undefined);
+          this.exportService.downloadSVG(filename, true, true, undefined);
         }
       }
       if (modifierPressed && e.key === 'l') {
@@ -123,7 +130,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       if (
         (e.key === 'ArrowRight' || e.key === 'ArrowUp') &&
-        this.replayService.getReplayOn()
+        this.replayService.replayOn()
       ) {
         e.preventDefault();
         e.stopPropagation();
@@ -131,7 +138,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       if (
         (e.key === 'ArrowLeft' || e.key === 'ArrowDown') &&
-        this.replayService.getReplayOn()
+        this.replayService.replayOn()
       ) {
         e.preventDefault();
         e.stopPropagation();
@@ -154,7 +161,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     });
 
-    document.addEventListener('openColorPicker', () => {
+    document.addEventListener(OPEN_COLOR_PICKER_EVENT, () => {
       this.colorPicker.openDialog();
     });
 
@@ -168,8 +175,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.modelerService.postInit();
-    this.showDescription$ = this.titleService.showDescription$;
-    this.showSettings$ = this.settingsService.showSettings$;
   }
 
   onColorChanged(color: string) {
@@ -183,12 +188,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.importDomainStoryService.automatedImportSuccessFull().subscribe(() => {
-      // A timeout is needed to make sure that the import and all asynchronous tasks are finished before the replay is started.
-      setTimeout(() => {
-        this.replayService.startReplay(true);
-      }, 100);
-    });
     this.activatedRoute.queryParamMap.subscribe((queryParams) => {
       const urlToLoad = queryParams.get('storyUrl');
       const startReplay = queryParams.get('startReplay') === 'true';
@@ -202,9 +201,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   @HostListener('window:beforeunload', ['$event'])
-  onWindowClose(event: any): void {
-    if (this.dirtyFlagService.dirty) {
-      event.returnValue = true;
+  onWindowClose(event: Event): void {
+    if (this.dirtyFlagService.dirty()) {
+      event.preventDefault();
     }
   }
 }

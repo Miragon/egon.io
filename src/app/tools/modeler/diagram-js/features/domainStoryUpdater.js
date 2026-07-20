@@ -13,7 +13,7 @@ import {
 
 import { reworkGroupElements } from "./util/util";
 import { isBackground, isGroup } from "./domainStoryRules";
-import { ElementTypes } from "../../../../domain/entities/elementTypes";
+import { ElementTypes } from "../../../../domain/entities/element-types";
 
 /**
  * a handler responsible for updating the element's businessObject
@@ -57,7 +57,6 @@ export default function DomainStoryUpdater(eventBus, egon, connectionDocking) {
       }
     }
     if (
-      shape &&
       shape.parent &&
       "type" in shape.parent &&
       shape.parent.type === ElementTypes.GROUP
@@ -135,9 +134,9 @@ export default function DomainStoryUpdater(eventBus, egon, connectionDocking) {
 
   // crop connection ends during create/update
   function cropConnection(e) {
-    var context = e.context,
-      hints = context.hints || {},
-      connection;
+    const context = e.context,
+      hints = context.hints || {};
+    let connection;
 
     if (!context.cropped && hints.createElementsBehavior !== false) {
       connection = context.connection;

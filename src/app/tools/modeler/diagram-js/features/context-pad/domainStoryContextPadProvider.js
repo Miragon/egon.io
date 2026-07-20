@@ -2,13 +2,24 @@
 
 import { assign, isArray } from "min-dash";
 import { generateAutomaticNumber } from "../numbering/numbering";
-import { ElementTypes } from "src/app/domain/entities/elementTypes";
+import { ElementTypes } from "src/app/domain/entities/element-types";
 import {
   hexToRGBA,
   isHexWithAlpha,
   rgbaToHex,
 } from "../../../../../utils/colorConverter";
 import { hasPrimaryModifier } from "diagram-js/lib/util/Mouse";
+import {
+  DS_REPLACE_PROVIDER,
+  EVENT_CREATE_END,
+  EVENT_PICKED_COLOR,
+  EVENT_ELEMENTS_DELETE,
+  ELEMENT_COLOR_CHANGE_EVENT,
+  ACTIVITY_DIRECTION_CHANGE_EVENT,
+  OPEN_CONTEXT_PAD_CSS_CLASS,
+  OPEN_COLOR_PICKER_EVENT,
+  DEFAULT_COLOR_EVENT,
+} from "../diagramJSConstants";
 
 let dirtyFlagService;
 let iconDictionaryService;
@@ -33,27 +44,27 @@ export default function DomainStoryContextPadProvider(
   rules,
 ) {
   contextPad.registerProvider(this);
-  popupMenu.registerProvider("ds-replace", replaceMenuProvider);
+  popupMenu.registerProvider(DS_REPLACE_PROVIDER, replaceMenuProvider);
 
   let _selectedElement;
   let startConnect;
 
-  eventBus.on("create.end", 250, function (event) {
-    var context = event.context,
+  eventBus.on(EVENT_CREATE_END, 250, function (event) {
+    const context = event.context,
       shape = context.shape;
 
     if (!hasPrimaryModifier(event) || !contextPad.isOpen(shape)) {
       return;
     }
 
-    var entries = contextPad.getEntries(shape);
+    const entries = contextPad.getEntries(shape);
 
     if (entries.replace) {
       entries.replace.action.click(event, shape);
     }
   });
 
-  document.addEventListener("pickedColor", (event) => {
+  document.addEventListener(EVENT_PICKED_COLOR, (event) => {
     if (_selectedElement) {
       executeCommandStack(event);
     }
@@ -108,7 +119,7 @@ export default function DomainStoryContextPadProvider(
         currentColor = hexToRGBA(currentColor);
       }
       document.dispatchEvent(
-        new CustomEvent("defaultColor", {
+        new CustomEvent(DEFAULT_COLOR_EVENT, {
           detail: {
             color: currentColor ?? "#000000",
           },
@@ -126,7 +137,7 @@ export default function DomainStoryContextPadProvider(
 
   function addDelete(actions, element) {
     // delete element entry, only show if allowed by rules
-    var deleteAllowed = rules.allowed("elements.delete", {
+    let deleteAllowed = rules.allowed(EVENT_ELEMENTS_DELETE, {
       elements: { element },
     });
 
@@ -204,10 +215,10 @@ export default function DomainStoryContextPadProvider(
         title: translate("Change type"),
         action: {
           click: function (event, element) {
-            let position = assign(getReplaceMenuPosition(element), {
+            let position = assign(getReplaceMenuPosition(), {
               cursor: { x: event.x, y: event.y },
             });
-            popupMenu.open(element, "ds-replace", position);
+            popupMenu.open(element, DS_REPLACE_PROVIDER, position);
           },
         },
       },
@@ -223,7 +234,7 @@ export default function DomainStoryContextPadProvider(
         title: translate("Change color"),
         action: {
           click: function (event, element) {
-            document.dispatchEvent(new CustomEvent("openColorPicker"));
+            document.dispatchEvent(new CustomEvent(OPEN_COLOR_PICKER_EVENT));
           },
         },
       },
@@ -297,10 +308,10 @@ export default function DomainStoryContextPadProvider(
         title: translate("Change type"),
         action: {
           click: function (event, element) {
-            let position = assign(getReplaceMenuPosition(element), {
+            let position = assign(getReplaceMenuPosition(), {
               cursor: { x: event.x, y: event.y },
             });
-            popupMenu.open(element, "ds-replace", position);
+            popupMenu.open(element, DS_REPLACE_PROVIDER, position);
           },
         },
       },
@@ -322,14 +333,14 @@ export default function DomainStoryContextPadProvider(
       newNumber: newNumber,
       element: element,
     };
-    commandStack.execute("activity.directionChange", context);
+    commandStack.execute(ACTIVITY_DIRECTION_CHANGE_EVENT, context);
   }
 
-  function getReplaceMenuPosition(element) {
+  function getReplaceMenuPosition() {
     let Y_OFFSET = 5;
 
     let diagramContainer = canvas.getContainer(),
-      pad = contextPad.getPad(element).html;
+      pad = document.getElementsByClassName(OPEN_CONTEXT_PAD_CSS_CLASS)[0];
 
     let diagramRect = diagramContainer.getBoundingClientRect(),
       padRect = pad.getBoundingClientRect();
@@ -385,12 +396,11 @@ export default function DomainStoryContextPadProvider(
   }
 
   function executeCommandStack(colorChangedEvent) {
-    const commandName = "element.colorChange";
     let newColor = colorChangedEvent.detail.color;
     if (isArray(_selectedElement)) {
       _selectedElement.forEach((el) =>
         commandStack.execute(
-          commandName,
+          ELEMENT_COLOR_CHANGE_EVENT,
           getColorChangeDescription(el, newColor),
         ),
       );
@@ -399,7 +409,7 @@ export default function DomainStoryContextPadProvider(
         _selectedElement,
         newColor,
       );
-      commandStack.execute(commandName, colorChangeDescription);
+      commandStack.execute(ELEMENT_COLOR_CHANGE_EVENT, colorChangeDescription);
     }
 
     dirtyFlagService.makeDirty();

@@ -1,5 +1,5 @@
 /** DEFAULT VALUES **/
-export const INITIAL_TITLE = '<title>';
+export const INITIAL_TITLE = 'Click to add title';
 export const INITIAL_DESCRIPTION = '';
 export const INITIAL_ICON_SET_NAME = 'default';
 
@@ -10,7 +10,7 @@ export const VERSION_KEY = 'version';
 
 /** AUTOSAVE DEFAULTS **/
 export const DEFAULT_AUTOSAVES_ENABLED = true;
-export const DEFAULT_AUTOSAVES_MAX_DRAFTS = 5;
+export const DEFAULT_AUTOSAVES_MAX_DRAFTS = 20;
 export const DEFAULT_AUTOSAVES_INTERVAL = 30;
 
 /** SNACKBAR **/

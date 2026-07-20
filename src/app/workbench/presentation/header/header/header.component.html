@@ -1,75 +1,34 @@
-<mat-toolbar color="primary">
-  <mat-toolbar-row class="firstRow">
-    <div class="mr-10 titel-scrollbar">
-      <span
-        class="headline"
-        (click)="openHeaderDialog()"
-        title="Edit title and description"
-      >
-        {{ title$ | async }}
-      </span>
-    </div>
-
-    <button
-      type="button"
-      class="headerButton"
-      (click)="openHeaderDialog()"
-      title="Edit title and description"
-    >
-      <span class="material-icons-outlined materialIconButton"> edit </span>
-      <div class="button-label">Title</div>
-    </button>
-    @if (showDescription | async) {
-      <button
-        type="button"
-        class="headerButton"
-        title="Hide description"
-        (click)="setShowDescription(false)"
-      >
-        <span class="material-icons-outlined materialIconButton">
-          visibility_off
-        </span>
-        <div class="button-label">Description</div>
-      </button>
-    }
-    @if (!(showDescription | async)) {
-      <button
-        type="button"
-        class="headerButton"
-        title="Show description"
-        (click)="setShowDescription(true)"
-      >
-        <span class="material-icons-outlined materialIconButton">
-          visibility
-        </span>
-        <div class="button-label">Description</div>
-      </button>
-    }
-    <span class="titleSpacer"></span>
-
-    <app-header-buttons
-      class="nowrap"
-      [hasDomainStory]="hasDomainStory"
-      [hasTitle]="hasTitle"
-      [isDirty]="isDirty$ | async"
-      [isReplayable]="isReplayable"
-      [isReplaying]="isReplay$ | async"
-      (import)="onImport()"
-      (openSettings)="openSettings()"
-      (startReplay)="startReplay()"
-      (stopReplay)="stopReplay()"
-      (nextSentence)="nextSentence()"
-      (previousSentence)="previousSentence()"
-      (newStory)="createNewDomainStory()"
-      (showKeyboardShortCuts)="openKeyboardShortcutsDialog()"
-      (openLabelDictionary)="openLabelDictionary()"
-      (openDownloadDialog)="openDownloadDialog()"
-      (openImportFromUrlDialog)="openImportFromUrlDialog()"
-    />
-  </mat-toolbar-row>
-</mat-toolbar>
-@if (showDescription$ | async) {
-  <mat-card class="smallScrollbar description">
-    <span class="descriptionText">{{ description$ | async }}</span>
-  </mat-card>
-}
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title class="headline">
+      {{ this.title() }}
+    </mat-panel-title>
+    <mat-panel-description>
+      <app-header-buttons
+        class="nowrap"
+        [hasDomainStory]="hasDomainStory"
+        [hasTitle]="hasTitle"
+        [isDirty]="isDirty()"
+        [isReplayable]="isReplayable"
+        [isReplaying]="isReplayOn()"
+        [showGroups]="showGroups()"
+        [hasGroups]="hasGroups()"
+        (import)="onImport()"
+        (openSettings)="openSettings()"
+        (startReplay)="startReplay()"
+        (stopReplay)="stopReplay()"
+        (nextSentence)="nextSentence()"
+        (previousSentence)="previousSentence()"
+        (toggleGroups)="toggleGroups()"
+        (newStory)="createNewDomainStory()"
+        (showKeyboardShortCuts)="openKeyboardShortcutsDialog()"
+        (openLabelDictionary)="openLabelDictionary()"
+        (openDownloadDialog)="openDownloadDialog()"
+        (openImportFromUrlDialog)="openImportFromUrlDialog()"
+        (click)="$event.stopPropagation()"
+      />
+      <!-- IMPORTANT: the (click)="$event.stopPropagation();" is needed to prevent the expansion panel from opening and closing when clicking on the buttons -->
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <app-properties-dialog />
+</mat-expansion-panel>

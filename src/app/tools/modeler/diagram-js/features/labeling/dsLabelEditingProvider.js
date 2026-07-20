@@ -4,10 +4,10 @@ import { assign } from "min-dash";
 
 import { createAutocompleteForEdit, getLabel } from "./dsLabelUtil";
 
-import { ElementTypes } from "src/app/domain/entities/elementTypes";
-import { sanitizeTextForSVGExport } from "src/app/utils/sanitizer";
+import { ElementTypes } from "src/app/domain/entities/element-types";
 import { is } from "../util/util";
 import { isBackground } from "../domainStoryRules";
+import { EVENT_CREATE_END } from "../diagramJSConstants";
 
 let dictionaryService;
 
@@ -29,7 +29,7 @@ export function toggleStashUse(use) {
 }
 
 export function focusElement(element) {
-  // Opening a Angular Dialog seems to mess with the focus logic somehow.
+  // Opening an Angular Dialog seems to mess with the focus logic somehow.
   // My guess is that is makes the mousedown event passive, which prevents "preventDefault" from intercepting.
   // I am not sure how to fix it, but this seems to be a workaround.
   setTimeout(() => element.focus(), 0);
@@ -91,7 +91,7 @@ export default function DSLabelEditingProvider(
     createAutocomplete(element);
   });
 
-  eventBus.on("create.end", 500, function (event) {
+  eventBus.on(EVENT_CREATE_END, 500, function (event) {
     let element = event.shape,
       canExecute = event.context.canExecute;
 
@@ -205,7 +205,7 @@ DSLabelEditingProvider.prototype.getEditingBBox = function (element) {
   let zoom = canvas.zoom();
   let defaultStyle = this._textRenderer.getDefaultStyle();
 
-  // take zoom into account
+  // take Zoom into account
   let defaultFontSize = defaultStyle.fontSize * zoom,
     defaultLineHeight = defaultStyle.lineHeight;
 
@@ -299,9 +299,5 @@ DSLabelEditingProvider.prototype.update = function (
     };
   }
 
-  this._modeling.updateLabel(
-    element,
-    sanitizeTextForSVGExport(newLabel),
-    newBounds,
-  );
+  this._modeling.updateLabel(element, newLabel, newBounds);
 };

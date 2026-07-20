@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Dictionary } from 'src/app/domain/entities/dictionary';
-import { ElementTypes } from 'src/app/domain/entities/elementTypes';
+import { ElementTypes } from 'src/app/domain/entities/element-types';
 import { builtInIcons } from 'src/app/tools/icon-set-config/domain/builtInIcons';
-import { sanitizeIconName } from '../../../utils/sanitizer';
-import { IconSet } from '../../../domain/entities/iconSet';
+import { sanitizeForCss } from '../../../utils/sanitizer';
+import { IconSet } from 'src/app/domain/entities/icon-set';
 import { INITIAL_ICON_SET_NAME } from 'src/app/domain/entities/constants';
 import { IconCssService } from 'src/app/tools/icon-set-config/services/icon-css.service';
 
@@ -17,11 +17,11 @@ export class IconDictionaryService {
 
   // The dictionaries hold icons (as SVG) and icon names as key-value pairs
 
-  private readonly customIcons = new Dictionary();
+  private readonly customIcons = new Dictionary<string>();
 
   // these dictionaries make up the current icon set:
-  private selectedActorsDictionary = new Dictionary();
-  private selectedWorkObjectsDictionary = new Dictionary();
+  private selectedActorsDictionary = new Dictionary<string>();
+  private selectedWorkObjectsDictionary = new Dictionary<string>();
 
   // default icon sets:
   private readonly NAMES_OF_DEFAULT_ICONS = {
@@ -35,39 +35,40 @@ export class IconDictionaryService {
       'Info',
     ],
   };
-  private readonly defaultActorsDictionary = new Dictionary();
-  private readonly defaultWorkObjectsDictionary = new Dictionary();
-  private readonly defaultIconSet: IconSet = (() => {
+
+  private createDefaultIconSet(): IconSet {
+    const defaultActorsDictionary = new Dictionary<string>();
+    const defaultWorkObjectsDictionary = new Dictionary<string>();
     this.initDictionary(
       this.NAMES_OF_DEFAULT_ICONS.actors,
       builtInIcons,
-      this.defaultActorsDictionary,
+      defaultActorsDictionary,
     );
     this.initDictionary(
       this.NAMES_OF_DEFAULT_ICONS.workObjects,
       builtInIcons,
-      this.defaultWorkObjectsDictionary,
+      defaultWorkObjectsDictionary,
     );
     return {
       name: INITIAL_ICON_SET_NAME,
-      actors: this.defaultActorsDictionary,
-      workObjects: this.defaultWorkObjectsDictionary,
+      actors: defaultActorsDictionary,
+      workObjects: defaultWorkObjectsDictionary,
     };
-  })();
+  }
 
   initTypeDictionaries(): void {
     if (
       this.selectedActorsDictionary.isEmpty() &&
       this.selectedWorkObjectsDictionary.isEmpty()
     ) {
-      this.setIconSet(this.defaultIconSet);
+      this.setIconSet(this.createDefaultIconSet());
     }
   }
 
   private initDictionary(
     selectedIconNames: string[],
-    allIcons: Dictionary,
-    dictionary: Dictionary,
+    allIcons: Dictionary<string>,
+    dictionary: Dictionary<string>,
   ) {
     dictionary.clear();
     for (const key of selectedIconNames) {
@@ -80,7 +81,7 @@ export class IconDictionaryService {
       throw new Error('Name should not include type!');
     }
 
-    this.getDictionaryForType(type).set(name, src);
+    this.getIconsAssignedAs(type).set(name, src);
   }
 
   unregisterIconForType(type: ElementTypes, name: string): void {
@@ -88,18 +89,7 @@ export class IconDictionaryService {
       throw new Error('Name should not include type!');
     }
 
-    this.getDictionaryForType(type).delete(name);
-  }
-
-  private getDictionaryForType(type: ElementTypes): Dictionary {
-    switch (type) {
-      case ElementTypes.ACTOR:
-        return this.selectedActorsDictionary;
-      case ElementTypes.WORKOBJECT:
-        return this.selectedWorkObjectsDictionary;
-      default:
-        return new Dictionary();
-    }
+    this.getIconsAssignedAs(type).delete(name);
   }
 
   // When an icon set or a domain story (which includes its icon set) are imported,
@@ -107,7 +97,7 @@ export class IconDictionaryService {
   // 1. add new custom icons (if any)
   // 2. update which icons are selected as actors/work objects
   updateIconRegistries(config: IconSet): void {
-    const newIcons = new Dictionary();
+    const newIcons = new Dictionary<string>();
     this.extractCustomIconsFromDictionary(config.actors, newIcons);
     this.extractCustomIconsFromDictionary(config.workObjects, newIcons);
     this.addCustomIcons(newIcons);
@@ -115,13 +105,12 @@ export class IconDictionaryService {
   }
 
   private extractCustomIconsFromDictionary(
-    elementDictionary: Dictionary,
-    customIcons: Dictionary,
+    elementDictionary: Dictionary<string>,
+    customIcons: Dictionary<string>,
   ) {
     elementDictionary.keysArray().forEach((name) => {
-      const sanitizedName = sanitizeIconName(name);
-      if (!this.getFullDictionary().has(sanitizedName)) {
-        customIcons.set(sanitizedName, elementDictionary.get(name));
+      if (!this.getFullDictionary().has(name)) {
+        customIcons.set(name, elementDictionary.get(name));
       }
     });
   }
@@ -131,7 +120,7 @@ export class IconDictionaryService {
     this.iconCssService.addIconsToCss(iconSrc, name);
   }
 
-  private addCustomIcons(icons: Dictionary) {
+  private addCustomIcons(icons: Dictionary<string>) {
     icons.keysArray().forEach((key) => {
       const custom = icons.get(key);
       this.addCustomIcon(custom, key);
@@ -140,33 +129,35 @@ export class IconDictionaryService {
 
   /** Getter & Setter **/
 
-  getFullDictionary(): Dictionary {
-    const fullDictionary = new Dictionary();
+  getFullDictionary(): Dictionary<string> {
+    const fullDictionary = new Dictionary<string>();
     fullDictionary.appendDict(builtInIcons);
     fullDictionary.appendDict(this.customIcons);
     return fullDictionary;
   }
 
-  getIconsAssignedAs(type: ElementTypes): Dictionary {
-    if (type === ElementTypes.ACTOR) {
-      return this.selectedActorsDictionary;
-    } else if (type === ElementTypes.WORKOBJECT) {
-      return this.selectedWorkObjectsDictionary;
+  getIconsAssignedAs(type: ElementTypes): Dictionary<string> {
+    switch (type) {
+      case ElementTypes.ACTOR:
+        return this.selectedActorsDictionary;
+      case ElementTypes.WORKOBJECT:
+        return this.selectedWorkObjectsDictionary;
+      default:
+        throw new Error(`Unsupported icon type: ${type}`);
     }
-    return new Dictionary();
   }
 
   getCSSClassOfIcon(name: string): string | null {
-    return ICON_CSS_CLASS_PREFIX + sanitizeIconName(name.toLowerCase());
+    return ICON_CSS_CLASS_PREFIX + sanitizeForCss(name);
   }
 
-  getIconSource(name: string): string | null {
+  getIconSource(name: string): string {
     if (builtInIcons.has(name)) {
       return builtInIcons.get(name);
     } else if (this.customIcons.has(name)) {
       return this.customIcons.get(name);
     }
-    return null;
+    return '';
   }
 
   setIconSet(iconSet: IconSet): void {
@@ -175,6 +166,6 @@ export class IconDictionaryService {
   }
 
   getDefaultIconSet(): IconSet {
-    return this.defaultIconSet;
+    return this.createDefaultIconSet();
   }
 }

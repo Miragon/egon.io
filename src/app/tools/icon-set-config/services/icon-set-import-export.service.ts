@@ -1,22 +1,22 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
 import { IconDictionaryService } from 'src/app/tools/icon-set-config/services/icon-dictionary.service';
 import { Dictionary } from 'src/app/domain/entities/dictionary';
-import { ElementTypes } from 'src/app/domain/entities/elementTypes';
+import { ElementTypes } from 'src/app/domain/entities/element-types';
 import {
   ICON_SET_CONFIGURATION_KEY,
   INITIAL_ICON_SET_NAME,
 } from '../../../domain/entities/constants';
-import { IconSet } from '../../../domain/entities/iconSet';
-import { IconSetConfigurationForExport } from '../../../domain/entities/icon-set-configuration-for-export';
-import { StorageService } from '../../../domain/services/storage.service';
+import { IconSet } from 'src/app/domain/entities/icon-set';
+import { IconSetExportConfiguration } from 'src/app/domain/entities/icon-set-export-configuration';
+import { StorageService } from '../../../utils/services/storage.service';
 import { downloadFile } from 'src/app/utils/downloadFile';
-import { Subject, Observable } from 'rxjs';
+import { Subject } from 'rxjs/internal/Subject';
+import { Observable } from 'rxjs/internal/Observable';
 
 export interface FileConfiguration {
   name: string;
-  actors: { [p: string]: any };
-  workObjects: { [p: string]: any };
+  actors: { [p: string]: string };
+  workObjects: { [p: string]: string };
 }
 
 @Injectable({
@@ -26,21 +26,19 @@ export class IconSetImportExportService {
   private readonly iconDictionaryService = inject(IconDictionaryService);
   private readonly storageService = inject(StorageService);
 
-  private readonly iconSetNameSubject = new BehaviorSubject<string>(
-    INITIAL_ICON_SET_NAME,
-  );
-  readonly iconSetChangedSubject: Subject<void> = new Subject<void>();
+  private readonly iconSetNameSignal = signal(INITIAL_ICON_SET_NAME);
+  readonly iconSetChangedEmitterSubject: Subject<void> = new Subject<void>();
   readonly iconSetChanged$: Observable<void> =
-    this.iconSetChangedSubject.asObservable();
+    this.iconSetChangedEmitterSubject.asObservable();
 
-  readonly iconSetName$ = this.iconSetNameSubject.asObservable();
+  readonly iconSetName = this.iconSetNameSignal.asReadonly();
 
   setIconSetName(name: string): void {
-    this.iconSetNameSubject.next(name);
+    this.iconSetNameSignal.set(name);
   }
 
   getIconSetName(): string {
-    return this.iconSetNameSubject.getValue();
+    return this.iconSetNameSignal();
   }
 
   exportConfiguration(): void {
@@ -50,7 +48,7 @@ export class IconSetImportExportService {
     }
 
     const configJSONString = JSON.stringify(iconSetConfiguration, null, 2);
-    const filename = this.iconSetNameSubject.value;
+    const filename = this.iconSetNameSignal();
 
     downloadFile(
       configJSONString,
@@ -78,7 +76,7 @@ export class IconSetImportExportService {
 
     let iconSetConfiguration;
 
-    if (actors.size() > 0 && workObjects.size() > 0) {
+    if (actors.length > 0 && workObjects.length > 0) {
       iconSetConfiguration = this.createConfigFromDictionaries(
         actors,
         workObjects,
@@ -87,14 +85,12 @@ export class IconSetImportExportService {
     return iconSetConfiguration;
   }
 
-  getCurrentConfigurationForExport():
-    | IconSetConfigurationForExport
-    | undefined {
+  getCurrentConfigurationForExport(): IconSetExportConfiguration | undefined {
     const currentConfiguration = this.getCurrentConfiguration();
 
     if (currentConfiguration) {
-      const actors: any = {};
-      const workObjects: any = {};
+      const actors: Record<string, string> = {};
+      const workObjects: Record<string, string> = {};
 
       currentConfiguration.actors.all().forEach((entry) => {
         actors[entry.key] = entry.value;
@@ -113,13 +109,13 @@ export class IconSetImportExportService {
   }
 
   private createConfigFromDictionaries(
-    actorsDict: Dictionary,
-    workObjectsDict: Dictionary,
+    actorsDict: Dictionary<string>,
+    workObjectsDict: Dictionary<string>,
   ): IconSet {
     const actorNames = actorsDict.keysArray();
     const workObjectNames = workObjectsDict.keysArray();
-    const newActors = new Dictionary();
-    const newWorkObjects = new Dictionary();
+    const newActors = new Dictionary<string>();
+    const newWorkObjects = new Dictionary<string>();
 
     // Fill Configuration from Canvas-Objects
     actorNames.forEach((actor) => {
@@ -136,7 +132,7 @@ export class IconSetImportExportService {
     });
 
     return {
-      name: this.iconSetNameSubject.value,
+      name: this.iconSetNameSignal(),
       actors: newActors,
       workObjects: newWorkObjects,
     };
@@ -148,8 +144,8 @@ export class IconSetImportExportService {
     if (fileConfiguration === undefined) {
       return {
         name: '',
-        actors: new Dictionary(),
-        workObjects: new Dictionary(),
+        actors: new Dictionary<string>(),
+        workObjects: new Dictionary<string>(),
       };
     }
 
@@ -203,6 +199,6 @@ export class IconSetImportExportService {
   }
 
   notifyIconSetSaved() {
-    this.iconSetChangedSubject.next();
+    this.iconSetChangedEmitterSubject.next();
   }
 }

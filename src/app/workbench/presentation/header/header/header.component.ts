@@ -1,34 +1,43 @@
-import { Component, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { TitleService } from '../../../../tools/title/services/title.service';
+import { Component, computed, inject, Signal } from '@angular/core';
+import { PropertiesService } from 'src/app/tools/properties/services/properties.service';
 import { ReplayService } from '../../../../tools/replay/services/replay.service';
 import { ImportDomainStoryService } from '../../../../tools/import/services/import-domain-story.service';
 import { SettingsService } from '../../../services/settings/settings.service';
-import { DirtyFlagService } from '../../../../domain/services/dirty-flag.service';
-import { DialogService } from '../../../../domain/services/dialog.service';
+import { DirtyFlagService } from 'src/app/tools/modeler/services/dirty-flag.service';
+import { DialogService } from 'src/app/tools/dialog/services/dialog.service';
 import { ExportService } from '../../../../tools/export/services/export.service';
 import { LabelDictionaryService } from '../../../../tools/label-dictionary/services/label-dictionary.service';
 import { ModelerService } from 'src/app/tools/modeler/services/modeler.service';
 
-import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { HeaderButtonsComponent } from '../header-buttons/header-buttons.component';
+import {
+  MatExpansionPanel,
+  MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
+import { PropertiesComponent } from 'src/app/tools/properties/presentation/properties.component';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  standalone: true,
+
   imports: [
-    CommonModule,
     MatToolbarModule,
     MatCardModule,
     HeaderButtonsComponent,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    PropertiesComponent,
   ],
 })
 export class HeaderComponent {
-  private readonly titleService = inject(TitleService);
+  readonly propertiesService = inject(PropertiesService);
   private readonly replayService = inject(ReplayService);
   private readonly importService = inject(ImportDomainStoryService);
   private readonly settingsService = inject(SettingsService);
@@ -38,48 +47,37 @@ export class HeaderComponent {
   private readonly exportService = inject(ExportService);
   private readonly labelDictionaryService = inject(LabelDictionaryService);
 
-  readonly title$ = this.titleService.title$;
-  readonly description$ = this.titleService.description$;
-  readonly showDescription$ = this.titleService.showDescription$;
+  readonly description = this.propertiesService.description;
 
-  readonly isReplay$: Observable<boolean>;
-  readonly isDirty$: Observable<boolean>;
+  readonly isReplayOn: Signal<boolean> = this.replayService.replayOn;
+  readonly showGroups: Signal<boolean> = this.replayService.showGroups;
+  readonly hasGroups: Signal<boolean> = this.replayService.hasGroups;
+  readonly isDirty: Signal<boolean> = this.dirtyFlagService.dirty;
 
-  readonly showDescription: Observable<boolean>;
-
-  constructor() {
-    this.isReplay$ = this.replayService.replayOn$;
-    this.isDirty$ = this.dirtyFlagService.dirty$;
-
-    this.showDescription = this.titleService.showDescription$;
-  }
-
-  openHeaderDialog(): void {
-    this.titleService.openHeaderDialog();
-  }
+  readonly title: Signal<string> = computed(() => {
+    const title = this.propertiesService.title();
+    if (title.length < 200) return title;
+    return title.substring(0, 197) + '...';
+  });
 
   openSettings(): void {
     this.settingsService.open();
   }
 
-  setShowDescription(show: boolean): void {
-    this.titleService.setShowDescription(show);
-  }
-
   createNewDomainStory(): void {
-    if (this.dirtyFlagService.dirty) {
+    if (this.dirtyFlagService.dirty()) {
       this.importService.openUnsavedChangesReminderDialog(() => {
-        this.titleService.reset();
+        this.propertiesService.reset();
         this.modelerService.reset();
       });
     } else {
-      this.titleService.reset();
+      this.propertiesService.reset();
       this.modelerService.reset();
     }
   }
 
   onImport(): void {
-    if (this.dirtyFlagService.dirty) {
+    if (this.dirtyFlagService.dirty()) {
       this.importService.openUnsavedChangesReminderDialog(() =>
         this.importService.performImport(),
       );
@@ -100,6 +98,10 @@ export class HeaderComponent {
     this.replayService.previousSentence();
   }
 
+  toggleGroups(): void {
+    this.replayService.toggleShowGroups();
+  }
+
   nextSentence(): void {
     this.replayService.nextSentence();
   }
@@ -117,7 +119,7 @@ export class HeaderComponent {
   }
 
   openImportFromUrlDialog(): void {
-    this.importService.openImportFromUrlDialog(this.dirtyFlagService.dirty);
+    this.importService.openImportFromUrlDialog(this.dirtyFlagService.dirty());
   }
 
   get hasDomainStory() {
@@ -125,7 +127,7 @@ export class HeaderComponent {
   }
 
   get hasTitle(): boolean {
-    return this.titleService.hasTitleOrDescription();
+    return this.propertiesService.hasTitleOrDescription();
   }
 
   get isReplayable() {

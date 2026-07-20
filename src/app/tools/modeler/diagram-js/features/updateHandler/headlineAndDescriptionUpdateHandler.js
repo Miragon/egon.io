@@ -1,30 +1,31 @@
-import { sanitizeTextForSVGExport } from "src/app/utils/sanitizer";
-
 export default function headlineAndDescriptionUpdateHandler(
   commandStack,
-  titleService,
+  propertiesService,
 ) {
   commandStack.registerHandler(
-    "story.updateHeadlineAndDescription",
+    "story.updateHeadlineAndDescriptionAndScope",
     handlerFunction,
   );
 
   function handlerFunction() {
     this.execute = function (ctx) {
-      ctx.oldTitle = titleService.getTitle();
-      ctx.oldDescription = titleService.getDescription();
+      ctx.oldTitle = propertiesService.title();
+      ctx.oldDescription = propertiesService.description();
+      ctx.oldScope = propertiesService.scope();
 
-      titleService.updateTitleAndDescription(
-        sanitizeTextForSVGExport(ctx.newTitle),
-        sanitizeTextForSVGExport(ctx.newDescription),
+      propertiesService.updateTitleAndDescriptionAndScope(
+        ctx.newTitle,
+        ctx.newDescription,
+        ctx.newScope,
         false,
       );
     };
 
     this.revert = function (ctx) {
-      titleService.updateTitleAndDescription(
+      propertiesService.updateTitleAndDescriptionAndScope(
         ctx.oldTitle,
         ctx.oldDescription,
+        ctx.oldScope,
         false,
       );
     };

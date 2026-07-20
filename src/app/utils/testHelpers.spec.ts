@@ -1,12 +1,16 @@
-import { testActivityCanvasObject } from '../domain/entities/activityCanvasObject';
+import { testActivityCanvasObject } from 'src/app/domain/entities/activity-canvas-object';
 import {
   CanvasObject,
   testCanvasObject,
-} from '../domain/entities/canvasObject';
-import { ElementTypes } from '../domain/entities/elementTypes';
+} from 'src/app/domain/entities/canvas-object';
+import { ElementTypes } from 'src/app/domain/entities/element-types';
 import { StorySentence } from '../tools/replay/domain/storySentence';
 
-export function preBuildTestStory(sentenceAmount: number): StorySentence[] {
+export function preBuildTestStory(sentenceAmount: number): {
+  storyWithoutGroups: StorySentence[];
+  storyWithGroups: StorySentence[];
+  storyWithGroupsInLastSentence: StorySentence[];
+} {
   const story: StorySentence[] = [];
   let i = 0;
   while (i < sentenceAmount) {
@@ -25,7 +29,11 @@ export function preBuildTestStory(sentenceAmount: number): StorySentence[] {
     });
     i++;
   }
-  return story;
+  return {
+    storyWithoutGroups: story,
+    storyWithGroups: story,
+    storyWithGroupsInLastSentence: story,
+  };
 }
 
 export function createTestCanvasObjects(

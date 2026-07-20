@@ -25,11 +25,6 @@
   height: 100%;
 }
 
-.header {
-  display: grid;
-  grid-template-rows: min-content 155px;
-}
-
 /* Logo Container */
 
 .logoContainer {
@@ -46,10 +41,7 @@
   border-color: #b9bcc6;
 
   span {
-    margin-left: 7px;
-    margin-right: 7px;
-    margin-top: 7px;
-    margin-bottom: 7px;
+    margin: 7px;
     align-items: center;
   }
 }

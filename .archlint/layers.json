@@ -66,9 +66,9 @@
           "mayUseAllBelow": true
         },
         {
-          "name": "title",
+          "name": "properties",
           "include": [
-            "*/title/**"
+            "*/properties/**"
           ],
           "mayUseAllBelow": true
         },
@@ -76,13 +76,6 @@
           "name": "replay",
           "include": [
             "*/replay/**"
-          ],
-          "mayUseAllBelow": true
-        },
-        {
-          "name": "unsavedChangesReminder",
-          "include": [
-            "*/unsavedChangesReminder/**"
           ],
           "mayUseAllBelow": true
         }

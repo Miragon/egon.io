@@ -6,7 +6,7 @@ import inherits from "inherits";
 import DomainStoryModule from "./features";
 import LabelEditingModule from "./features/labeling";
 import ModelingModule from "./features/modeling";
-import { ElementTypes } from "../../../domain/entities/elementTypes";
+import { ElementTypes } from "../../../domain/entities/element-types";
 
 import MoveCanvasModule from "diagram-js/lib/navigation/movecanvas";
 import KeyboardMoveModule from "diagram-js/lib/navigation/keyboard-move";
@@ -26,7 +26,9 @@ import SnappingModule from "diagram-js/lib/features/snapping";
 import AdditionalShortcuts from "./features/shortcuts";
 import minimapModule from "diagram-js-minimap";
 import AlignToOrigin from "@bpmn-io/align-to-origin";
+import { EVENT_DIAGRAM_CLEAR } from "./features/diagramJSConstants";
 
+// Do not convert to class, this breaks the modeler
 export default function DomainStoryModeler(options) {
   BaseViewer.call(this, options);
   this._elements = [];
@@ -97,7 +99,7 @@ DomainStoryModeler.prototype._addConnection = function (element) {
 DomainStoryModeler.prototype.importBusinessObjects = function (
   businessObjects,
 ) {
-  this.get("eventBus").fire("diagram.clear", {});
+  this.get("eventBus").fire(EVENT_DIAGRAM_CLEAR, {});
   this._elements = [];
   this._groupElements = [];
 

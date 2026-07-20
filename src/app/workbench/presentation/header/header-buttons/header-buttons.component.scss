@@ -1,4 +1,4 @@
-.disabled .button-label,
+.disabled,
 .disabled span,
 .disabled:hover span {
   cursor: initial;
@@ -6,11 +6,7 @@
 }
 
 .dirty {
-  color: #b64435;
-}
-
-.dirty:hover {
-  color: #0093ac;
+  background-color: #e1aea4;
 }
 
 .replaying {
@@ -22,4 +18,16 @@
   align-self: center;
   margin-left: 16px;
   width: 150px;
+  font-size: medium;
+  color: black;
+}
+
+button {
+  padding: 0 6px 0 0px;
+  letter-spacing: 0.05em;
+}
+
+.buttonIcon {
+  font-weight: 100;
+  vertical-align: middle;
 }

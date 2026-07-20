@@ -1,29 +1,38 @@
-.firstRow {
-  min-height: 4rem;
-  padding: 0px;
+.header {
+  height: 40px;
+  padding: 0;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 1px;
+  border-color: #b9bcc6;
+  border-radius: 2px;
+  border-style: solid;
 }
 
 .tab-like {
   width: 100%;
   height: 100%;
-  border-radius: 0px;
+  border-radius: 0;
+  font-size: medium;
 }
 
 .tab-small {
   height: 100%;
   width: 200px;
-  border-radius: 0px;
+  border-radius: 0;
+  font-size: medium;
 }
 
 .settings {
   display: grid;
-  grid-template-rows: 4rem auto;
+  grid-template-rows: 40px auto;
   width: 100%;
   height: 100%;
 }
 
 .highlight {
-  background-color: #0093ac;
+  background-color: #a4d7e1;
 }
 
 .alignedWithText {

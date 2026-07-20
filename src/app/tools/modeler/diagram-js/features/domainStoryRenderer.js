@@ -14,7 +14,6 @@ import { query as domQuery } from "min-dom";
 import { assign, isObject } from "min-dash";
 import { getNumberStash } from "src/app/tools/modeler/diagram-js/features/labeling/dsLabelEditingProvider";
 import {
-  addNumberToRegistry,
   generateAutomaticNumber,
   numberBoxDefinitions,
 } from "src/app/tools/modeler/diagram-js/features/numbering/numbering";
@@ -24,13 +23,18 @@ import {
   countLines,
   labelPosition,
 } from "src/app/tools/modeler/diagram-js/features/labeling/position";
-import { ElementTypes } from "src/app/domain/entities/elementTypes";
+import { ElementTypes } from "src/app/domain/entities/element-types";
 import { angleBetween } from "../../../../utils/mathExtensions";
 import {
   isCustomIcon,
   isCustomSvgIcon,
   getAnnotationBracketSvg,
 } from "./util/util";
+import {
+  EVENT_BENDPOINT_MOVE_END,
+  EVENT_BENDPOINT_MOVE_START,
+  LABEL_NUMBER_CSS_CLASS,
+} from "./diagramJSConstants";
 
 let RENDERER_IDS = new Ids();
 let numbers = [];
@@ -84,13 +88,7 @@ export default function DomainStoryRenderer(
       box.x += 3;
     }
 
-    let newRenderedNumber = renderNumber(
-      parentGfx,
-      semantic.number,
-      numberStyle(box),
-      element.type,
-    );
-    addNumberToRegistry(newRenderedNumber, semantic.number);
+    renderNumber(parentGfx, semantic.number, numberStyle(box), element.type);
   }
 
   // style functions
@@ -207,7 +205,7 @@ export default function DomainStoryRenderer(
     let text = textRenderer.createText(number || "", options);
     let height = 0;
 
-    svgClasses(text).add("djs-labelNumber");
+    svgClasses(text).add(LABEL_NUMBER_CSS_CLASS);
 
     setCoordinates(type, text, options, height, parentGfx);
 
@@ -443,7 +441,7 @@ export default function DomainStoryRenderer(
 
       // just adjusting the start- and endpoint of the connection-element moves only the drawn connection,
       // not the interactive line. This can be fixed by manually overriding the points of the interactive polyline
-      // in the HTMl with the points of the drawn one.
+      // in the HTML with the points of the drawn one.
       // this however does not adjust the surrounding box of the connection.
       fixConnectionInHTML(p.parentElement);
 
@@ -721,17 +719,17 @@ export default function DomainStoryRenderer(
     return componentsToPath(rectangle);
   };
 
-  eventBus.on("bendpoint.move.start", 200, function (event) {
+  eventBus.on(EVENT_BENDPOINT_MOVE_START, 200, function (event) {
     // the bendpoint which we are dragging will otherwise be displayed with 0.3 opacity
-    // through bendpoint-dragging we match the css class more specificly, hence our style applies
+    // through bendpoint-dragging we match the CSS class more specifically, hence our style applies
     svgClasses(event.context.draggerGfx).add("bendpoint-dragging");
     // the old path of the activity will otherwise be displayed in gray
     canvas.addMarker(event.context.connection, "djs-element-hidden");
   });
 
-  eventBus.on("bendpoint.move.end", 2000, function (event) {
-    // the acitvity will not be displayed if we don't remove the marker we added during bendpoint.move.start
-    // high priority is neccessary, so we come before something that might stop the execution
+  eventBus.on(EVENT_BENDPOINT_MOVE_END, 2000, function (event) {
+    // the activity will not be displayed if we don't remove the marker we added during bendpoint.move.start
+    // high priority is necessary, so we come before something that might stop the execution
     canvas.removeMarker(event.context.connection, "djs-element-hidden");
   });
 }
@@ -764,7 +762,6 @@ DomainStoryRenderer.prototype.drawShape = function (p, element) {
   let type = element.type;
   element.businessObject.type = type;
 
-  _elementRegistryService.correctInitialize();
   _dirtyFlagService.makeDirty();
 
   if (type.includes(ElementTypes.ACTOR)) {
